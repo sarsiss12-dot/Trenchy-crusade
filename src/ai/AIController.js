@@ -14,6 +14,23 @@ export class AIController {
       const workshop=buildings.find(b=>b.type==='workshop'&&b.progress===1&&b.queue.length<1);if(faction===0&&workshop&&engineers.length<2)AIOrders.train(sim,workshop,'engineer');
       const threat=sim.squads.find(s=>s.f!==faction&&s.hp>0&&buildings.some(b=>dist(b,s)<22));if(threat)AIOrders.move(sim,sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer').slice(0,3).map(s=>s.id),threat.x,threat.z,threat);
     }
-    if(sim.ai.wave<=0){sim.ai.wave=45;const squads=sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer'),goal=sim.points.find(p=>p.owner!==faction),hq=sim.buildings.find(b=>b.f!==faction&&b.type==='hq'&&b.hp>0);if(sim.time>180&&squads.length>=5&&hq)AIOrders.move(sim,squads.map(s=>s.id),hq.x,hq.z,hq);else if(goal)AIOrders.move(sim,squads.slice(0,Math.max(2,squads.length-2)).map(s=>s.id),goal.x,goal.z);}
+    if(sim.ai.wave<=0){
+      sim.ai.wave=45;
+      const squads=sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer');
+      if(sim.match?.mode==='SIEGE'){
+        if(sim.match.state!=='WAR')return;
+        const role=sim.match.roles?.[faction],objective=sim.buildings.find(b=>b.id===sim.match.mainObjectiveId&&b.hp>0);
+        if(role==='ATTACKER'&&objective)AIOrders.move(sim,squads.map(s=>s.id),objective.x,objective.z,objective);
+        else if(role==='DEFENDER'&&objective){
+          const threat=sim.squads.filter(s=>s.f!==faction&&s.hp>0).sort((a,b)=>dist(a,objective)-dist(b,objective))[0];
+          if(threat)AIOrders.move(sim,squads.map(s=>s.id),threat.x,threat.z,threat);
+          else AIOrders.move(sim,squads.map(s=>s.id),objective.x,objective.z);
+        }
+      }else{
+        const goal=sim.points.find(p=>p.owner!==faction),hq=sim.buildings.find(b=>b.f!==faction&&b.type==='hq'&&b.hp>0);
+        if(sim.time>180&&squads.length>=5&&hq)AIOrders.move(sim,squads.map(s=>s.id),hq.x,hq.z,hq);
+        else if(goal)AIOrders.move(sim,squads.slice(0,Math.max(2,squads.length-2)).map(s=>s.id),goal.x,goal.z);
+      }
+    }
   }
 }
