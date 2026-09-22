@@ -6,6 +6,7 @@ import {MATCH_STATE,MATCH_EVENT,validateSiegeRoles} from '../src/simulation/Matc
 import {CommandSystem} from '../src/input/CommandSystem.js';
 import {AttackCommand} from '../src/input/Commands.js';
 import {formatCountdown} from '../src/ui/HUD.js';
+import {BALANCE} from '../src/core/Config.js';
 const advance=(s,seconds)=>{for(let i=0;i<Math.ceil(seconds*20);i++)s.step(.05);};
 const quiet=s=>{s.ai.tick=s.ai.wave=1e9;return s;};
 test('source tree was bootstrapped and Phase 04 artifacts are archived',()=>{for(const p of ['src','data','tests','docs','Trench-Crusade-Faz04.zip'])assert.ok(fs.existsSync(new URL('../'+p,import.meta.url)));});
@@ -50,3 +51,9 @@ test('player tap orders filter out enemy squads',()=>{const source=fs.readFileSy
 test('siege AI routes waves by siege role instead of inactive capture points',()=>{const source=fs.readFileSync(new URL('../src/ai/AIController.js',import.meta.url),'utf8');assert.match(source,/match\?\.mode==='SIEGE'/);assert.match(source,/role==='ATTACKER'.*mainObjectiveId|mainObjectiveId.*role==='ATTACKER'/s);assert.match(source,/else\{[\s\S]*sim\.points\.find/);});
 
 test('standalone bundle footer has valid factory closure',()=>{const html=fs.readFileSync(new URL('../Trench-Crusade-Faz05.html',import.meta.url),'utf8');assert.doesNotMatch(html,/\n\}\}\};\nconst __cache/);assert.match(html,/\n\}\};\nconst __cache/);});
+
+test('siege ignores legacy capture-point income',()=>{const s=quiet(new Simulation(0));s.points.forEach(p=>p.owner=1);const economy=s.economySystem.get(1),before=s.resources[1];economy.update(1);const gained=s.resources[1]-before;const supplies=s.buildings.filter(b=>b.f===1&&b.hp>0&&b.progress===1&&b.type==='supply').length;assert.equal(gained,BALANCE.economy.baseIncome+supplies*BALANCE.economy.supplyIncome);});
+
+test('direct move order interrupts gathering without deleting carried cargo',()=>{const s=quiet(new Simulation());const engineer=s.squads.find(q=>q.f===0&&q.type==='engineer'),node=s.resourceNodes.find(n=>n.x<=50),commands=new CommandSystem(s);engineer.x=node.x;engineer.z=node.z;engineer.worker.state='GATHERING';engineer.worker.nodeId=node.id;engineer.worker.timer=1;engineer.worker.cargo=3;engineer.worker.cargoType='supply';commands.dispatch({type:'MOVE',ids:[engineer.id],x:30,z:70});assert.equal(engineer.worker.state,'IDLE');assert.equal(engineer.worker.nodeId,null);assert.equal(engineer.worker.cargo,3);assert.equal(engineer.worker.cargoType,'supply');});
+
+test('gathering requires engineer to remain at the resource node',()=>{const s=quiet(new Simulation());const engineer=s.squads.find(q=>q.f===0&&q.type==='engineer'),node=s.resourceNodes.find(n=>n.x<=50),before=node.amount;engineer.worker.state='GATHERING';engineer.worker.nodeId=node.id;engineer.worker.timer=999;engineer.x=node.x+BALANCE.logistics.arrivalRadius+5;engineer.z=node.z;s.logisticsSystem.update(.05);assert.equal(node.amount,before);assert.notEqual(engineer.worker.state,'GATHERING');});
