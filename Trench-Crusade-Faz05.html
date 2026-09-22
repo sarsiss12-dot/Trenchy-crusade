@@ -1092,7 +1092,8 @@ class Simulation {
 __exports.Simulation=Simulation;
 },
 'src/core/GameState.js':function(__exports,__require){
-const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep1.createSiegeMatchState;
+
 
 
 const points=()=>[
@@ -1113,7 +1114,12 @@ class GameState {
     if(![1,2,3].includes(data.version)||!Array.isArray(data.squads)||!Array.isArray(data.buildings))throw Error('Uyumsuz kayıt');
     if(!FACTION_DEFINITIONS[data.player])throw Error('Bilinmeyen faction');
     if(data.version===1){data.version=2;data.economies=[{strategy:'newAntioch',stock:{supply:data.resources[0]??400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0}},{strategy:'legacyBlackGrail'}];data.resourceNodes=[];for(const squad of data.squads)if(squad.type==='engineer'&&!squad.worker)squad.worker={state:'IDLE',nodeId:null,targetBuildingId:null,depotId:null,cargoType:null,cargo:0,timer:0,auto:false,autoResourceType:null,searchCooldown:0,effectCooldown:0};}
-    if(data.version<3){data.version=3;data.tick=Math.round((data.time||0)/.05);data.gameplayEvents=[];data.match=null;}
+    if(data.version<3){
+      data.version=3;
+      data.tick=Math.round((data.time||0)/.05);
+      data.gameplayEvents=[];
+      data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
+    }
     return data;
   }
   static isSerializable(source){try{const json=GameState.serialize(source);return !/(visualEvents|renderer|mesh|WebGL)/.test(json);}catch{return false;}}
@@ -1334,13 +1340,15 @@ class MovementSystem {
   constructor(simulation){this.simulation=simulation;this.formation=new FormationSystem();}
   move(ids,x,z,target=null){
     let failed=0;
-    const list=this.simulation.squads.filter(s=>ids.includes(s.id)&&s.hp>0);
-    if(this.simulation.match?.state==='PREPARATION'&&list.some(s=>{const zone=FACTION_DEFINITIONS[s.f].deploymentZone;return x<zone.minX||x>zone.maxX;}))return list.length||1;
+    const list=this.simulation.squads.filter(s=>ids.includes(s.id)&&s.hp>0),preparation=this.simulation.match?.state==='PREPARATION';
+    if(preparation&&list.some(s=>{const zone=FACTION_DEFINITIONS[s.f].deploymentZone;return x<zone.minX||x>zone.maxX;}))return list.length||1;
     list.forEach((s,index)=>{
-      const formation=this.formation.goal(index,list.length,x,z);
+      const zone=preparation?FACTION_DEFINITIONS[s.f].deploymentZone:null;
+      const formation=this.formation.goal(index,list.length,x,z,zone);
       s.target=target?.id||null;s.order=target?'attack':'move';
       let goal=formation;
       if(target){const radius=target.r?target.r+3:3;const angle=Math.atan2(s.z-target.z,s.x-target.x);goal={x:target.x+Math.cos(angle)*radius,z:target.z+Math.sin(angle)*radius};}
+      if(preparation&&zone)goal={...goal,x:Math.max(zone.minX+.51,Math.min(zone.maxX-.51,goal.x))};
       const path=pathfind(s.x,s.z,goal.x,goal.z,this.simulation.buildings);s.path=path||[];if(!path)failed++;
     });
     return failed;
@@ -1356,10 +1364,10 @@ class MovementSystem {
     }else if(target&&!enemy&&Math.floor(this.simulation.time*2)!==squad.replan){squad.replan=Math.floor(this.simulation.time*2);this.move([squad.id],target.x,target.z,target);}
   }
   separate(living,dt){
-    const limit=BALANCE.army.separation;
+    const limit=BALANCE.army.separation,preparation=this.simulation.match?.state==='PREPARATION';
     for(let i=0;i<living.length;i++)for(let j=i+1;j<living.length;j++){
       const a=living[i],b=living[j],distance=dist(a,b);
-      if(distance>0&&distance<limit){const force=(limit-distance)*dt*BALANCE.army.separationForce;for(const [squad,sign] of [[a,1],[b,-1]]){const x=squad.x+(a.x-b.x)/distance*force*sign,z=squad.z+(a.z-b.z)/distance*force*sign;if(walkable(x,z,this.simulation.buildings)){squad.x=x;squad.z=z;}}}
+      if(distance>0&&distance<limit){const force=(limit-distance)*dt*BALANCE.army.separationForce;for(const [squad,sign] of [[a,1],[b,-1]]){let x=squad.x+(a.x-b.x)/distance*force*sign,z=squad.z+(a.z-b.z)/distance*force*sign;if(preparation){const zone=FACTION_DEFINITIONS[squad.f].deploymentZone;x=Math.max(zone.minX,Math.min(zone.maxX,x));}if(walkable(x,z,this.simulation.buildings)){squad.x=x;squad.z=z;}}}
     }
   }
 }
@@ -1397,7 +1405,11 @@ const __dep0=__require('src/core/math.js');const clamp=__dep0.clamp;const __dep1
 
 
 class FormationSystem {
-  goal(index,count,x,z){const margin=2,max=BALANCE.world.size-margin;return {x:clamp(x+(count>1?(index%3-1)*3.5:0),margin,max),z:clamp(z+(count>1?(Math.floor(index/3)-Math.floor(count/6))*3.5:0),margin,max)};}
+  goal(index,count,x,z,zone=null){
+    const margin=2,max=BALANCE.world.size-margin,inset=.51;
+    const minX=zone?Math.max(margin,zone.minX+inset):margin,maxX=zone?Math.min(max,zone.maxX-inset):max;
+    return {x:clamp(x+(count>1?(index%3-1)*3.5:0),minX,maxX),z:clamp(z+(count>1?(Math.floor(index/3)-Math.floor(count/6))*3.5:0),margin,max)};
+  }
 }
 
 __exports.FormationSystem=FormationSystem;
@@ -1493,7 +1505,7 @@ class ConstructionSystem {
     if(!this.simulation.economySystem.get(faction).canAfford(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
     if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=rules.maxSameType)return 'Bu yapıdan en fazla 3 tane';
     if(!this.simulation.buildings.some(building=>building.hp>0&&building.progress===1&&building.f===faction&&dist(building,{x,z})<rules.baseRadius))return 'Tamamlanmış üssüne 20 m yakın olmalı';
-    const footprint=definition.footprint||definition.r;if(x-footprint<1||z-footprint<1||x+footprint>world.size-1||z+footprint>world.size-1)return 'Harita sınırına çok yakın';
+    const footprint=definition.footprint||definition.r;if(x-footprint<1||z-footprint<1||x+footprint>world.size-1||z+footprint>world.size-1)return 'Harita sınırına çok yakın';\n    if(this.simulation.match?.state==='PREPARATION'){const zone=FACTION_DEFINITIONS[faction].deploymentZone;if(x-footprint<zone.minX||x+footprint>zone.maxX)return 'Hazırlık bölgesi dışına kurulamaz';}
     for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
     if(x>47&&x<65&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
     if(this.simulation.buildings.some(building=>building.hp>0&&dist(building,{x,z})<(building.footprint||building.r)+footprint+rules.obstacleMargin))return 'Başka yapıya çok yakın';
@@ -1529,7 +1541,7 @@ class ConstructionSystem {
     if(building.workEffectCooldown<=0){const worker=workers[0];this.simulation.visualEvents.emit(VFX_EVENT.WORK,worker.x,.4,worker.z,building.x,.3,building.z,building.f,building.f,workers.length,building.r,worker.yaw,false,true,building.id);building.workEffectCooldown=BALANCE.construction.workEffectPeriod;}
     if(building.progress===1)this.finish(building);
   }
-  updateProduction(building,dt){if(!building.queue.length)return;const queued=building.queue[0],definition=getUnitDefinition(queued.type);queued.time+=dt;if(queued.time<definition.time)return;let position=null;for(let index=0;index<16;index++){const angle=index/16*6.283,x=building.x+Math.cos(angle)*(building.r+3),z=building.z+Math.sin(angle)*(building.r+3);if(walkable(x,z,this.simulation.buildings)&&!this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<2)){position={x,z};break;}}if(position){const squad=this.unitManager.add(building.f,queued.type,position.x,position.z);building.queue.shift();if(building.rally)this.movementSystem.move([squad.id],building.rally.x,building.rally.z);if(building.f===this.simulation.player)this.simulation.notify(definition.names[building.f]+' göreve hazır');}}
+  updateProduction(building,dt){if(!building.queue.length)return;const queued=building.queue[0],definition=getUnitDefinition(queued.type);queued.time+=dt;if(queued.time<definition.time)return;let position=null;for(let index=0;index<16;index++){const angle=index/16*6.283,x=building.x+Math.cos(angle)*(building.r+3),z=building.z+Math.sin(angle)*(building.r+3),zone=this.simulation.match?.state==='PREPARATION'?FACTION_DEFINITIONS[building.f].deploymentZone:null;if(zone&&(x<zone.minX||x>zone.maxX))continue;if(walkable(x,z,this.simulation.buildings)&&!this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<2)){position={x,z};break;}}if(position){const squad=this.unitManager.add(building.f,queued.type,position.x,position.z);building.queue.shift();if(building.rally)this.movementSystem.move([squad.id],building.rally.x,building.rally.z);if(building.f===this.simulation.player)this.simulation.notify(definition.names[building.f]+' göreve hazır');}}
   update(dt){
     for(const building of this.simulation.buildings){if(building.hp<=0)continue;if(building.progress<1){this.updateConstruction(building,dt);continue;}building.cooldown-=dt;this.updateProduction(building,dt);
       if(['tower','defense'].includes(building.type)&&building.cooldown<=0){const enemy=this.combatSystem.enemy(building,BALANCE.tower.range);if(enemy){this.combatSystem.damageSystem.apply(building,enemy,BALANCE.tower.damage);building.cooldown=BALANCE.tower.period;}}
@@ -1654,12 +1666,29 @@ function validateSiegeRoles(definitions=FACTION_DEFINITIONS){
   return true;
 }
 
+function createSiegeMatchState(duration=BALANCE.match.durationSeconds,buildings=[],elapsed=0,winner=null,player=0){
+  validateSiegeRoles();
+  const roles=FACTION_DEFINITIONS.map(f=>f.gameplayRole),defender=roles.indexOf('DEFENDER');
+  const mainObjectiveId=buildings.find(b=>b.f===defender&&b.mainObjectiveForRole==='DEFENDER')?.id
+    ??buildings.find(b=>b.f===defender&&b.type==='hq')?.id
+    ??null;
+  const preparationRemaining=Math.max(0,BALANCE.match.preparationSeconds-Math.max(0,elapsed));
+  const warElapsed=Math.max(0,Math.max(0,elapsed)-BALANCE.match.preparationSeconds);
+  const matchRemaining=Math.max(0,duration-warElapsed);
+  let state=preparationRemaining>0?MATCH_STATE.PREPARATION:MATCH_STATE.WAR,outcome=null;
+  if(winner!==null&&winner!==undefined){
+    outcome=roles[winner]||null;
+    state=winner===player?MATCH_STATE.VICTORY:MATCH_STATE.DEFEAT;
+  }
+  return {mode:BALANCE.match.mode,state,preparationRemaining,matchRemaining,duration,warningEmitted:preparationRemaining<=BALANCE.match.warningSeconds,criticalEmitted:false,roles,mainObjectiveId,outcome};
+}
+
 class MatchFlow {
   constructor(simulation){this.simulation=simulation;}
   emit(type,data={}){this.simulation.gameplayEvents.push({tick:this.simulation.tick,type,...data});if(this.simulation.gameplayEvents.length>64)this.simulation.gameplayEvents.shift();}
-  setup(duration=BALANCE.match.durationSeconds){validateSiegeRoles();const s=this.simulation;s.match={mode:BALANCE.match.mode,state:MATCH_STATE.SETUP,preparationRemaining:BALANCE.match.preparationSeconds,matchRemaining:duration,duration,warningEmitted:false,roles:FACTION_DEFINITIONS.map(f=>f.gameplayRole),mainObjectiveId:null,outcome:null};this.emit(MATCH_EVENT.MATCH_SETUP);}
+  setup(duration=BALANCE.match.durationSeconds){const s=this.simulation;s.match=createSiegeMatchState(duration,[],0,null,s.player);s.match.state=MATCH_STATE.SETUP;this.emit(MATCH_EVENT.MATCH_SETUP);}
   start(){const s=this.simulation;s.match.state=MATCH_STATE.PREPARATION;this.emit(MATCH_EVENT.PREPARATION_STARTED);s.notify('HAZIRLIK — birliklerini konuşlandır.');}
-  bindObjective(){const s=this.simulation,defender=s.match.roles.indexOf('DEFENDER');s.match.mainObjectiveId=s.buildings.find(b=>b.f===defender&&b.mainObjectiveForRole==='DEFENDER')?.id??null;}
+  bindObjective(){const s=this.simulation,defender=s.match.roles.indexOf('DEFENDER');s.match.mainObjectiveId=s.buildings.find(b=>b.f===defender&&b.mainObjectiveForRole==='DEFENDER')?.id??s.buildings.find(b=>b.f===defender&&b.type==='hq')?.id??null;}
   update(dt){const s=this.simulation,m=s.match;if(!m||[MATCH_STATE.VICTORY,MATCH_STATE.DEFEAT].includes(m.state))return;if(m.state===MATCH_STATE.PREPARATION){m.preparationRemaining=Math.max(0,m.preparationRemaining-dt);if(m.preparationRemaining<1e-9)m.preparationRemaining=0;if(!m.warningEmitted&&m.preparationRemaining<=BALANCE.match.warningSeconds){m.warningEmitted=true;this.emit(MATCH_EVENT.PREPARATION_WARNING,{remaining:Math.ceil(m.preparationRemaining)});s.notify('HAZIRLIK BİTİYOR — '+Math.ceil(m.preparationRemaining));}if(m.preparationRemaining===0){m.state=MATCH_STATE.WAR;this.emit(MATCH_EVENT.WAR_STARTED);s.notify('SAVAŞ BAŞLADI');}}else if(m.state===MATCH_STATE.WAR){m.matchRemaining=Math.max(0,m.matchRemaining-dt);if(m.matchRemaining<1e-9)m.matchRemaining=0;if(m.matchRemaining===0)this.resolve('DEFENDER');}}
   objectiveDamaged(target){const m=this.simulation.match;if(!m||target.id!==m.mainObjectiveId||m.state!==MATCH_STATE.WAR)return;this.emit(MATCH_EVENT.MAIN_OBJECTIVE_DAMAGED,{health:target.hp});if(target.hp/target.maxHp<=.25&&!m.criticalEmitted){m.criticalEmitted=true;this.emit(MATCH_EVENT.MAIN_OBJECTIVE_CRITICAL,{health:target.hp});}}
   objectiveDestroyed(target){const m=this.simulation.match;if(m&&target.id===m.mainObjectiveId&&m.state===MATCH_STATE.WAR)this.resolve('ATTACKER');}
@@ -1669,6 +1698,7 @@ class MatchFlow {
 __exports.MATCH_STATE=MATCH_STATE;
 __exports.MATCH_EVENT=MATCH_EVENT;
 __exports.validateSiegeRoles=validateSiegeRoles;
+__exports.createSiegeMatchState=createSiegeMatchState;
 __exports.MatchFlow=MatchFlow;
 },
 'src/render/Renderer.js':function(__exports,__require){
@@ -2527,6 +2557,8 @@ const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACT
 
 
 
+
+const formatCountdown=remaining=>{const total=Math.max(0,Math.ceil(Number(remaining)||0));return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');};
 class HUD {
   constructor(get){this.get=get;}
   update(sim,selected){
@@ -2537,7 +2569,7 @@ class HUD {
     if(newAntioch){$('material').textContent=Math.floor(economy.stock.material);$('manpower').textContent=Math.floor(economy.stock.manpower);}
     $('army').textContent=sim.forceUsed(sim.player)+' / '+sim.forceCap(sim.player);$('time').textContent=String(Math.floor(sim.time/60)).padStart(2,'0')+':'+String(Math.floor(sim.time%60)).padStart(2,'0');
     const match=sim.match,remaining=match?.state==='PREPARATION'?match.preparationRemaining:match?.matchRemaining??0,objective=sim.buildings.find(b=>b.id===match?.mainObjectiveId),role=match?.roles?.[sim.player]||'—';
-    $('matchPhase').textContent=match?.state==='PREPARATION'?'HAZIRLIK':match?.state==='WAR'?'SAVAŞ':match?.state||'KURULUM';$('matchClock').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(Math.max(0,Math.ceil(remaining)%60)).padStart(2,'0');$('matchClock').classList.toggle('warning',match?.state==='PREPARATION'&&remaining<=10);$('missionText').textContent=role==='DEFENDER'?'SAVUNAN · Ana savunma merkezini süre sonuna kadar koru.':'SALDIRAN · Süre dolmadan ana savunma merkezini yok et.';$('objectives').innerHTML=`<span>ANA MERKEZ ${objective?Math.ceil(objective.hp/objective.maxHp*100):0}%</span><span>${role}</span>`;
+    $('matchPhase').textContent=match?.state==='PREPARATION'?'HAZIRLIK':match?.state==='WAR'?'SAVAŞ':match?.state||'KURULUM';$('matchClock').textContent=formatCountdown(remaining);$('matchClock').classList.toggle('warning',match?.state==='PREPARATION'&&remaining<=10);$('missionText').textContent=role==='DEFENDER'?'SAVUNAN · Ana savunma merkezini süre sonuna kadar koru.':'SALDIRAN · Süre dolmadan ana savunma merkezini yok et.';$('objectives').innerHTML=`<span>ANA MERKEZ ${objective?Math.ceil(objective.hp/objective.maxHp*100):0}%</span><span>${role}</span>`;
     const entities=[...sim.squads,...sim.buildings].filter(entity=>selected.has(entity.id)),building=entities.find(entity=>entity.queue),squads=entities.filter(entity=>entity.path);
     if(building){$('selectionType').textContent=FACTION_DEFINITIONS[building.f].name.toUpperCase()+' / YAPI';$('selectionName').textContent=building.names[building.f];$('selectionInfo').textContent=`${Math.ceil(building.hp)} / ${building.maxHp} CAN · `+(building.progress<1?'İnşa %'+Math.floor(building.progress*100)+' · '+(building.assignedEngineers?.length||0)+' mühendis':building.queue.length?'Sıra '+building.queue.length+' · '+getUnitDefinition(building.queue[0].type).names[building.f]+' · '+Math.ceil(getUnitDefinition(building.queue[0].type).time-building.queue[0].time)+' sn':building.desc);}
     else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),kind=terrain(squads[0].x,squads[0].z),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');}
@@ -2547,6 +2579,7 @@ class HUD {
   }
 }
 
+__exports.formatCountdown=formatCountdown;
 __exports.HUD=HUD;
 },
 'src/ui/Minimap.js':function(__exports,__require){
@@ -2556,7 +2589,7 @@ const __dep0=__require('src/world/Terrain.js');const terrain=__dep0.terrain;cons
 
 class Minimap {
   constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('2d');this.background=document.createElement('canvas');this.background.width=224;this.background.height=224;const context=this.background.getContext('2d');for(let z=0;z<BALANCE.world.size;z+=BALANCE.world.cell)for(let x=0;x<BALANCE.world.size;x+=BALANCE.world.cell){const kind=terrain(x,z);context.fillStyle=({river:'#425b59',bridge:'#998458',forest:'#374c35',trench:'#8b805f',mud:'#3c3d30'})[kind]||'#535744';context.fillRect(x*2,z*2,4,4);}}
-  draw(sim,renderer){const context=this.context;context.drawImage(this.background,0,0);for(const node of sim.resourceNodes||[])if(!node.depleted){context.fillStyle=node.type==='supply'?'#c0a25f':node.type==='material'?'#8f9a91':'#b18a74';context.fillRect(node.x*2-2,node.z*2-2,4,4);}for(const point of sim.points){context.strokeStyle=point.owner<0?'#e1c288':FACTION_DEFINITIONS[point.owner].color;context.lineWidth=2;context.strokeRect(point.x*2-5,point.z*2-5,10,10);}for(const building of sim.buildings)if(building.hp>0){context.fillStyle=FACTION_DEFINITIONS[building.f].color;context.fillRect(building.x*2-4,building.z*2-4,8,8);}for(const squad of sim.squads)if(squad.hp>0){context.fillStyle=squad.f===sim.player?'#e2e9d9':'#d57c5c';context.beginPath();context.arc(squad.x*2,squad.z*2,2.7,0,7);context.fill();}context.strokeStyle='#f2e8c8';context.lineWidth=1.5;context.beginPath();for(const [index,point] of [[0,[0,0]],[1,[renderer.width,0]],[2,[renderer.width,renderer.height]],[3,[0,renderer.height]]]){const world=renderer.ground(...point);if(!index)context.moveTo(world.x*2,world.z*2);else context.lineTo(world.x*2,world.z*2);}context.closePath();context.stroke();}
+  draw(sim,renderer){const context=this.context;context.drawImage(this.background,0,0);for(const node of sim.resourceNodes||[])if(!node.depleted){context.fillStyle=node.type==='supply'?'#c0a25f':node.type==='material'?'#8f9a91':'#b18a74';context.fillRect(node.x*2-2,node.z*2-2,4,4);}if(sim.match?.mode!=='SIEGE')for(const point of sim.points){context.strokeStyle=point.owner<0?'#e1c288':FACTION_DEFINITIONS[point.owner].color;context.lineWidth=2;context.strokeRect(point.x*2-5,point.z*2-5,10,10);}for(const building of sim.buildings)if(building.hp>0){context.fillStyle=FACTION_DEFINITIONS[building.f].color;context.fillRect(building.x*2-4,building.z*2-4,8,8);}for(const squad of sim.squads)if(squad.hp>0){context.fillStyle=squad.f===sim.player?'#e2e9d9':'#d57c5c';context.beginPath();context.arc(squad.x*2,squad.z*2,2.7,0,7);context.fill();}context.strokeStyle='#f2e8c8';context.lineWidth=1.5;context.beginPath();for(const [index,point] of [[0,[0,0]],[1,[renderer.width,0]],[2,[renderer.width,renderer.height]],[3,[0,renderer.height]]]){const world=renderer.ground(...point);if(!index)context.moveTo(world.x*2,world.z*2);else context.lineTo(world.x*2,world.z*2);}context.closePath();context.stroke();}
 }
 
 __exports.Minimap=Minimap;
@@ -2578,7 +2611,7 @@ class OverlayRenderer {
   draw(sim,renderer,selected,drag,orderMarker,now=performance.now()){
     const context=this.context;context.clearRect(0,0,renderer.width,renderer.height);
     for(const entity of [...sim.squads,...sim.buildings]){if(entity.hp<=0)continue;if(!selected.has(entity.id)&&entity.hp===entity.maxHp&&!(entity.progress<1)&&!entity.path)continue;const point=renderer.project(entity.x,entity.path?2.4:7,entity.z);if(point.x<0||point.x>renderer.width||point.y<0||point.y>renderer.height)continue;const width=entity.path?27:45;context.fillStyle='#0c1412df';context.fillRect(point.x-width/2-1,point.y-1,width+2,5);context.fillStyle=entity.f===sim.player?'#bed095':'#cb7960';context.fillRect(point.x-width/2,point.y,width*entity.hp/entity.maxHp,3);if(entity.progress<1){context.fillStyle='#cdb078';context.fillRect(point.x-width/2,point.y+5,width*entity.progress,2);}if(selected.has(entity.id)&&entity.path?.length){context.strokeStyle='#d6c98c66';context.setLineDash([4,5]);context.beginPath();const origin=renderer.project(entity.x,.3,entity.z);context.moveTo(origin.x,origin.y);for(const waypoint of entity.path){const projected=renderer.project(waypoint.x,.3,waypoint.z);context.lineTo(projected.x,projected.y);}context.stroke();context.setLineDash([]);}}
-    for(const [point,index] of sim.points.map((point,index)=>[point,index])){const projected=renderer.project(point.x,4,point.z);context.font='10px Arial';context.textAlign='center';context.fillStyle='#e0d4ab';context.fillText(['I · KUZEY','II · MERKEZ','III · GÜNEY'][index],projected.x,projected.y);}
+    if(sim.match?.mode!=='SIEGE')for(const [point,index] of sim.points.map((point,index)=>[point,index])){const projected=renderer.project(point.x,4,point.z);context.font='10px Arial';context.textAlign='center';context.fillStyle='#e0d4ab';context.fillText(['I · KUZEY','II · MERKEZ','III · GÜNEY'][index],projected.x,projected.y);}
     if(drag?.select&&drag.moved){context.fillStyle='#c9ca7420';context.strokeStyle='#d0c58c';context.fillRect(drag.x,drag.y,drag.cx-drag.x,drag.cy-drag.y);context.strokeRect(drag.x,drag.y,drag.cx-drag.x,drag.cy-drag.y);}
     if(orderMarker){const age=(now-orderMarker.t)/1000;if(age>1)return null;const point=renderer.project(orderMarker.x,.3,orderMarker.z);context.strokeStyle=orderMarker.attack?'#e89a6f':'#e5d397';if(orderMarker.attack){context.beginPath();context.moveTo(point.x-15,point.y-8);context.lineTo(point.x+15,point.y+8);context.moveTo(point.x+15,point.y-8);context.lineTo(point.x-15,point.y+8);context.stroke();}context.beginPath();context.ellipse(point.x,point.y,12+age*14,6+age*7,0,0,7);context.stroke();}
     return orderMarker;
@@ -2586,7 +2619,7 @@ class OverlayRenderer {
 }
 
 __exports.OverlayRenderer=OverlayRenderer;
-}};
+}}};
 const __cache=Object.create(null);
 function __require(id){if(__cache[id])return __cache[id];const exports=__cache[id]={};const factory=__factories[id];if(!factory)throw Error('Missing module '+id);factory(exports,__require);return exports;}
 __require('src/main.js');
