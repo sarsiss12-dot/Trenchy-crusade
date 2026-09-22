@@ -23,7 +23,7 @@ export class GameState {
       data.version=3;
       data.tick=Math.round((data.time||0)/.05);
       data.gameplayEvents=[];
-      data.match=createSiegeMatchState(undefined,data.buildings,data.time||0,data.winner,data.player);
+      data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
     }
     return data;
   }
