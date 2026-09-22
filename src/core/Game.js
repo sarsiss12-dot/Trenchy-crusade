@@ -248,7 +248,7 @@ function tap(x,y) {
     updateUI();
     return;
   }
-  const squads=sim.squads.filter(s=>s.hp>0&&selected.has(s.id));
+  const squads=sim.squads.filter(s=>s.f===sim.player&&s.hp>0&&selected.has(s.id));
   if(squads.length) {
     const failed=commandSystem.dispatch(target&&!resourceTarget?AttackCommand(squads.map(s=>s.id),target.id,p.x,p.z):MoveCommand(squads.map(s=>s.id),p.x,p.z));
     if(failed)notify('Bazı mangalar hedefe ulaşamıyor. Geçit veya açık zemin seç.');
