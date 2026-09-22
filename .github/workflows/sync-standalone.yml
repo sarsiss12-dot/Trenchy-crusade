@@ -1,0 +1,33 @@
+name: Sync standalone
+
+on:
+  push:
+    branches:
+      - codex/establish-asymmetric-match-flow
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/establish-asymmetric-match-flow
+      - name: Rebuild standalone
+        run: python3 build.py
+      - name: Commit generated standalone when changed
+        run: |
+          if git diff --quiet -- Trench-Crusade-Faz05.html; then
+            echo "Standalone already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Trench-Crusade-Faz05.html
+          git commit -m "build: regenerate standalone with build.py"
+          git push

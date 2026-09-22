@@ -1,0 +1,1 @@
+export const newAntiochVisuals=Object.freeze({id:'newAntioch',index:0,organic:false,bodyPrimitive:'box',headPrimitive:'cylinder',architecture:'fortified',palette:Object.freeze({material:[.24,.29,.29],structure:[.43,.44,.39]})});

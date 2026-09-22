@@ -1,0 +1,13 @@
+export const COMMAND=Object.freeze({MOVE:'MOVE',ATTACK:'ATTACK',BUILD:'BUILD',STOP:'STOP',TRAIN:'TRAIN',CANCEL:'CANCEL',SET_RALLY:'SET_RALLY',GATHER:'GATHER',REPAIR:'REPAIR',ASSIST_CONSTRUCTION:'ASSIST_CONSTRUCTION',SET_AUTO_GATHER:'SET_AUTO_GATHER'});
+export const MoveCommand=(ids,x,z)=>({type:COMMAND.MOVE,ids:[...ids],x,z});
+export const AttackCommand=(ids,targetId,x,z)=>({type:COMMAND.ATTACK,ids:[...ids],targetId,x,z});
+export const BuildCommand=(faction,buildingType,x,z,engineerIds=[])=>({type:COMMAND.BUILD,faction,buildingType,x,z,engineerIds:[...engineerIds]});
+export const StopCommand=ids=>({type:COMMAND.STOP,ids:[...ids]});
+export const TrainCommand=(buildingId,unitType)=>({type:COMMAND.TRAIN,buildingId,unitType});
+export const CancelCommand=buildingId=>({type:COMMAND.CANCEL,buildingId});
+export const SetRallyCommand=(buildingId,x,z)=>({type:COMMAND.SET_RALLY,buildingId,x,z});
+export const GatherCommand=(ids,nodeId,auto=false)=>({type:COMMAND.GATHER,ids:[...ids],nodeId,auto:!!auto});
+export const RepairCommand=(ids,buildingId)=>({type:COMMAND.REPAIR,ids:[...ids],buildingId});
+export const AssistConstructionCommand=(ids,buildingId)=>({type:COMMAND.ASSIST_CONSTRUCTION,ids:[...ids],buildingId});
+export const SetAutoGatherCommand=(ids,enabled,resourceType=null)=>({type:COMMAND.SET_AUTO_GATHER,ids:[...ids],enabled:!!enabled,resourceType});
+export const isSerializableCommand=command=>{try{return JSON.parse(JSON.stringify(command)).type===command.type;}catch{return false;}};
