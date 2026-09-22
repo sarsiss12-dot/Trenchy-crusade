@@ -31,3 +31,6 @@ test('HUD countdown rounds total seconds before splitting minutes and seconds',(
 
 test('separation cannot push squads outside preparation deployment zones',()=>{const s=quiet(new Simulation());const defenders=s.squads.filter(x=>x.f===0).slice(0,2),attackers=s.squads.filter(x=>x.f===1).slice(0,2);for(const q of defenders){q.x=50;q.z=50;}for(const q of attackers){q.x=62;q.z=50;}s.movementSystem.separate([...defenders,...attackers],1);assert.ok(defenders.every(q=>q.x<=50));assert.ok(attackers.every(q=>q.x>=62));});
 test('siege minimap source gates inactive capture markers',()=>{const source=fs.readFileSync(new URL('../src/ui/Minimap.js',import.meta.url),'utf8');assert.match(source,/match\?\.mode!=='SIEGE'.*for\(const point of sim\.points\)/s);});
+
+test('trained squads stay inside preparation deployment zones',()=>{const s=quiet(new Simulation());const b=s.buildings.find(x=>x.f===0&&x.type==='barracks');b.x=47;b.z=70;b.queue=[{type:'infantry',time:999}];s.constructionSystem.updateProduction(b,.05);const produced=s.squads.at(-1);assert.ok(produced.f!==0||produced.x<=50);});
+test('siege overlay source hides inactive capture labels',()=>{const source=fs.readFileSync(new URL('../src/ui/OverlayRenderer.js',import.meta.url),'utf8');assert.match(source,/match\?\.mode!=='SIEGE'.*sim\.points/s);});
