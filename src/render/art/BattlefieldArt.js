@@ -15,6 +15,7 @@ import {
   terrain,forests,craters,crossings
 }
 from '../../world/World.js';
+import {trenchSegments} from '../../world/Terrain.js';
 const C= {
   earth:[.27,.255,.215],mud:[.16,.145,.115],stone:[.43,.44,.39],metal:[.24,.29,.29],sand:[.49,.43,.31],bone:[.68,.64,.43],flesh:[.34,.17,.19],black:[.10,.13,.13]
 };
@@ -32,8 +33,8 @@ export function landscape() {
     add('cylinder',c.x,.26,c.z,c.r*1.65,.08,c.r*1.65,[.12,.14,.12]);
     add('cylinder',c.x,.31,c.z,c.r,.02,c.r,[.20,.25,.23]);
   }
-  for(const x of[43,69])for(let z=12; z<101; z+=1.35) {
-    if(crossings.some(v=>Math.abs(v-z)<4))continue;
+  for(const segment of trenchSegments)for(let z=segment.minZ; z<segment.maxZ; z+=1.35) {
+    const x=segment.x;
     for(const dx of[-2,2]) {
       add('sphere',x+dx,.35,z,1.2,.66,1.6,C.sand);
       if(hash(x,z)>.48)add('sphere',x+dx,.77,z,1,.5,1.3,tint(C.sand,.85));
