@@ -9,13 +9,15 @@ export class MovementSystem {
   constructor(simulation){this.simulation=simulation;this.formation=new FormationSystem();}
   move(ids,x,z,target=null){
     let failed=0;
-    const list=this.simulation.squads.filter(s=>ids.includes(s.id)&&s.hp>0);
-    if(this.simulation.match?.state==='PREPARATION'&&list.some(s=>{const zone=FACTION_DEFINITIONS[s.f].deploymentZone;return x<zone.minX||x>zone.maxX;}))return list.length||1;
+    const list=this.simulation.squads.filter(s=>ids.includes(s.id)&&s.hp>0),preparation=this.simulation.match?.state==='PREPARATION';
+    if(preparation&&list.some(s=>{const zone=FACTION_DEFINITIONS[s.f].deploymentZone;return x<zone.minX||x>zone.maxX;}))return list.length||1;
     list.forEach((s,index)=>{
-      const formation=this.formation.goal(index,list.length,x,z);
+      const zone=preparation?FACTION_DEFINITIONS[s.f].deploymentZone:null;
+      const formation=this.formation.goal(index,list.length,x,z,zone);
       s.target=target?.id||null;s.order=target?'attack':'move';
       let goal=formation;
       if(target){const radius=target.r?target.r+3:3;const angle=Math.atan2(s.z-target.z,s.x-target.x);goal={x:target.x+Math.cos(angle)*radius,z:target.z+Math.sin(angle)*radius};}
+      if(preparation&&zone)goal={...goal,x:Math.max(zone.minX+.51,Math.min(zone.maxX-.51,goal.x))};
       const path=pathfind(s.x,s.z,goal.x,goal.z,this.simulation.buildings);s.path=path||[];if(!path)failed++;
     });
     return failed;
