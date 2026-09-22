@@ -660,12 +660,14 @@ const __dep0=__require('src/core/math.js');const hash=__dep0.hash;
 const crossings=[24,56,88];
 const forests=[{x:34,z:29,r:10},{x:78,z:82,r:11},{x:20,z:48,r:8},{x:91,z:62,r:7}];
 const craters=Array.from({length:28},(_,i)=>({x:28+hash(i,7)*58,z:8+hash(i,8)*96,r:1.4+hash(i,9)*2.6})).filter(c=>Math.abs(c.x-56)>7);
+const trenchSegments=Object.freeze([Object.freeze({x:43,minZ:34,maxZ:46}),Object.freeze({x:69,minZ:70,maxZ:82})]);
 // Short abandoned earthworks are terrain cover, not a ready-made defensive line.
-function terrain(x,z){if(x<1||z<1||x>111||z>111)return'edge';if(Math.abs(x-56)<4)return crossings.some(b=>Math.abs(z-b)<4)?'bridge':'river';if((Math.abs(x-43)<2.2&&z>34&&z<46)||(Math.abs(x-69)<2.2&&z>70&&z<82))return'trench';if(forests.some(f=>Math.hypot(x-f.x,z-f.z)<f.r))return'forest';if(craters.some(c=>Math.hypot(x-c.x,z-c.z)<c.r))return'mud';return'land';}
+function terrain(x,z){if(x<1||z<1||x>111||z>111)return'edge';if(Math.abs(x-56)<4)return crossings.some(b=>Math.abs(z-b)<4)?'bridge':'river';if(trenchSegments.some(segment=>Math.abs(x-segment.x)<2.2&&z>segment.minZ&&z<segment.maxZ))return'trench';if(forests.some(f=>Math.hypot(x-f.x,z-f.z)<f.r))return'forest';if(craters.some(c=>Math.hypot(x-c.x,z-c.z)<c.r))return'mud';return'land';}
 
 __exports.crossings=crossings;
 __exports.forests=forests;
 __exports.craters=craters;
+__exports.trenchSegments=trenchSegments;
 __exports.terrain=terrain;
 },
 'src/effects/VisualEvents.js':function(__exports,__require){
@@ -1111,7 +1113,8 @@ const hydrateLegacyBuilding=building=>{
     assignedEngineers:Array.isArray(building.assignedEngineers)?building.assignedEngineers:[]
   };
 };
-const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';}};
+const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';if(squad.worker){squad.worker.state='IDLE';squad.worker.nodeId=null;squad.worker.targetBuildingId=null;squad.worker.depotId=null;squad.worker.pendingNodeId=null;squad.worker.pendingEngineering=null;squad.worker.timer=0;squad.worker.auto=false;squad.worker.searchCooldown=0;}}};
+const redeployLegacyBuildings=buildings=>{for(const building of buildings){if(building.hp<=0)continue;const zone=FACTION_DEFINITIONS[building.f]?.deploymentZone;if(!zone)continue;const footprint=building.footprint||building.r||0,margin=.51;building.x=Math.max(zone.minX+footprint+margin,Math.min(zone.maxX-footprint-margin,building.x));building.rally=null;}};
 const ensureLegacyNewAntiochEngineer=data=>{
   const hasEngineer=data.squads.some(squad=>squad.f===0&&squad.type==='engineer'&&squad.hp>0);
   if(hasEngineer)return;
@@ -1148,6 +1151,7 @@ class GameState {
       data.tick=Math.round((data.time||0)/.05);
       data.gameplayEvents=[];
       data.buildings=data.buildings.map(hydrateLegacyBuilding);
+      redeployLegacyBuildings(data.buildings);
       ensureLegacyNewAntiochEngineer(data);
       redeployLegacySquads(data.squads);
       data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
@@ -2038,7 +2042,8 @@ class Camera {
 __exports.Camera=Camera;
 },
 'src/render/art/BattlefieldArt.js':function(__exports,__require){
-const __dep0=__require('src/render/art/AtmosphereArt.js');const atmosphereArt=__dep0.atmosphereArt;const __dep1=__require('src/render/factions/FactionVisualRegistry.js');const getFactionVisual=__dep1.getFactionVisual;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/render/art/ResourceArt.js');const resourceNodeArt=__dep3.resourceNodeArt;const __dep4=__require('src/render/art/ConstructionArt.js');const constructionSiteArt=__dep4.constructionSiteArt;const placementFeedbackArt=__dep4.placementFeedbackArt;const __dep5=__require('src/render/Batch.js');const Batch=__dep5.Batch;const __dep6=__require('src/data.js');const hash=__dep6.hash;const FACTIONS=__dep6.FACTIONS;const UNITS=__dep6.UNITS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const forests=__dep7.forests;const craters=__dep7.craters;const crossings=__dep7.crossings;
+const __dep0=__require('src/render/art/AtmosphereArt.js');const atmosphereArt=__dep0.atmosphereArt;const __dep1=__require('src/render/factions/FactionVisualRegistry.js');const getFactionVisual=__dep1.getFactionVisual;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/render/art/ResourceArt.js');const resourceNodeArt=__dep3.resourceNodeArt;const __dep4=__require('src/render/art/ConstructionArt.js');const constructionSiteArt=__dep4.constructionSiteArt;const placementFeedbackArt=__dep4.placementFeedbackArt;const __dep5=__require('src/render/Batch.js');const Batch=__dep5.Batch;const __dep6=__require('src/data.js');const hash=__dep6.hash;const FACTIONS=__dep6.FACTIONS;const UNITS=__dep6.UNITS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const forests=__dep7.forests;const craters=__dep7.craters;const crossings=__dep7.crossings;const __dep8=__require('src/world/Terrain.js');const trenchSegments=__dep8.trenchSegments;
+
 
 
 
@@ -2064,8 +2069,8 @@ function landscape() {
     add('cylinder',c.x,.26,c.z,c.r*1.65,.08,c.r*1.65,[.12,.14,.12]);
     add('cylinder',c.x,.31,c.z,c.r,.02,c.r,[.20,.25,.23]);
   }
-  for(const x of[43,69])for(let z=12; z<101; z+=1.35) {
-    if(crossings.some(v=>Math.abs(v-z)<4))continue;
+  for(const segment of trenchSegments)for(let z=segment.minZ; z<segment.maxZ; z+=1.35) {
+    const x=segment.x;
     for(const dx of[-2,2]) {
       add('sphere',x+dx,.35,z,1.2,.66,1.6,C.sand);
       if(hash(x,z)>.48)add('sphere',x+dx,.77,z,1,.5,1.3,tint(C.sand,.85));
