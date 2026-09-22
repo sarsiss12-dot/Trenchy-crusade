@@ -4,8 +4,8 @@ export class CommandSystem {
   bind(simulation){this.simulation=simulation;}
   dispatch(command){
     const sim=this.simulation;this.sequence++;if(this.history.length>=64)this.history.shift();this.history.push({sequence:this.sequence,command:JSON.parse(JSON.stringify(command))});
-    if(command.type===COMMAND.MOVE)return sim.move(command.ids,command.x,command.z);
-    if(command.type===COMMAND.ATTACK){const target=[...sim.squads,...sim.buildings].find(entity=>entity.id===command.targetId&&entity.hp>0);return sim.move(command.ids,command.x,command.z,target||null);}
+    if(command.type===COMMAND.MOVE){sim.engineeringSystem.stop(command.ids);sim.logisticsSystem.interrupt(command.ids);return sim.move(command.ids,command.x,command.z);}
+    if(command.type===COMMAND.ATTACK){sim.engineeringSystem.stop(command.ids);sim.logisticsSystem.interrupt(command.ids);const target=[...sim.squads,...sim.buildings].find(entity=>entity.id===command.targetId&&entity.hp>0);return sim.move(command.ids,command.x,command.z,target||null);}
     if(command.type===COMMAND.BUILD)return sim.build(command.faction,command.buildingType,command.x,command.z,command.engineerIds||[]);
     if(command.type===COMMAND.GATHER)return sim.gather(command.ids,command.nodeId,command.auto);
     if(command.type===COMMAND.REPAIR)return sim.repair(command.ids,command.buildingId);
