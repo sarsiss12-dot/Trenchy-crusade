@@ -1,5 +1,20 @@
 import {FACTION_DEFINITIONS} from '../../data/factions.js';
+import {getBuildingDefinition} from '../../data/buildings.js';
 import {createSiegeMatchState} from '../simulation/MatchFlow.js';
+
+const hydrateLegacyBuilding=building=>{
+  const definition=getBuildingDefinition(building.type);
+  if(!definition)return building;
+  return {...building,
+    names:definition.names,cost:definition.cost,costs:definition.costs,time:definition.time,r:definition.r,desc:definition.desc,symbol:definition.symbol,
+    production:definition.production,footprint:definition.footprint,requires:definition.requires,forceCap:definition.forceCap??0,storage:definition.storage??null,
+    category:definition.category??'SUPPORT',mainObjectiveForRole:definition.mainObjectiveForRole??null,
+    hp:building.hp??definition.hp,maxHp:building.maxHp??definition.hp,progress:building.progress??1,
+    queue:Array.isArray(building.queue)?building.queue:[],cooldown:building.cooldown??0,
+    assignedEngineers:Array.isArray(building.assignedEngineers)?building.assignedEngineers:[]
+  };
+};
+const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';}};
 
 const points=()=>[
   {x:48,z:24,owner:-1,progress:0,claim:-1},
@@ -23,6 +38,8 @@ export class GameState {
       data.version=3;
       data.tick=Math.round((data.time||0)/.05);
       data.gameplayEvents=[];
+      data.buildings=data.buildings.map(hydrateLegacyBuilding);
+      redeployLegacySquads(data.squads);
       data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
     }
     return data;
