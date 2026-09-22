@@ -2,6 +2,7 @@ import {FACTION_DEFINITIONS} from '../../data/factions.js';
 import {getBuildingDefinition} from '../../data/buildings.js';
 import {createSiegeMatchState} from '../simulation/MatchFlow.js';
 import {createSquad} from '../units/Squad.js';
+import {getUnitDefinition} from '../../data/units.js';
 
 const hydrateLegacyBuilding=building=>{
   const definition=getBuildingDefinition(building.type);
@@ -18,8 +19,12 @@ const hydrateLegacyBuilding=building=>{
 const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';}};
 const ensureLegacyNewAntiochEngineer=data=>{
   const hasEngineer=data.squads.some(squad=>squad.f===0&&squad.type==='engineer'&&squad.hp>0);
-  const hasWorkshop=data.buildings.some(building=>building.f===0&&building.type==='workshop'&&building.hp>0&&building.progress===1);
-  if(hasEngineer||hasWorkshop)return;
+  if(hasEngineer)return;
+  const definition=getUnitDefinition('engineer'),economy=data.economies?.[0],stock=economy?.stock||{},hasWorkshop=data.buildings.some(building=>building.f===0&&building.type==='workshop'&&building.hp>0&&building.progress===1);
+  const forceCap=data.buildings.filter(building=>building.f===0&&building.hp>0&&building.progress===1).reduce((sum,building)=>sum+(building.forceCap||0),0);
+  const forceUsed=data.squads.filter(squad=>squad.f===0&&squad.hp>0).reduce((sum,squad)=>sum+(getUnitDefinition(squad.type)?.forceCost||0),0)+data.buildings.filter(building=>building.f===0&&building.hp>0).reduce((sum,building)=>sum+(building.queue||[]).reduce((queued,item)=>queued+(getUnitDefinition(item.type)?.forceCost||0),0),0);
+  const costs=definition.costs||{},canAfford=Object.keys(costs).every(key=>(stock[key]||0)>=costs[key]),canTrain=hasWorkshop&&canAfford&&forceUsed+(definition.forceCost||0)<=forceCap;
+  if(canTrain)return;
   const ids=[...data.squads,...data.buildings].map(entity=>Number.isInteger(entity.id)?entity.id:0),[x,z]=FACTION_DEFINITIONS[0].base;
   data.nextId=Math.max(Number.isInteger(data.nextId)?data.nextId:1,...ids.map(id=>id+1));
   data.squads.push(createSquad(data.nextId++,0,'engineer',x+5,z-4));
