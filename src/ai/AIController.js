@@ -6,7 +6,7 @@ export class AIController {
     const sim=this.simulation,faction=1-sim.player;sim.ai.tick-=dt;sim.ai.wave-=dt;
     if(sim.ai.tick<=0){
       sim.ai.tick=6;const buildings=sim.buildings.filter(b=>b.f===faction&&b.hp>0),engineers=sim.squads.filter(s=>s.f===faction&&s.type==='engineer'&&s.hp>0);
-      if(faction===0)for(const [index,engineer] of engineers.entries())if(engineer.worker.state==='IDLE'&&!engineer.worker.auto)sim.setAutoGather([engineer.id],true,index%2?'material':'supply');
+      if(faction===0)for(const [index,engineer] of engineers.entries())if(engineer.worker.state==='IDLE'&&!engineer.worker.auto)sim.setAutoGather([engineer.id],true,index%2?'supply':'material');
       const wants=faction===0?['workshop','materialDepot','observation','hospital','defense','supply']:['supply','tower','workshop','hospital','chapel'];
       const type=wants.find(wanted=>!buildings.some(b=>b.type===wanted))||(buildings.filter(b=>b.type==='supply').length<2?'supply':null);
       if(type){const hq=buildings.find(b=>b.type==='hq'),workerIds=engineers.slice(0,2).map(s=>s.id);if(hq&&(faction!==0||workerIds.length))for(let i=0;i<20;i++){const angle=i*2.399,radius=10+Math.floor(i/7)*5,x=hq.x+Math.cos(angle)*radius,z=hq.z+Math.sin(angle)*radius;if(!AIOrders.build(sim,faction,type,x,z,workerIds))break;}}
