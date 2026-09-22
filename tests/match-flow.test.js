@@ -48,3 +48,5 @@ test('siege placement ignores inactive capture-point reservations',()=>{const s=
 test('player tap orders filter out enemy squads',()=>{const source=fs.readFileSync(new URL('../src/core/Game.js',import.meta.url),'utf8');assert.match(source,/sim\.squads\.filter\(s=>s\.f===sim\.player&&s\.hp>0&&selected\.has\(s\.id\)\)/);});
 
 test('siege AI routes waves by siege role instead of inactive capture points',()=>{const source=fs.readFileSync(new URL('../src/ai/AIController.js',import.meta.url),'utf8');assert.match(source,/match\?\.mode==='SIEGE'/);assert.match(source,/role==='ATTACKER'.*mainObjectiveId|mainObjectiveId.*role==='ATTACKER'/s);assert.match(source,/else\{[\s\S]*sim\.points\.find/);});
+
+test('standalone bundle footer has valid factory closure',()=>{const html=fs.readFileSync(new URL('../Trench-Crusade-Faz05.html',import.meta.url),'utf8');assert.doesNotMatch(html,/\n\}\}\};\nconst __cache/);assert.match(html,/\n\}\};\nconst __cache/);});
