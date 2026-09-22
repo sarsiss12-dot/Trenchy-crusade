@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {Simulation} from '../src/simulation/Simulation.js';
 import {MATCH_STATE,MATCH_EVENT,validateSiegeRoles} from '../src/simulation/MatchFlow.js';
 import {CommandSystem} from '../src/input/CommandSystem.js';
-import {AttackCommand} from '../src/input/Commands.js';
+import {AttackCommand} from '../src/input/Commands.js';\nimport {formatCountdown} from '../src/ui/HUD.js';
 const advance=(s,seconds)=>{for(let i=0;i<Math.ceil(seconds*20);i++)s.step(.05);};
 const quiet=s=>{s.ai.tick=s.ai.wave=1e9;return s;};
 test('source tree was bootstrapped and Phase 04 artifacts are archived',()=>{for(const p of ['src','data','tests','docs','Trench-Crusade-Faz04.zip'])assert.ok(fs.existsSync(new URL('../'+p,import.meta.url)));});
@@ -19,3 +19,11 @@ test('preparation and war saves restore timers, roles and objective state',()=>{
 test('timer and victory are deterministic for equal tick streams',()=>{const a=quiet(new Simulation(0,true,{duration:.2})),b=quiet(new Simulation(0,true,{duration:.2}));advance(a,60.25);advance(b,60.25);assert.equal(a.serialize(),b.serialize());assert.equal(a.winner,0);});
 test('mobile deselect control and selection clear API are present',async()=>{const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),game=fs.readFileSync(new URL('../src/core/Game.js',import.meta.url),'utf8');assert.match(html,/id="deselect"/);assert.match(game,/\$\('deselect'\)\.onclick=.*selected\.clear/);});
 test('duration choices and population/economy strategy hooks remain data-driven',()=>{const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),s=new Simulation();for(const duration of [300,600,1800,3600])assert.match(html,new RegExp(`value="${duration}"`));assert.equal(s.economies[0].strategy,'newAntioch');assert.equal(s.economies[1].strategy,'legacyBlackGrail');assert.ok(s.economies[0].population);});
+
+test('legacy version 1/2 saves migrate into a valid siege match state',()=>{for(const version of [1,2]){const s=quiet(new Simulation(0,true,{duration:300}));advance(s,12);const data=JSON.parse(s.serialize());data.version=version;delete data.match;delete data.tick;delete data.gameplayEvents;if(version===1){delete data.economies;delete data.resourceNodes;}const r=Simulation.restore(JSON.stringify(data));assert.ok(r.match);assert.equal(r.match.mode,'SIEGE');assert.ok(['PREPARATION','WAR','VICTORY','DEFEAT'].includes(r.match.state));assert.ok(r.match.roles.includes('DEFENDER'));assert.ok(r.match.roles.includes('ATTACKER'));assert.ok(r.buildings.some(b=>b.id===r.match.mainObjectiveId&&b.f===0&&b.type==='hq'));}});
+
+test('preparation formation goals stay inside each faction deployment zone',()=>{const s=quiet(new Simulation());for(const faction of [0,1]){const squads=s.squads.filter(x=>x.f===faction).slice(0,4),ids=squads.map(x=>x.id),zone=faction===0?{x:50,z:70}:{x:62,z:40};s.move(ids,zone.x,zone.z);for(const squad of squads){const goal=squad.path.at(-1);if(goal){if(faction===0)assert.ok(goal.x<=50);else assert.ok(goal.x>=62);}}}});
+
+test('preparation construction footprint cannot cross faction deployment zones',()=>{const s=quiet(new Simulation());s.addBuilding(0,'supply',44,70,true);s.addBuilding(1,'supply',67,40,true);assert.match(s.placement(0,'supply',49,70),/Hazırlık bölgesi/);assert.match(s.placement(1,'supply',63,40),/Hazırlık bölgesi/);});
+
+test('HUD countdown rounds total seconds before splitting minutes and seconds',()=>{assert.equal(formatCountdown(59.95),'01:00');assert.equal(formatCountdown(60),'01:00');assert.equal(formatCountdown(599.95),'10:00');assert.equal(formatCountdown(0),'00:00');assert.equal(formatCountdown(-1),'00:00');});
