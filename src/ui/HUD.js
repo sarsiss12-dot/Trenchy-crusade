@@ -2,6 +2,8 @@ import {FACTION_DEFINITIONS} from '../../data/factions.js';
 import {getUnitDefinition} from '../../data/units.js';
 import {terrain} from '../world/Terrain.js';
 import {BALANCE} from '../core/Config.js';
+
+export const formatCountdown=remaining=>{const total=Math.max(0,Math.ceil(Number(remaining)||0));return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');};
 export class HUD {
   constructor(get){this.get=get;}
   update(sim,selected){
