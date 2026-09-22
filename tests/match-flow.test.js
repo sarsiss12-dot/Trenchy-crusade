@@ -44,3 +44,7 @@ test('laden engineers deliver cargo before switching resource nodes',()=>{const 
 test('preparation rejects gather orders outside the engineer deployment zone without sticking the worker',()=>{const s=quiet(new Simulation());const e=s.squads.find(q=>q.f===0&&q.type==='engineer'),node=s.resourceNodes.find(n=>n.x>50);assert.ok(node);const result=s.gather([e.id],node.id,false);assert.match(result,/Hazırlık bölgesi/);assert.notEqual(e.worker.state,'MOVING_TO_RESOURCE');assert.equal(e.worker.nodeId,null);});
 
 test('siege placement ignores inactive capture-point reservations',()=>{const s=quiet(new Simulation());const point=s.points[0],original=s.points;s.points=[{...point,x:34,z:70}];const result=s.placement(0,'supply',34,70);assert.doesNotMatch(result,/İkmal noktasını kapatamazsın/);s.points=original;});
+
+test('player tap orders filter out enemy squads',()=>{const source=fs.readFileSync(new URL('../src/core/Game.js',import.meta.url),'utf8');assert.match(source,/sim\.squads\.filter\(s=>s\.f===sim\.player&&s\.hp>0&&selected\.has\(s\.id\)\)/);});
+
+test('siege AI routes waves by siege role instead of inactive capture points',()=>{const source=fs.readFileSync(new URL('../src/ai/AIController.js',import.meta.url),'utf8');assert.match(source,/match\?\.mode==='SIEGE'/);assert.match(source,/role==='ATTACKER'.*mainObjectiveId|mainObjectiveId.*role==='ATTACKER'/s);assert.match(source,/else\{[\s\S]*sim\.points\.find/);});
