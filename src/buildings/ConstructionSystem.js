@@ -26,7 +26,7 @@ export class ConstructionSystem {
     if(x>47&&x<65&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
     if(this.simulation.buildings.some(building=>building.hp>0&&dist(building,{x,z})<(building.footprint||building.r)+footprint+rules.obstacleMargin))return 'Başka yapıya çok yakın';
     if(this.simulation.resourceNodes.some(node=>!node.depleted&&dist(node,{x,z})<node.r+footprint+1))return 'Kaynak alanını kapatamazsın';
-    if(this.simulation.points.some(point=>dist(point,{x,z})<footprint+rules.pointMargin))return 'İkmal noktasını kapatamazsın';
+    if(this.simulation.match?.mode!=='SIEGE'&&this.simulation.points.some(point=>dist(point,{x,z})<footprint+rules.pointMargin))return 'İkmal noktasını kapatamazsın';
     if(this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<footprint+rules.obstacleMargin))return 'Manganın yolu üzerinde';
     return '';
   }
