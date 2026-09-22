@@ -1,6 +1,7 @@
 import {FACTION_DEFINITIONS} from '../../data/factions.js';
 import {getBuildingDefinition} from '../../data/buildings.js';
 import {createSiegeMatchState} from '../simulation/MatchFlow.js';
+import {createSquad} from '../units/Squad.js';
 
 const hydrateLegacyBuilding=building=>{
   const definition=getBuildingDefinition(building.type);
@@ -15,6 +16,14 @@ const hydrateLegacyBuilding=building=>{
   };
 };
 const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';}};
+const ensureLegacyNewAntiochEngineer=data=>{
+  const hasEngineer=data.squads.some(squad=>squad.f===0&&squad.type==='engineer'&&squad.hp>0);
+  const hasWorkshop=data.buildings.some(building=>building.f===0&&building.type==='workshop'&&building.hp>0&&building.progress===1);
+  if(hasEngineer||hasWorkshop)return;
+  const ids=[...data.squads,...data.buildings].map(entity=>Number.isInteger(entity.id)?entity.id:0),[x,z]=FACTION_DEFINITIONS[0].base;
+  data.nextId=Math.max(Number.isInteger(data.nextId)?data.nextId:1,...ids.map(id=>id+1));
+  data.squads.push(createSquad(data.nextId++,0,'engineer',x+5,z-4));
+};
 
 const points=()=>[
   {x:48,z:24,owner:-1,progress:0,claim:-1},
@@ -39,6 +48,7 @@ export class GameState {
       data.tick=Math.round((data.time||0)/.05);
       data.gameplayEvents=[];
       data.buildings=data.buildings.map(hydrateLegacyBuilding);
+      ensureLegacyNewAntiochEngineer(data);
       redeployLegacySquads(data.squads);
       data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
     }
