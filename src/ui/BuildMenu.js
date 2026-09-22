@@ -1,0 +1,6 @@
+export class BuildMenu {
+  constructor(panel,list){this.panel=panel;this.list=list;}
+  cost(definition,faction){if(faction!==0)return definition.cost+' öz';const cost=definition.costs;return [`▣ ${cost.supply||0}`,`⚙ ${cost.material||0}`,cost.manpower?`✚ ${cost.manpower}`:''].filter(Boolean).join(' · ');}
+  toggle(definitions,faction,simulation,onChoose){this.panel.hidden=!this.panel.hidden;this.list.innerHTML='';for(const definition of definitions.filter(item=>item.id!=='hq'&&simulation.constructionSystem.definitionAllowed(faction,item))){const missing=simulation.constructionSystem.missingRequirement(faction,definition),button=document.createElement('button');button.classList.toggle('locked',!!missing);button.disabled=!!missing;const requirement=missing?`⛓ ${definitions.find(item=>item.id===missing).names[faction]} gerekli`:(definition.requires?.length?'Gereksinim karşılandı':'Temel yapı');button.innerHTML=`<b>${definition.symbol} ${definition.names[faction]}</b><small>${definition.desc}</small><em>${this.cost(definition,faction)} · ${definition.time} sn</em><small>${requirement}</small>`;button.onclick=()=>onChoose(definition);this.list.append(button);}}
+  close(){this.panel.hidden=true;}
+}

@@ -1,0 +1,23 @@
+import {FACTION_DEFINITIONS} from '../../data/factions.js';
+import {getUnitDefinition} from '../../data/units.js';
+import {terrain} from '../world/Terrain.js';
+import {BALANCE} from '../core/Config.js';
+export class HUD {
+  constructor(get){this.get=get;}
+  update(sim,selected){
+    const $=this.get;for(const id of selected)if(![...sim.squads,...sim.buildings].some(entity=>entity.id===id&&entity.hp>0))selected.delete(id);
+    const newAntioch=sim.economySystem.get(sim.player).activeGathering,economy=sim.economies?.[sim.player];
+    $('resource').textContent=Math.floor(newAntioch?economy.stock.supply:sim.resources[sim.player]);
+    $('materialBox').hidden=!newAntioch;$('manpowerBox').hidden=!newAntioch;
+    if(newAntioch){$('material').textContent=Math.floor(economy.stock.material);$('manpower').textContent=Math.floor(economy.stock.manpower);}
+    $('army').textContent=sim.forceUsed(sim.player)+' / '+sim.forceCap(sim.player);$('time').textContent=String(Math.floor(sim.time/60)).padStart(2,'0')+':'+String(Math.floor(sim.time%60)).padStart(2,'0');
+    const match=sim.match,remaining=match?.state==='PREPARATION'?match.preparationRemaining:match?.matchRemaining??0,objective=sim.buildings.find(b=>b.id===match?.mainObjectiveId),role=match?.roles?.[sim.player]||'—';
+    $('matchPhase').textContent=match?.state==='PREPARATION'?'HAZIRLIK':match?.state==='WAR'?'SAVAŞ':match?.state||'KURULUM';$('matchClock').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(Math.max(0,Math.ceil(remaining)%60)).padStart(2,'0');$('matchClock').classList.toggle('warning',match?.state==='PREPARATION'&&remaining<=10);$('missionText').textContent=role==='DEFENDER'?'SAVUNAN · Ana savunma merkezini süre sonuna kadar koru.':'SALDIRAN · Süre dolmadan ana savunma merkezini yok et.';$('objectives').innerHTML=`<span>ANA MERKEZ ${objective?Math.ceil(objective.hp/objective.maxHp*100):0}%</span><span>${role}</span>`;
+    const entities=[...sim.squads,...sim.buildings].filter(entity=>selected.has(entity.id)),building=entities.find(entity=>entity.queue),squads=entities.filter(entity=>entity.path);
+    if(building){$('selectionType').textContent=FACTION_DEFINITIONS[building.f].name.toUpperCase()+' / YAPI';$('selectionName').textContent=building.names[building.f];$('selectionInfo').textContent=`${Math.ceil(building.hp)} / ${building.maxHp} CAN · `+(building.progress<1?'İnşa %'+Math.floor(building.progress*100)+' · '+(building.assignedEngineers?.length||0)+' mühendis':building.queue.length?'Sıra '+building.queue.length+' · '+getUnitDefinition(building.queue[0].type).names[building.f]+' · '+Math.ceil(getUnitDefinition(building.queue[0].type).time-building.queue[0].time)+' sn':building.desc);}
+    else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),kind=terrain(squads[0].x,squads[0].z),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');}
+    else{$('selectionType').textContent=FACTION_DEFINITIONS[sim.player].name.toUpperCase()+' / SEFER KUVVETİ';$('selectionName').textContent='Cephe seni bekliyor.';$('selectionInfo').textContent='Mangaya dokun, ardından bir hedef seç.';}
+    $('deselect').hidden=entities.length===0;const friendly=squads.filter(item=>item.f===sim.player),engineers=friendly.filter(item=>item.type==='engineer');
+    $('stop').querySelector('span').textContent=building?'İptal':'Dur';$('stop').disabled=!(friendly.length||building&&building.f===sim.player&&(building.progress<1||building.queue.length));$('trainHeavy').disabled=!sim.buildings.some(item=>item.f===sim.player&&item.type==='workshop'&&item.progress===1&&item.hp>0);$('trainEngineer').hidden=!newAntioch;$('autoGather').hidden=!newAntioch;$('autoGather').disabled=!engineers.length;$('autoGather').classList.toggle('active',engineers.length>0&&engineers.every(item=>item.worker.auto));$('buildMenu').disabled=sim.economySystem.get(sim.player).engineeredConstruction&&!sim.squads.some(item=>item.f===sim.player&&item.type==='engineer'&&item.hp>0);
+  }
+}

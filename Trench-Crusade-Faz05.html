@@ -1,0 +1,2594 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#151b1a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><title>Trench Crusade · Ashen Crossing</title><style>:root{--bg:#171d1b;--panel:#18201eec;--border:#5c625040;--gold:#c4b17d;--text:#e4e3d6;--muted:#a0aa9d;--accent:#b79457}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:13px}button{font:inherit;cursor:pointer;min-height:42px;background:#242c27;color:var(--text);border:1px solid #68705750;padding:10px 14px;transition:background .12s}button:hover{background:#41483a}button:active,button.active{background:#55543b;border-color:var(--gold)}button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}[hidden]{display:none!important}#world,#overlay{position:absolute;inset:0;width:100%;height:100%;touch-action:none}#overlay{pointer-events:none}header{position:absolute;left:0;right:0;top:0;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:linear-gradient(#141b19f5,#171e1beb);border-bottom:1px solid var(--border);gap:20px}.brand{display:flex;gap:12px;align-items:center;font-family:Georgia,serif;font-size:17px;letter-spacing:2px}.brand small{font-family:Arial,sans-serif;display:block;font-size:8px;letter-spacing:2.5px;color:var(--muted);margin-top:5px}.brand em{color:var(--gold);padding:0 5px}.sigil{font-size:38px;color:var(--gold)}#economy{margin-left:auto;display:flex;gap:30px;align-items:center;font-size:9px;letter-spacing:1.5px;color:var(--muted)}#economy b{display:block;font-size:21px;letter-spacing:0;margin-top:3px;color:var(--text);font-weight:500}#economy .time{font-size:14px;color:var(--gold)}#pause{font-size:18px;min-width:43px}#mission{position:absolute;top:96px;left:25px;pointer-events:none;display:flex;flex-direction:column;gap:7px;text-shadow:0 2px 8px #000}.eyebrow{font-size:9px;letter-spacing:2px;color:var(--gold);font-weight:bold}#mission strong{font:23px Georgia,serif}#mission>span:not(.eyebrow){color:#c4c9bb;font-size:11px}#objectives{display:flex;gap:8px;margin-top:5px}#objectives span{background:#161d1bbb;border:1px solid #8f94604f;padding:5px 8px;color:var(--gold);font-size:10px}#perf{position:absolute;right:23px;top:83px;font:10px monospace;color:#abb5a1;text-align:right;line-height:1.65;background:#141b1999;padding:6px 9px}#tools{position:absolute;right:20px;top:155px;display:flex;flex-direction:column;gap:5px}#tools button{font-size:22px;width:51px;min-height:44px;padding:4px;background:#18201edf}#tools button.active{background:#52503b}#tools span{display:block;font-size:8px;letter-spacing:.4px;margin-top:2px}#mapPanel{position:absolute;left:20px;bottom:20px;width:205px;padding:8px;background:var(--panel);border:1px solid var(--border);box-shadow:0 10px 30px #0005}.panelLabel{font-size:8px;letter-spacing:1.6px;color:var(--gold);display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px}.panelLabel span{font-size:7px;color:#9aab7c}#minimap{display:block;width:100%;aspect-ratio:1;cursor:crosshair;touch-action:none;border:1px solid #5f695240}#mapFoot{font-size:7px;color:var(--muted);letter-spacing:1px;text-align:center;padding-top:9px}#mapFoot i{color:var(--gold);padding:0 5px}#bottom{position:absolute;bottom:20px;left:240px;right:20px;min-height:107px;display:flex;align-items:center;gap:20px;padding:20px;background:var(--panel);border:1px solid var(--border)}#selection{display:flex;flex-direction:column;gap:7px;min-width:200px;flex:1}#selection strong{font:20px Georgia,serif}#selectionInfo{font-size:11px;color:var(--muted);max-width:390px;line-height:1.4}#actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:420px}#actions button{font-size:18px;display:flex;align-items:center;gap:8px}#actions span{font-size:11px}#buildMenu{border-color:#aa935c85}#buildPanel{position:absolute;right:20px;bottom:142px;width:360px;max-height:calc(100% - 225px);overflow:auto;padding:14px;background:#18201ef7;border:1px solid #80745180}#closeBuild{min-height:30px;padding:0 10px;font-size:23px}#buildingList{display:grid;grid-template-columns:1fr 1fr;gap:7px}#buildingList button{padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:7px}#buildingList b{font-size:12px;color:#dcdaca}#buildingList small{font-size:10px;line-height:1.4;color:var(--muted)}#buildingList em{font-style:normal;font-size:10px;color:var(--gold)}#placement{position:absolute;bottom:142px;left:50%;transform:translateX(-50%);background:#18201ef5;border:1px solid var(--gold);padding:10px;display:flex;align-items:center;gap:8px;width:max-content;max-width:90%}#placementText{font-size:11px;max-width:240px}#confirmBuild{background:#46523a}#toast{position:absolute;top:80px;left:50%;transform:translateX(-50%);padding:12px 18px;max-width:70%;background:#17211bef;border:1px solid #a6905799;pointer-events:none;opacity:0;transition:opacity .2s;text-align:center;z-index:8}.scrim{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(100deg,#0c1517ed,#14201cac 60%,#151c1966);z-index:10;overflow:auto;padding:20px}.startCard{width:435px;text-align:center;padding:25px 24px;background:linear-gradient(#18201b8c,#101813d9);border:1px solid #78826840;box-shadow:0 25px 100px #0006}.startSigil{font-size:42px;color:var(--gold);margin-top:17px}h1{font:46px/.93 Georgia,serif;letter-spacing:3px;margin:16px 0 18px;font-weight:400}h1 span{font-size:58px;color:#d3c39b}.subtitle{font-size:9px;color:var(--gold);border-top:1px solid #81806640;border-bottom:1px solid #81806640;padding:12px 0}p{font-size:12px;color:#aab2a4;line-height:1.6}.factionChoice{display:flex;gap:8px;margin:20px 0 12px}.factionChoice button{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:13px 10px}.factionChoice b{font-size:11px;letter-spacing:1px}.factionChoice small{color:var(--muted);font-size:10px}.factionChoice .chosen{border-color:var(--gold);background:#414331}.primary{width:100%;background:#ac9661;color:#141b16;border:1px solid #d0ba7f;font-weight:bold;font-size:12px;letter-spacing:1.8px;padding:15px}.primary:hover{background:#c3af79}.primary span{float:right}.startHelp{font-size:10px;line-height:1.9;color:var(--muted);margin:15px 0}.startHelp b{color:#cecebd;font-weight:400}.startHelp i{padding:0 6px}.fine{font-size:8px;color:#858f7e;letter-spacing:.7px;line-height:1.8}#resume{margin-top:8px;width:100%;font-size:10px;letter-spacing:1px}.menuCard{max-height:95%;overflow:auto;width:380px;background:#18201ef8;border:1px solid #7d7e5e70;padding:25px;display:flex;flex-direction:column;gap:9px}.menuCard h2{font:27px Georgia,serif;margin:6px 0}.menuCard p{margin:4px 0 10px}.menuCard .help{font-size:11px}.menuCard button{flex-shrink:0}#stress{font-size:10px;color:var(--muted)}
+@media(max-width:800px){header{height:55px;padding:0 12px;gap:10px}.brand{font-size:12px;letter-spacing:1px;gap:7px}.brand small{font-size:6px;letter-spacing:1px}.sigil{font-size:29px}#economy{gap:14px;font-size:7px}#economy b{font-size:17px}#economy .time{display:none}#mission{left:14px;top:71px;gap:4px}#mission strong{font-size:18px}#mission>span:not(.eyebrow){font-size:9px;max-width:220px}#perf{right:12px;top:65px;font-size:8px;padding:5px}#tools{right:12px;top:137px;gap:3px}#tools button{width:43px;min-height:42px;font-size:18px}#mapPanel{left:10px;bottom:12px;width:140px;padding:5px}#mapFoot{font-size:5px;padding-top:5px}.panelLabel{font-size:6px;letter-spacing:1px}#bottom{left:160px;right:10px;bottom:12px;padding:10px;gap:7px;min-height:118px;flex-direction:column;align-items:stretch}#selection{min-width:0;gap:4px}#selectionType{font-size:7px;letter-spacing:1px}#selection strong{font-size:16px}#selectionInfo{font-size:9px}#actions{justify-content:flex-start;gap:4px;max-width:none}#actions button{padding:7px;min-height:38px;font-size:15px;gap:5px}#actions span{font-size:9px}#buildPanel{right:10px;bottom:143px;max-height:calc(100% - 210px);width:330px}#placement{bottom:147px;padding:7px;gap:5px}#placementText{font-size:10px;max-width:150px}#placement button{font-size:10px;padding:7px}#toast{font-size:11px;top:57px} }
+@media(max-width:500px){#bottom{left:10px;bottom:10px;min-height:111px}#mapPanel{bottom:139px;width:111px}#mapFoot{display:none}#tools{top:153px}#mission{top:74px}#mission strong{font-size:17px}#mission>span:not(.eyebrow){max-width:230px}#perf{top:58px;font-size:7px}#actions button{flex:1;justify-content:center;padding:7px 4px}#selectionInfo{font-size:10px}#selection{gap:5px}#buildingList button{min-height:108px}#buildPanel{bottom:134px;max-height:calc(100% - 195px);width:calc(100% - 20px)}#placement{bottom:137px;left:auto;right:10px;transform:none;max-width:calc(100% - 130px);flex-wrap:wrap}#placementText{max-width:100%;width:100%}.startCard{padding:20px 16px}.startSigil{margin-top:10px}h1{font-size:38px}h1 span{font-size:49px}.brand small{font-size:5px}#economy{gap:10px}.brand{font-size:10px}.sigil{font-size:25px}#pause{padding:8px;min-width:36px}}
+@media(max-height:520px) and (min-width:501px){#mission{top:65px}#mission strong{font-size:16px}#missionText{display:none}#tools{top:115px;right:10px;display:grid;grid-template-columns:43px 43px}#mapPanel{width:125px}#bottom{left:146px;min-height:93px}#buildPanel{bottom:120px;max-height:calc(100% - 180px)}#placement{bottom:116px}.startCard{width:580px;padding:15px 24px}.startSigil,.startCard>.eyebrow,.fine{display:none}h1{font-size:24px;margin:0 0 8px}h1 br{display:none}h1 span{font-size:30px}.subtitle{padding:6px}.factionChoice{margin:10px 0}.startHelp{margin:8px 0}.startCard p{margin:6px 0}.scrim{padding:10px}.menuCard{padding:15px}}
+
+@media(max-width:500px){#perf{top:auto;bottom:139px;right:10px;max-width:calc(100% - 133px);font-size:7px;line-height:1.7}}
+/* Phase 02: hierarchy and patina; controls remain in their established positions. */
+:root{--panel:#131b18f0;--border:#8b805b50;--gold:#d0b985;--muted:#afb6a6}
+header{box-shadow:0 3px 22px #0006;border-bottom-color:#9c885249}
+#overlay{box-shadow:inset 0 0 100px #040b0840}
+#bottom,#mapPanel,#buildPanel{box-shadow:0 8px 25px #0007,inset 0 1px #b4a27312}
+#bottom{border-top:2px solid #86744880}
+#selection strong{color:#e7dfc9;text-shadow:0 1px 3px #000}
+button{border-radius:2px;background:linear-gradient(#30372d,#202820);box-shadow:inset 0 1px #abb18a0d}
+button.active{box-shadow:inset 0 -2px #bba16a}
+#toast{border-left:3px solid #caa168;border-right:1px solid #7b6f4a;background:linear-gradient(100deg,#2c3025f5,#121b17f2);box-shadow:0 7px 26px #0008;line-height:1.5;letter-spacing:.15px}
+#perf{border:1px solid #6a72523a;background:#0c1512c9;color:#b6c2a8}
+#effectStress{color:#d0b985;font-size:10px}
+#selectionInfo{line-height:1.5}
+@media(max-width:500px){#perf{font-size:7px;max-width:calc(100% - 134px)}#toast{max-width:84%;padding:9px 12px}#overlay{box-shadow:inset 0 0 65px #040b0830}}
+@media(prefers-reduced-motion:reduce){button,#toast{transition:none}}
+#economy span{white-space:nowrap}#buildingList button.locked{border-color:#8a554e;filter:saturate(.65)}#buildingList button.locked b:after{content:'  ⛓';color:#d08c77}#autoGather.active{border-color:#b9aa62;background:#4b5035}@media(max-width:800px){#economy{gap:8px}#economy span{font-size:6px}#economy b{font-size:14px}#actions{max-height:82px;overflow-y:auto}}@media(max-width:500px){header .brand small{display:none}#economy{gap:6px}#economy span{font-size:5px}#economy b{font-size:12px}}
+
+#selection{position:relative}#deselect{position:absolute;right:0;top:0;min-height:30px;width:34px;padding:0;font-size:21px;border-radius:3px}.durationLabel{display:block;margin:12px 0 5px;font-size:9px;letter-spacing:1.5px;color:var(--gold)}#matchDuration{width:100%;margin-bottom:9px;padding:10px;background:#242c27;color:var(--text);border:1px solid #68705780}#matchClock.warning{color:#e89a6f;animation:pulse .5s alternate infinite}@keyframes pulse{to{opacity:.45}}
+</style></head><body>
+<canvas id="world"></canvas><canvas id="overlay"></canvas>
+<header><div class="brand"><span class="sigil">✠</span><div>TRENCH CRUSADE<small>ASHEN CROSSING <em> / </em> FAZ 05</small></div></div><div id="economy"><span id="supplyBox" title="Mühimmat, yiyecek ve cephe ihtiyaçları">▣ İKMAL <b id="resource">400</b></span><span id="materialBox" title="Metal, makine parçaları ve tahkimat malzemesi">⚙ MALZEME <b id="material">300</b></span><span id="manpowerBox" title="Yeni birliklerin insan gücü">✚ İNSAN <b id="manpower">60</b></span><span>KUVVET <b id="army">37 / 48</b></span><span class="time" id="time">00:00</span></div><button id="pause" aria-label="Duraklat">Ⅱ</button></header>
+<div id="mission"><span class="eyebrow" id="matchPhase">HAZIRLIK</span><strong id="matchClock">01:00</strong><span id="missionText">Ana savunma merkezini kuşatma boyunca koru.</span><div id="objectives"></div></div>
+<div id="perf">WEBGL 2 · BAŞLATILIYOR</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<nav id="tools"><button id="pan" class="active" title="Kamera modu (V)">✥<span>Kamera</span></button><button id="select" title="Alan seçimi (B)">▣<span>Alan seç</span></button><button id="all" title="Tüm mangalar (A)">⚑<span>Tümü</span></button><button id="home" title="Üs (H)">⌂<span>Üs</span></button><button id="plus" aria-label="Yakınlaştır">＋</button><button id="minus" aria-label="Uzaklaştır">−</button></nav>
+<aside id="mapPanel"><div class="panelLabel">TAKTİK HARİTA <span>CANLI</span></div><canvas id="minimap" width="224" height="224" aria-label="Kamerayı taşımak için taktik haritaya dokun"></canvas><div id="mapFoot">3 GEÇİT <i>•</i> TARTIŞMALI BÖLGE</div></aside>
+<section id="bottom"><div id="selection"><button id="deselect" aria-label="Seçimi kapat" title="Seçimi kapat" hidden>×</button><span class="eyebrow" id="selectionType">NEW ANTIOCH / SEFER KUVVETİ</span><strong id="selectionName">Cephe seni bekliyor.</strong><span id="selectionInfo">Mangaya dokun, ardından bir hedef seç.</span></div><div id="actions"><button id="buildMenu">⚒ <span>Üs inşa et</span></button><button id="trainInf">＋ <span>Piyade</span></button><button id="trainHeavy">✠ <span>Ağır</span></button><button id="trainEngineer">⚙ <span>Mühendis</span></button><button id="autoGather">↻ <span>Oto topla</span></button><button id="stop">■ <span>Dur</span></button></div></section>
+<section id="buildPanel" hidden><div class="panelLabel">İNŞA DOKTRİNİ <button id="closeBuild" aria-label="İnşa menüsünü kapat">×</button></div><div id="buildingList"></div></section>
+<div id="placement" hidden><span id="placementText">Yapı konumu seç</span><button id="confirmBuild">✓ İnşa et</button><button id="cancelBuild">× Vazgeç</button></div>
+<div id="start" class="scrim"><div class="startCard"><div class="eyebrow">BİR KUTSAL SAVAŞIN KÜLLERİNDEN</div><div class="startSigil">✠</div><h1>TRENCH<br><span>CRUSADE</span></h1><div class="subtitle">A S H E N &nbsp; C R O S S I N G</div><p>Üç geçit. İki inanç. Geri çekilecek yer yok.</p><div class="factionChoice"><button class="chosen" data-faction="0"><b>NEW ANTIOCH</b><small>Çelik, disiplin ve iman.</small></button><button data-faction="1"><b>BLACK GRAIL</b><small>Çürüme, et ve salgın.</small></button></div><label class="durationLabel" for="matchDuration">MAÇ SÜRESİ</label><select id="matchDuration"><option value="300">5 dakika</option><option value="600" selected>10 dakika</option><option value="1800">30 dakika</option><option value="3600">60 dakika</option></select><button id="begin" class="primary">SEFERE BAŞLA <span>→</span></button><button id="resume" hidden>KAYITLI SEFERE DEVAM ET</button><div class="startHelp"><b>Dokun</b> seç / emir ver <i>·</i> <b>Sürükle</b> kamera<br><b>İki parmak</b> yakınlaştır <i>·</i> <b>Alan seç</b> çoklu seçim</div><div class="fine">BAĞIMSIZ HAYRAN PROJESİ · RESMÎ ÜRÜN DEĞİLDİR<br>PROSEDÜREL 3D / HARİCİ GÖRSEL VE SES YOK</div></div></div>
+<div id="menu" class="scrim" hidden><div class="menuCard"><span class="eyebrow">CEPHE KONTROLÜ</span><h2 id="menuTitle">Savaş duraklatıldı</h2><p id="menuInfo">İlerlemen bu cihazda otomatik kaydedilir.</p><button id="continue" class="primary">Savaşa dön</button><button id="save">Kaydet</button><button id="sound">Ses: kapalı</button><button id="quality">Görüntü: dengeli</button><button id="effectQuality">Efekt yoğunluğu: Orta</button><button id="effectStress">Efekt testi · 160 asker çatışması</button><button id="stress">Performans senaryosu · 160 asker</button><button id="restart">Yeni sefer</button><p class="help">Kamera: sürükle / ok tuşları<br>Seçim: dokun / B ile alan seç<br>Emir: zemine veya düşmana dokun<br>A: tümünü seç · H: üs · Esc: iptal<br>İnşa: yapı seç → zemine dokun → onayla<br>Kışla seçiliyken zemine dokun: toplanma noktası</p><span class="fine" id="saveStatus"></span></div></div>
+<script>
+const __factories={'src/main.js':function(__exports,__require){
+const __dep0=__require('src/core/Game.js');const Game=__dep0.Game;
+
+const game=new Game();
+
+__exports.game=game;
+},
+'src/core/Game.js':function(__exports,__require){
+const __dep0=__require('src/effects/EffectCoordinator.js');const Effects=__dep0.EffectCoordinator;const __dep1=__require('src/render/art/EffectArt.js');const effectArt=__dep1.effectArt;const __dep2=__require('src/render/Batch.js');const Batch=__dep2.Batch;const __dep3=__require('src/simulation/Simulation.js');const Simulation=__dep3.Simulation;const __dep4=__require('src/render/Renderer.js');const Renderer=__dep4.Renderer;const __dep5=__require('src/render/art/BattlefieldArt.js');const landscape=__dep5.landscape;const dynamicArt=__dep5.dynamicArt;const __dep6=__require('src/data.js');const BUILDINGS=__dep6.BUILDINGS;const UNITS=__dep6.UNITS;const FACTIONS=__dep6.FACTIONS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const walkable=__dep7.walkable;const __dep8=__require('src/audio/AudioManager.js');const AudioEngine=__dep8.AudioEngine;const __dep9=__require('src/input/CommandSystem.js');const CommandSystem=__dep9.CommandSystem;const __dep10=__require('src/input/SelectionSystem.js');const SelectionSystem=__dep10.SelectionSystem;const __dep11=__require('src/input/TouchControls.js');const TouchControls=__dep11.TouchControls;const __dep12=__require('src/input/Commands.js');const MoveCommand=__dep12.MoveCommand;const AttackCommand=__dep12.AttackCommand;const BuildCommand=__dep12.BuildCommand;const StopCommand=__dep12.StopCommand;const TrainCommand=__dep12.TrainCommand;const CancelCommand=__dep12.CancelCommand;const SetRallyCommand=__dep12.SetRallyCommand;const GatherCommand=__dep12.GatherCommand;const RepairCommand=__dep12.RepairCommand;const AssistConstructionCommand=__dep12.AssistConstructionCommand;const SetAutoGatherCommand=__dep12.SetAutoGatherCommand;const __dep13=__require('src/ui/Notifications.js');const Notifications=__dep13.Notifications;const __dep14=__require('src/ui/BuildMenu.js');const BuildMenu=__dep14.BuildMenu;const __dep15=__require('src/ui/HUD.js');const HUD=__dep15.HUD;const __dep16=__require('src/ui/Minimap.js');const Minimap=__dep16.Minimap;const __dep17=__require('src/ui/PerformancePanel.js');const PerformancePanel=__dep17.PerformancePanel;const __dep18=__require('src/ui/OverlayRenderer.js');const OverlayRenderer=__dep18.OverlayRenderer;const __dep19=__require('src/core/Config.js');const BALANCE=__dep19.BALANCE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Game {
+  constructor(){
+const $=id=>document.getElementById(id),canvas=$('world'),overlay=$('overlay'),ctx=overlay.getContext('2d'),map=$('minimap');
+let renderer;
+try {
+  renderer=new Renderer(canvas);
+}catch(e) {
+  $('start').innerHTML='<div class="menuCard"><h2>Görüntü başlatılamadı</h2><p>'+e.message+'</p></div>';
+  throw e;
+}
+renderer.setStatic(landscape());
+let sim=new Simulation(),selection=new SelectionSystem(),selected=selection.ids,mode='pan',playing=false,paused=false,faction=0,ghost=null,drag=null,pointers=new Map(),pinch=null,last=0,acc=0,uiTimer=0,saveTimer=0,fps=60,eventTime=-1,ended=false,keys=new Set(),stress=false;
+const audio=new AudioEngine();
+const commandSystem=new CommandSystem(sim);
+const effects=new Effects(1),frameBatch=new Batch(),smokeBatch=new Batch();
+let endDelay=0,perfTimer=0;
+const SAVE='trench-ashen-v1';
+const notifications=new Notifications($('toast'),BALANCE.ui.notificationMilliseconds),hud=new HUD($),minimap=new Minimap(map),performancePanel=new PerformancePanel($('perf')),overlayRenderer=new OverlayRenderer(ctx),buildMenu=new BuildMenu($('buildPanel'),$('buildingList'));
+function notify(message){notifications.show(message);}
+function resize() {
+  renderer.resize();
+  overlay.width=renderer.width*(devicePixelRatio>1?1.5:1);
+  overlay.height=renderer.height*(devicePixelRatio>1?1.5:1);
+  ctx.setTransform(overlay.width/renderer.width,0,0,overlay.height/renderer.height,0,0);
+}
+window.addEventListener('resize',resize);
+window.addEventListener('pagehide',()=>save());
+resize();
+function start(player,load=false) {
+  try {
+    sim=load?Simulation.restore(localStorage.getItem(SAVE)):new Simulation(player,true,{duration:Number($('matchDuration').value)});
+    commandSystem.bind(sim);
+  }catch(e) {
+    notify('Kayıt okunamadı; yeni sefer başlatıldı.');
+    sim=new Simulation(player);
+    commandSystem.bind(sim);
+  }
+  effects.clear();effects.clock=sim.time;effects.restore(sim.visuals);
+  acc=0;endDelay=0;
+  faction=sim.player;
+  selected.clear();
+  ghost=null;
+  playing=true;
+  paused=false;
+  ended=false;
+  stress=false;
+  eventTime=-1;
+  $('start').hidden=true;
+  $('menu').hidden=true;
+  $('placement').hidden=true;
+  $('buildPanel').hidden=true;
+  $('continue').hidden=false;
+  $('selectionType').textContent=FACTIONS[faction].name.toUpperCase()+' / SEFER KUVVETİ';
+  home();
+  updateUI();
+  notify(sim.economySystem.get(sim.player).activeGathering?'Mühendisleri kaynak alanına gönder; yükü üsse taşısınlar.':'İlk emir: bir manga seç ve cepheye gönder.');
+}
+function home() {
+  const [x,z]=FACTIONS[sim.player].base;
+  renderer.cam.x=x+(sim.player?-10:10);
+  renderer.cam.z=z;
+  renderer.cam.zoom=innerWidth<600?BALANCE.camera.mobileZoom:BALANCE.camera.desktopZoom;
+  renderer.updateCamera();
+}
+function save() {
+  if(!playing||stress)return;
+  try {
+    const data=JSON.parse(sim.serialize());
+    data.visuals=effects.snapshot();
+    localStorage.setItem(SAVE,JSON.stringify(data));
+    $('saveStatus').textContent='Kayıt: '+new Date().toLocaleTimeString('tr-TR');
+  }catch(e) {
+    $('saveStatus').textContent='Tarayıcı kayda izin vermiyor.';
+  }
+}
+try {
+  $('resume').hidden=!localStorage.getItem(SAVE);
+}catch {
+}
+$('begin').onclick=()=>start(faction);
+$('resume').onclick=()=>start(faction,true);
+document.querySelectorAll('[data-faction]').forEach(b=>b.onclick=()=> {
+  faction=+b.dataset.faction; document.querySelectorAll('[data-faction]').forEach(x=>x.classList.toggle('chosen',x===b)); const base=FACTIONS[faction].base; renderer.cam.x=base[0]; renderer.cam.z=base[1]; renderer.updateCamera();
+});
+function menu(open) {
+  paused=open;
+  $('menu').hidden=!open;
+  if(open) {
+    $('menuTitle').textContent=sim.winner===null?'Savaş duraklatıldı':sim.winner===sim.player?'Geçit bizim.':'Cephe çöktü.';
+    $('menuInfo').textContent=sim.winner===null?'İlerlemen bu cihazda otomatik kaydedilir.':'Süre '+Math.floor(sim.time/60)+' dk · Hayatta kalan '+sim.count(sim.player)+' manga.';
+    $('continue').hidden=sim.winner!==null;
+    save();
+  }
+}
+$('pause').onclick=()=>menu(!paused);
+$('continue').onclick=()=>menu(false);
+$('save').onclick=()=> {
+  save();
+  notify(stress?'Performans senaryosu kaydedilmez.':'Sefer kaydedildi.');
+};
+$('restart').onclick=()=> {
+  save();
+  playing=false;
+  paused=false;
+  $('menu').hidden=true;
+  $('start').hidden=false;
+  try {
+    $('resume').hidden=!localStorage.getItem(SAVE);
+  }catch {
+  }
+};
+$('sound').onclick=()=> {
+  $('sound').textContent='Ses: '+(audio.toggle()?'açık':'kapalı');
+};
+let quality=1;
+const qs=[1,1.4,2];
+$('quality').onclick=()=> {
+  quality=(quality+1)%3;
+  renderer.quality=qs[quality];
+  resize();
+  $('quality').textContent='Görüntü: '+['ekonomik','dengeli','yüksek'][quality];
+};
+$('effectQuality').onclick=()=>{
+  effects.setQuality((effects.quality+1)%3);
+  $('effectQuality').textContent='Efekt yoğunluğu: '+effects.budget.name;
+};
+function setMode(m) {
+  mode=m;
+  $('pan').classList.toggle('active',m==='pan');
+  $('select').classList.toggle('active',m==='select');
+}
+$('pan').onclick=()=>setMode('pan');
+$('select').onclick=()=>setMode('select');
+$('all').onclick=()=> {
+  selected=selection.replace(sim.squads.filter(s=>s.f===sim.player&&s.hp>0).map(s=>s.id));
+  updateUI();
+};
+$('deselect').onclick=()=>{selected.clear();updateUI();};
+$('home').onclick=home;
+$('plus').onclick=()=>renderer.zoom(.85);
+$('minus').onclick=()=>renderer.zoom(1.18);
+function selectedBuilding() {
+  return sim.buildings.find(b=>selected.has(b.id)&&b.hp>0&&b.f===sim.player);
+}
+$('buildMenu').onclick=()=>buildMenu.toggle(BUILDINGS,sim.player,sim,definition=>{
+  const engineered=sim.economySystem.get(sim.player).engineeredConstruction;let engineerIds=engineered?sim.squads.filter(squad=>selected.has(squad.id)&&squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0).map(squad=>squad.id):[];
+  if(engineered&&!engineerIds.length){const engineer=sim.squads.find(squad=>squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0);if(!engineer){notify('İnşa için muharebe mühendisi gerekli.');return;}engineerIds=[engineer.id];selected=selection.replace(engineerIds);}
+  const point=renderer.ground(renderer.width*.52,renderer.height*.45);
+  ghost={...definition,type:definition.id,f:sim.player,x:point.x,z:point.z,valid:false,engineerIds};
+  checkGhost();buildMenu.close();$('placement').hidden=false;notify('Zemine dokunarak konum seç; ardından inşayı onayla.');
+});
+$('closeBuild').onclick=()=>buildMenu.close();
+function checkGhost() {
+  if(!ghost)return;
+  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z);
+  ghost.valid=!err;
+  $('placementText').textContent=err||ghost.names[sim.player]+' · '+buildMenu.cost(ghost,sim.player)+' · ✓ geçerli zemin';
+  $('confirmBuild').disabled=!!err;
+}
+$('cancelBuild').onclick=()=> {
+  ghost=null;
+  $('placement').hidden=true;
+};
+$('confirmBuild').onclick=()=> {
+  if(!ghost)return;
+  const error=commandSystem.dispatch(BuildCommand(sim.player,ghost.type,ghost.x,ghost.z,ghost.engineerIds));
+  if(error) {
+    notify(error);
+    checkGhost();
+  }else {
+    ghost=null;
+    $('placement').hidden=true;
+    updateUI();
+  }
+};
+function train(type) {
+  let b=selectedBuilding();
+  const producer=UNITS.find(unit=>unit.id===type)?.producer;
+  if(!b||b.type!==producer)b=sim.buildings.find(x=>x.f===sim.player&&x.type===producer&&x.hp>0&&x.progress===1);
+  const err=commandSystem.dispatch(TrainCommand(b?.id,type));
+  notify(err||'Manga üretim kuyruğuna alındı.');
+  updateUI();
+}
+$('trainInf').onclick=()=>train('infantry');
+$('trainHeavy').onclick=()=>train('heavy');
+$('trainEngineer').onclick=()=>train('engineer');
+$('autoGather').onclick=()=>{const engineers=sim.squads.filter(squad=>selected.has(squad.id)&&squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0),enabled=!engineers.length||!engineers.every(squad=>squad.worker.auto),error=commandSystem.dispatch(SetAutoGatherCommand(engineers.map(squad=>squad.id),enabled));notify(error||(enabled?'Otomatik toplama etkin.':'Otomatik toplama kapalı.'));updateUI();};
+$('stop').onclick=()=> {
+  const b=selectedBuilding();
+  if(b) {
+    commandSystem.dispatch(CancelCommand(b.id));
+    notify('İptal edildi; kaynak iade edildi.');
+  }else {
+    commandSystem.dispatch(StopCommand([...selected]));
+  }
+  updateUI();
+};
+function hit(px,py) {
+  let best=null,score=Infinity;
+  for(const e of [...sim.squads,...sim.buildings,...sim.resourceNodes]) {
+    const resource=typeof e.id==='string';if(resource?e.depleted:e.hp<=0)continue;
+    const p=renderer.project(e.x,resource ? .7 : e.path ? 1 : 2,e.z),d=Math.hypot(p.x-px,p.y-py),radius=resource?28:e.path?24:Math.max(24,e.r*renderer.height/renderer.cam.zoom);
+    if(d<radius&&d<score) {
+      score=d;
+      best=e;
+    }
+  }
+  return best;
+}
+function tap(x,y) {
+  if(!playing||paused)return;
+  const p=renderer.ground(x,y);
+  if(ghost) {
+    ghost.x=Math.round(p.x);
+    ghost.z=Math.round(p.z);
+    checkGhost();
+    return;
+  }
+  const target=hit(x,y);
+  const resourceTarget=target&&typeof target.id==='string';
+  const engineers=sim.squads.filter(squad=>squad.hp>0&&selected.has(squad.id)&&squad.f===sim.player&&squad.type==='engineer');
+  if(resourceTarget&&engineers.length){const error=commandSystem.dispatch(GatherCommand(engineers.map(squad=>squad.id),target.id,true));notify(error||'Kaynak toplama ve teslim rotası kuruldu.');orderMarker={x:target.x,z:target.z,t:performance.now(),attack:false};return;}
+  if(!resourceTarget&&target?.f===sim.player&&engineers.length&&target.progress<1){const error=commandSystem.dispatch(AssistConstructionCommand(engineers.map(squad=>squad.id),target.id));notify(error||'Mühendisler şantiyeye yardım ediyor.');return;}
+  if(!resourceTarget&&target?.f===sim.player&&engineers.length&&target.progress===1&&target.hp<target.maxHp){const error=commandSystem.dispatch(RepairCommand(engineers.map(squad=>squad.id),target.id));notify(error||'Onarım emri verildi.');return;}
+  if(target?.f===sim.player) {
+    selected=selection.replace([target.id]);
+    updateUI();
+    return;
+  }
+  const squads=sim.squads.filter(s=>s.hp>0&&selected.has(s.id));
+  if(squads.length) {
+    const failed=commandSystem.dispatch(target&&!resourceTarget?AttackCommand(squads.map(s=>s.id),target.id,p.x,p.z):MoveCommand(squads.map(s=>s.id),p.x,p.z));
+    if(failed)notify('Bazı mangalar hedefe ulaşamıyor. Geçit veya açık zemin seç.');
+    else notify(target&&!resourceTarget?'Saldırı emri verildi.':'İntikal emri verildi.');
+    orderMarker= {
+      x:target?.x??p.x,z:target?.z??p.z,t:performance.now(),attack:!!target&&!resourceTarget
+    };
+  }else {
+    const b=selectedBuilding();
+    if(['barracks','workshop'].includes(b?.type)&&walkable(p.x,p.z,sim.buildings)) {
+      commandSystem.dispatch(SetRallyCommand(b.id,p.x,p.z));
+      notify('Kışla toplanma noktası belirlendi.');
+    }else if(target&&!resourceTarget) {
+      selected=selection.replace([target.id]);
+      updateUI();
+    }else {
+      selected.clear();
+      updateUI();
+    }
+  }
+}
+let orderMarker=null;
+const touchControls=new TouchControls(canvas,{
+  down(point,event,active){
+    if(!playing||paused)return;pointers=active;
+    if(active.size===2){const[a,b]=[...active.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),x:(a.x+b.x)/2,y:(a.y+b.y)/2};drag=null;}
+    else if(active.size===1)drag={x:point.x,y:point.y,cx:point.x,cy:point.y,moved:false,select:(mode==='select'||event.shiftKey)&&event.button!==2,button:event.button};
+  },
+  move(point,previous,event,active){
+    pointers=active;if(active.size===2){const[a,b]=[...active.values()],distance=Math.hypot(a.x-b.x,a.y-b.y),x=(a.x+b.x)/2,y=(a.y+b.y)/2;if(pinch){renderer.zoom(pinch.d/Math.max(1,distance));renderer.pan(x-pinch.x,y-pinch.y);}pinch={d:distance,x,y};}
+    else if(drag){if(Math.hypot(point.x-drag.x,point.y-drag.y)>7)drag.moved=true;drag.cx=point.x;drag.cy=point.y;if(drag.moved&&!drag.select)renderer.pan(point.x-previous.x,point.y-previous.y);}
+  },
+  up(point,previous,event,active){
+    pointers=active;if(pinch){if(!active.size)pinch=null;drag=null;return;}
+    if(drag){if(drag.moved&&drag.select){const x1=Math.min(drag.x,drag.cx),x2=Math.max(drag.x,drag.cx),y1=Math.min(drag.y,drag.cy),y2=Math.max(drag.y,drag.cy);selected=selection.replace(sim.squads.filter(squad=>{const projected=renderer.project(squad.x,1,squad.z);return squad.f===sim.player&&squad.hp>0&&projected.x>x1&&projected.x<x2&&projected.y>y1&&projected.y<y2;}).map(squad=>squad.id));updateUI();}else if(!drag.moved)tap(point.x,point.y);drag=null;}
+  }
+});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+canvas.addEventListener('wheel',e=> {
+  e.preventDefault(); renderer.zoom(Math.exp(e.deltaY*.001));
+}, {
+  passive:false
+});
+function mapMove(e) {
+  const r=map.getBoundingClientRect();
+  renderer.cam.x=clamp((e.clientX-r.left)/r.width*BALANCE.world.size,BALANCE.camera.edgeMargin,BALANCE.world.size-BALANCE.camera.edgeMargin);
+  renderer.cam.z=clamp((e.clientY-r.top)/r.height*BALANCE.world.size,BALANCE.camera.edgeMargin,BALANCE.world.size-BALANCE.camera.edgeMargin);
+  renderer.updateCamera();
+}
+let mapping=false;
+map.onpointerdown=e=> {
+  mapping=true;
+  map.setPointerCapture(e.pointerId);
+  mapMove(e);
+};
+map.onpointermove=e=> {
+  if(mapping)mapMove(e);
+};
+map.onpointerup=()=>mapping=false;
+map.onpointercancel=()=>mapping=false;
+window.addEventListener('keydown',e=> {
+  if(!playing)return; keys.add(e.key.toLowerCase()); if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault(); if(e.repeat)return; const k=e.key.toLowerCase(); if(k==='escape') {
+    if(ghost)$('cancelBuild').click(); else if(!$('buildPanel').hidden)$('closeBuild').click(); else menu(!paused);
+  }
+  if(paused)return; if(k==='b')setMode('select'); if(k==='v')setMode('pan'); if(k==='a')$('all').click(); if(k==='h')home(); if(k===' ')menu(true);
+});
+window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+window.addEventListener('blur',()=> {
+  keys.clear(); pointers.clear(); drag=null;
+});
+document.addEventListener('visibilitychange',()=> {
+  last=0; acc=0; if(document.hidden) {
+    save(); if(playing&&sim.winner===null)menu(true);
+  }
+});
+canvas.addEventListener('webglcontextlost',e=> {
+  e.preventDefault(); save(); paused=true; notify('Grafik bağlamı kayboldu; kurtarma bekleniyor.');
+});
+canvas.addEventListener('webglcontextrestored',()=> {
+  renderer=new Renderer(canvas); renderer.setStatic(landscape()); home(); resize(); menu(true); notify('Görüntü geri yüklendi; savaşa dönebilirsin.');
+});
+function updateUI(){
+  hud.update(sim,selected);checkGhost();
+  const events=sim.events.filter(event=>event.t>eventTime);
+  if(events.length){notify(events.at(-1).msg);eventTime=events.at(-1).t;}
+}
+function drawMap(){minimap.draw(sim,renderer);}
+$('stress').onclick=()=> {
+  save();
+  sim=new Simulation(sim.player);
+  commandSystem.bind(sim);
+  effects.clear();endDelay=0;ended=false;acc=0;
+  stress=true;
+  sim.squads=[];
+  for(let f=0; f<2; f++)for(let i=0; i<10; i++)sim.addSquad(f,i%3===0?'heavy':'infantry',f?77+(i%3)*3:33-(i%3)*3,24+Math.floor(i/3)*17);
+  selected.clear();
+  renderer.cam= {
+    x:56,z:56,zoom:100
+  };
+  renderer.updateCamera();
+  sim.ai.wave=9999;
+  sim.ai.tick=9999;
+  menu(false);
+  notify('160 asker senaryosu. Ana sefer kaydı korunur.');
+};
+$('effectStress').onclick=()=>{
+  save();
+  sim=new Simulation(sim.player);commandSystem.bind(sim);sim.squads=[];sim.buildings=[];
+  sim.ai.tick=sim.ai.wave=99999;sim.match.state='WAR';effects.clear();acc=0;endDelay=0;ended=false;
+  stress=true;playing=true;selected.clear();
+  for(let f=0;f<2;f++)for(let i=0;i<10;i++){
+    const z=18+i*7.5,x=f?64:48;
+    sim.addSquad(f,i%3===0?'heavy':'infantry',x,z);
+  }
+  renderer.cam={x:56,z:56,zoom:100};renderer.updateCamera();
+  menu(false);notify('Efekt testi: 160 asker çatışıyor. Ana kayıt korunur.');
+};
+function frame(now) {
+  const elapsed=last?(now-last)/1000:0;
+  const dt=Math.min(elapsed,BALANCE.simulation.maxFrame);
+  last=now;
+  fps=fps*.94+(elapsed?1/elapsed:60)*.06;
+  if(playing&&!paused) {
+    acc+=dt;
+    while(acc>=BALANCE.simulation.step) {
+      sim.step(BALANCE.simulation.step);
+      acc-=BALANCE.simulation.step;
+    }
+    const k=BALANCE.camera.panSpeed*dt;
+    if(keys.has('arrowleft'))renderer.pan(k,0);
+    if(keys.has('arrowright')||keys.has('d'))renderer.pan(-k,0);
+    if(keys.has('arrowup')||keys.has('w'))renderer.pan(0,k);
+    if(keys.has('arrowdown')||keys.has('s'))renderer.pan(0,-k);
+    saveTimer+=dt;
+    if(saveTimer>BALANCE.lifecycle.autosaveSeconds) {
+      saveTimer=0;
+      save();
+    }
+    effects.update(dt,sim,renderer);
+    if(effects.soundShot>=0)audio.shot(effects.soundShot);
+    if(effects.soundExplosion)audio.explosion(effects.soundExplosion);
+    if(sim.winner!==null&&!ended){
+      endDelay+=dt;
+      if(endDelay>1.8){ended=true;save();menu(true);}
+    }
+  }
+  uiTimer+=dt;
+  if(uiTimer>BALANCE.ui.refresh) {
+    uiTimer=0;
+    updateUI();
+    drawMap();
+    notifications.update();
+  }
+  const art=dynamicArt(sim,renderer,selected,ghost,frameBatch,playing?effects.clock:sim.time);
+  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer);
+  renderer.render(art.batch,smokeBatch);
+  orderMarker=overlayRenderer.draw(sim,renderer,selected,drag,orderMarker);
+  if(effects.flash>0){ctx.strokeStyle='rgba(207,151,77,'+effects.flash+')';ctx.lineWidth=12;ctx.strokeRect(6,6,renderer.width-12,renderer.height-12);ctx.lineWidth=1;}
+  perfTimer+=dt;
+  if(perfTimer>=BALANCE.ui.performanceRefresh){
+    perfTimer=0;
+    performancePanel.update(fps,sim,renderer,art,effects);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+// Small read-only diagnostics, plus explicit test entry point via UI actions.
+const diagnostics= {
+  get effects(){return effects;},
+  get sim() {
+    return sim;
+  },get renderer() {
+    return renderer;
+  },get selected() {
+    return [...selected];
+  },get paused() {
+    return paused;
+  },get ghost() {
+    return ghost;
+  },get fps() {
+    return fps;
+  },start,save
+};
+this.diagnostics=diagnostics;
+window.game=diagnostics;
+  }
+}
+
+__exports.Game=Game;
+},
+'src/effects/EffectCoordinator.js':function(__exports,__require){
+const __dep0=__require('src/core/math.js');const clamp=__dep0.clamp;const __dep1=__require('src/world/Terrain.js');const terrain=__dep1.terrain;const __dep2=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep2.VFX_EVENT;const __dep3=__require('src/core/Config.js');const BALANCE=__dep3.BALANCE;const __dep4=__require('src/core/DeterministicRNG.js');const DeterministicRNG=__dep4.DeterministicRNG;const __dep5=__require('src/effects/EffectPool.js');const EffectPool=__dep5.EffectPool;const __dep6=__require('src/effects/ParticleSystem.js');const ParticleSystem=__dep6.ParticleSystem;const PARTICLE=__dep6.PARTICLE;const __dep7=__require('src/effects/SmokeSystem.js');const SmokeSystem=__dep7.SmokeSystem;const __dep8=__require('src/effects/DecalSystem.js');const DecalSystem=__dep8.DecalSystem;const __dep9=__require('src/effects/CorpseManager.js');const CorpseManager=__dep9.CorpseManager;
+
+
+
+
+
+
+
+
+
+
+const EFFECT_QUALITY=BALANCE.effects.quality;
+
+class EffectCoordinator {
+  constructor(quality=1) {
+    this.particles=new ParticleSystem();this.smoke=new SmokeSystem();
+    this.corpses=new CorpseManager();this.marks=new DecalSystem();
+    this.smokeOrder=[];this.rng=new DeterministicRNG(348127);this.clock=0;
+    this.environmentTimer=0;this.flash=0;this.soundShot=-1;this.soundExplosion=0;
+    this.consume=e=>this.event(e);this.camera=null;
+    this.setQuality(quality);
+  }
+  random(){return this.rng.next();}
+  setQuality(index){this.quality=clamp(index|0,0,2);this.budget=EFFECT_QUALITY[this.quality];for(const k of ['particles','smoke','corpses','marks'])this[k].setLimit(this.budget[k]);}
+  clear(){for(const k of ['particles','smoke','corpses','marks'])this[k].clear();this.flash=0;this.soundShot=-1;this.soundExplosion=0;this.clock=0;this.environmentTimer=0;}
+  visible(x,z,margin=100){if(!this.camera)return true;const p=this.camera.project(x,1,z);return p.x>-margin&&p.x<this.camera.width+margin&&p.y>-margin&&p.y<this.camera.height+margin;}
+  puff(x,y,z,size,life,f,kind=0){
+    const p=this.smoke.take(kind,x,y,z,life,size,f,this.random());
+    p.vx=.18+this.random()*.18;p.vz=-.08;p.vy=kind===2?.04:.35+this.random()*.25;
+    return p;
+  }
+  mark(x,z,size,f,kind=0){
+    const t=terrain(x,z);if(t==='river')return;
+    const p=this.marks.take(kind,x,t==='bridge'?.375:.09,z,this.budget.markLife,size,f,this.random());
+    p.yaw=this.random()*6.283;return p;
+  }
+  burst(x,y,z,n,f,kind=PARTICLE.DIRT,strength=1){
+    n=Math.max(1,Math.round(n*this.budget.density));
+    for(let i=0;i<n;i++){
+      const p=this.particles.take(kind,x,y,z,.3+this.random()*.7,.06+this.random()*.13,f,this.random());
+      const a=this.random()*6.283,vel=(.8+this.random()*2)*strength;
+      p.vx=Math.cos(a)*vel;p.vz=Math.sin(a)*vel;p.vy=(1+this.random()*2.5)*strength;
+      p.yaw=a;p.roll=this.random()*3;
+    }
+  }
+  explosion(x,z,size,f,building=false){
+    this.mark(x,z,size*(building?2.6:1.2),f,building?2:0);
+    if(!this.visible(x,z,160))return;
+    const core=this.particles.take(PARTICLE.FIRE,x,.7,z,.42,size*1.25,f,this.random());
+    core.vy=.5;
+    this.burst(x,.7,z,building?28:10,f,building?PARTICLE.DEBRIS:PARTICLE.DIRT,building?2.2:1);
+    this.burst(x,.6,z,building?14:5,f,f?PARTICLE.TOXIC:PARTICLE.SPARK,1.6);
+    const n=Math.round((building?9:3)*this.budget.density);
+    for(let i=0;i<n;i++){
+      const a=this.random()*6.283,d=this.random()*size*.8;
+      const p=this.puff(x+Math.cos(a)*d,.5+this.random(),z+Math.sin(a)*d,size*(.6+this.random()*.5),building?6+this.random()*4:2+this.random()*2,f);
+      p.age=-i*.09;
+    }
+    this.soundExplosion=Math.max(this.soundExplosion,building?2:1);
+    if(building)this.flash=Math.min(.16,this.flash+.13);
+  }
+  event(e){
+    if(e.type===VFX_EVENT.SHOT){
+      if(!this.visible(e.x,e.z)&&!this.visible(e.tx,e.tz))return;
+      const shots=Math.min(e.count,this.quality===0?2:4);
+      for(let i=0;i<shots;i++){
+        const offset=(i-(shots-1)/2)*.75,a=Math.atan2(e.tx-e.x,e.tz-e.z);
+        const x=e.x+Math.cos(a)*offset,z=e.z-Math.sin(a)*offset;
+        const t=this.particles.take(PARTICLE.TRACER,x,e.y,z,.13+(e.faction?.05:0),e.heavy?.12:.07,e.faction,this.random());
+        t.tx=e.tx+(this.random()-.5)*1.3;t.ty=e.ty;t.tz=e.tz+(this.random()-.5)*1.3;t.age=-i*.025;
+        const p=this.particles.take(PARTICLE.FLASH,x+Math.sin(a)*.7,e.y,z+Math.cos(a)*.7,.13,e.heavy?.75:.43,e.faction,this.random());
+        p.yaw=a;p.age=-i*.025;
+      }
+      this.puff(e.x,e.y,e.z,.6,.65,e.faction,1);
+      const tx=e.tx+(this.random()-.5)*1.5,tz=e.tz+(this.random()-.5)*1.5;
+      this.burst(tx,e.ty,tz,e.building?7:4,e.targetFaction,e.building?PARTICLE.SPARK:e.targetFaction?PARTICLE.TOXIC:PARTICLE.DIRT);
+      this.burst(tx+.5,.2,tz+.5,4,0,PARTICLE.DIRT);
+      this.mark(tx,tz,e.heavy?1.4:.6,e.faction,0);
+      if(e.heavy)this.explosion(tx,tz,e.building?1.5:.85,e.faction);
+      else if(this.random()<.5)this.puff(tx,.25,tz,.7,1.1,e.targetFaction);
+      this.soundShot=e.faction;
+    }else if(e.type===VFX_EVENT.CASUALTY){
+      const p=this.corpses.take(0,e.x,0,e.z,this.budget.corpseLife,1,e.faction,this.random());
+      p.yaw=e.yaw;p.heavy=e.heavy;p.roll=(this.random()-.5)*.7;
+      this.mark(e.x,e.z,.9,e.faction,1);
+      if(this.visible(e.x,e.z))this.burst(e.x,.65,e.z,4,e.faction,e.faction?PARTICLE.TOXIC:PARTICLE.DIRT,.5);
+    }else if(e.type===VFX_EVENT.COLLAPSE){
+      this.explosion(e.x,e.z,e.size,e.faction,true);
+    }else if(e.type===VFX_EVENT.SQUAD_LOST){
+      this.mark(e.x,e.z,3.2,e.faction,1);
+    }else if(e.type===VFX_EVENT.WORK){
+      if(this.visible(e.tx,e.tz)){this.burst(e.tx,.25,e.tz,Math.min(5,2+e.count),e.faction,PARTICLE.DIRT,.45);if(this.random()<.55)this.puff(e.tx,.35,e.tz,.55,.8,e.faction);}
+    }else if(e.type===VFX_EVENT.REPAIR){
+      if(this.visible(e.tx,e.tz)){this.burst(e.tx,e.ty,e.tz,4,e.faction,PARTICLE.SPARK,.55);this.puff(e.tx,.7,e.tz,.45,.65,e.faction,1);}
+    }else if(e.type===VFX_EVENT.DELIVERY){
+      if(this.visible(e.x,e.z))this.burst(e.x,.25,e.z,3,e.faction,PARTICLE.DIRT,.35);
+    }
+  }
+  update(dt,sim,camera=null){
+    this.camera=camera;this.clock+=dt;this.flash=Math.max(0,this.flash-dt*.3);
+    this.soundShot=-1;this.soundExplosion=0;
+    sim.visualEvents.drain(this.consume);
+    for(const pool of [this.particles,this.smoke,this.corpses,this.marks]){
+      for(let i=0;i<pool.limit;i++){
+        const p=pool.slots[i];if(!p.active)continue;
+        p.age+=dt;if(p.age>=p.life){p.active=false;continue;}if(p.age<0)continue;
+        if(pool===this.particles&&p.kind>=PARTICLE.SPARK&&p.kind!==PARTICLE.FIRE){
+          p.vy-=dt*6;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
+          if(p.y<.13){p.y=.13;p.vy=Math.abs(p.vy)*.17;p.vx*=.7;p.vz*=.7;}
+          p.roll+=dt*2.5;
+        }else if(pool===this.smoke){p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;}
+      }
+    }
+    this.environmentTimer-=dt;
+    if(this.environmentTimer<=0){
+      this.environmentTimer=this.quality===0?1.2:.7;
+      for(const b of sim.buildings){
+        if(b.progress<1||!this.visible(b.x,b.z,100))continue;
+        const ratio=b.hp/b.maxHp,ruin=b.hp<=0&&sim.time-(b.diedAt??-100)<BALANCE.lifecycle.buildingRuinRetention;
+        if((ratio<.65&&b.hp>0)||ruin){
+          this.puff(b.x+(this.random()-.5)*b.r,ruin?.6:2.5,b.z+(this.random()-.5)*b.r,ratio<.3?2.8:1.5,4.5,b.f);
+          if(ratio<.3&&!ruin){const p=this.particles.take(b.f?PARTICLE.TOXIC:PARTICLE.FIRE,b.x+.6,.9,b.z+b.r*.6,.65,.8,b.f,this.random());p.vy=.2;}
+        }else if(b.f===1&&this.quality>0&&this.random()<.3)this.puff(b.x,1,b.z,1.2,3.5,1,2);
+      }
+      // A very small, fixed environmental emitter set; no off-screen spawn work.
+      for(const [x,z] of [[33,59],[78,47],[60,102]])if(this.visible(x,z))this.puff(x,1.7,z,1.4,5,0);
+      if(this.quality>0){const x=43+this.random()*26,z=10+this.random()*92;if(this.visible(x,z))this.puff(x,.6,z,8,7,0,2);}
+    }
+  }
+}
+// Only long-lived visuals enter the save; live projectiles/smoke restart cleanly.
+EffectCoordinator.prototype.snapshot=function(){
+  return {version:1,corpses:this.corpses.slots.slice(0,this.corpses.limit).filter(p=>p.active).map(p=>({...p})),marks:this.marks.slots.slice(0,this.marks.limit).filter(p=>p.active).map(p=>({...p}))};
+};
+EffectCoordinator.prototype.restore=function(data){
+  if(!data||data.version!==1)return;
+  for(const key of ['corpses','marks']){
+    const list=Array.isArray(data[key])?data[key]:[];
+    for(const v of list.slice(-this[key].limit)){
+      if(!['x','z','age','life','size'].every(k=>Number.isFinite(v[k]))||v.age>=v.life)continue;
+      const p=this[key].take(v.kind,v.x,v.y||0,v.z,Math.min(v.life,240),v.size,v.f===1?1:0,v.seed||0);
+      p.age=Math.max(0,v.age);p.yaw=v.yaw||0;p.heavy=!!v.heavy;
+    }
+  }
+};
+
+
+__exports.EffectPool=EffectPool;
+__exports.PARTICLE=PARTICLE;
+__exports.Effects=EffectCoordinator;
+__exports.EFFECT_QUALITY=EFFECT_QUALITY;
+__exports.EffectCoordinator=EffectCoordinator;
+},
+'src/core/math.js':function(__exports,__require){
+
+const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+function hash(x,z,seed=1) {
+  let n=Math.imul((x*100|0)^seed,374761393)+Math.imul(z*100|0,668265263);
+  n=Math.imul(n^(n>>>13),1274126177);
+  return ((n^(n>>>16))>>>0)/4294967295;
+}
+
+__exports.clamp=clamp;
+__exports.dist=dist;
+__exports.hash=hash;
+},
+'src/world/Terrain.js':function(__exports,__require){
+const __dep0=__require('src/core/math.js');const hash=__dep0.hash;
+
+const crossings=[24,56,88];
+const forests=[{x:34,z:29,r:10},{x:78,z:82,r:11},{x:20,z:48,r:8},{x:91,z:62,r:7}];
+const craters=Array.from({length:28},(_,i)=>({x:28+hash(i,7)*58,z:8+hash(i,8)*96,r:1.4+hash(i,9)*2.6})).filter(c=>Math.abs(c.x-56)>7);
+// Short abandoned earthworks are terrain cover, not a ready-made defensive line.
+function terrain(x,z){if(x<1||z<1||x>111||z>111)return'edge';if(Math.abs(x-56)<4)return crossings.some(b=>Math.abs(z-b)<4)?'bridge':'river';if((Math.abs(x-43)<2.2&&z>34&&z<46)||(Math.abs(x-69)<2.2&&z>70&&z<82))return'trench';if(forests.some(f=>Math.hypot(x-f.x,z-f.z)<f.r))return'forest';if(craters.some(c=>Math.hypot(x-c.x,z-c.z)<c.r))return'mud';return'land';}
+
+__exports.crossings=crossings;
+__exports.forests=forests;
+__exports.craters=craters;
+__exports.terrain=terrain;
+},
+'src/effects/VisualEvents.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;
+
+const VFX_EVENT=Object.freeze({SHOT:1,CASUALTY:2,COLLAPSE:3,SQUAD_LOST:4,HIT:5,EXPLOSION:6,BUILDING_DAMAGED:7,BUILDING_DESTROYED:8,WORK:9,REPAIR:10,DELIVERY:11});
+class VisualEvents {
+  constructor(capacity=BALANCE.effects.visualEventCapacity){this.capacity=capacity;this.slots=Array.from({length:capacity},()=>({type:0,x:0,y:0,z:0,tx:0,ty:0,tz:0,faction:0,targetFaction:0,count:0,size:0,yaw:0,heavy:false,building:false,id:0}));this.read=0;this.write=0;this.count=0;this.dropped=0;}
+  emit(type,x,y,z,tx,ty,tz,faction,targetFaction,count=1,size=1,yaw=0,heavy=false,building=false,id=0){const event=this.slots[this.write];event.type=type;event.x=x;event.y=y;event.z=z;event.tx=tx;event.ty=ty;event.tz=tz;event.faction=faction;event.targetFaction=targetFaction;event.count=count;event.size=size;event.yaw=yaw;event.heavy=heavy;event.building=building;event.id=id;this.write=(this.write+1)%this.capacity;if(this.count===this.capacity){this.read=(this.read+1)%this.capacity;this.dropped++;}else this.count++;}
+  drain(consume){while(this.count){consume(this.slots[this.read]);this.read=(this.read+1)%this.capacity;this.count--;}}
+  clear(){this.read=0;this.write=0;this.count=0;this.dropped=0;}
+}
+
+__exports.VFX_EVENT=VFX_EVENT;
+__exports.VisualEvents=VisualEvents;
+},
+'src/core/Config.js':function(__exports,__require){
+const __dep0=__require('data/balance.js');const BALANCE=__dep0.BALANCE;
+
+
+const CONFIG = BALANCE;
+
+__exports.BALANCE=BALANCE;
+__exports.CONFIG=CONFIG;
+},
+'data/balance.js':function(__exports,__require){
+
+const BALANCE = Object.freeze({
+  simulation: Object.freeze({ step: 0.05, maxFrame: 0.1, maxSteps: 5 }),
+  match: Object.freeze({mode:'SIEGE', preparationSeconds:60, durationSeconds:600, durationOptions:Object.freeze([300,600,1800,3600]), warningSeconds:10, captureVictory:false}),
+  world: Object.freeze({ size: 112, cell: 2, grid: 56 }),
+  army: Object.freeze({ maxSquads: 10, squadSize: 8, separation: 2.5, separationForce: 0.65, baseForceCap:32 }),
+  economy: Object.freeze({ baseIncome: 2, supplyIncome: 2, controlIncome: 3 }),
+  capture: Object.freeze({ radius: 5, duration: 8, decay: 0.5 }),
+  terrain: Object.freeze({ mudSpeed: 0.58, forestSpeed: 0.76, trenchSpeed: 0.83, trenchDamage: 0.58, forestDamage: 0.78 }),
+  support: Object.freeze({ hospitalRadius: 12, hospitalDelay: 5, hospitalHeal: 16, workshopRadius: 14, workshopRepair: 7, chapelRadius: 18, chapelDamage: 1.2 }),
+  tower: Object.freeze({ range: 22, damage: 22, period: 1.4 }),
+  construction: Object.freeze({ maxSameType: 3, baseRadius: 20, obstacleMargin: 2, pointMargin: 3, cancelRefund: 0.75, queueLimit: 3, engineerRadius:5.5, engineerCap:3, engineerFactors:Object.freeze([1,.65,.4]), workEffectPeriod:.65 }),
+  logistics:Object.freeze({arrivalRadius:2.8,deliveryRadius:5.5,autoSearchPeriod:2,gatherTick:.25}),
+  repair:Object.freeze({radius:4.8,rate:18,materialPerHp:.08,combatDelay:4,effectPeriod:.55}),
+  camera: Object.freeze({ minZoom: 27, maxZoom: 100, desktopZoom: 55, mobileZoom: 67, panSpeed:300, edgeMargin:4 }),
+  ui: Object.freeze({ refresh:0.2, performanceRefresh:0.25, notificationMilliseconds:3800 }),
+  lifecycle: Object.freeze({ deadSquadRetention: 15, buildingRuinRetention: 22, autosaveSeconds: 10 }),
+  effects: Object.freeze({
+    visualEventCapacity: 256,
+    quality: Object.freeze([
+      Object.freeze({name:'Düşük', particles:144, smoke:36, corpses:48, marks:80, density:.5, corpseLife:25, markLife:80}),
+      Object.freeze({name:'Orta', particles:320, smoke:72, corpses:96, marks:160, density:.8, corpseLife:45, markLife:150}),
+      Object.freeze({name:'Yüksek', particles:560, smoke:120, corpses:144, marks:240, density:1, corpseLife:60, markLife:210})
+    ])
+  })
+});
+
+__exports.BALANCE=BALANCE;
+},
+'src/core/DeterministicRNG.js':function(__exports,__require){
+
+class DeterministicRNG {
+  constructor(seed=348127){this.state=seed>>>0||1;}
+  next(){let n=this.state;n^=n<<13;n^=n>>>17;n^=n<<5;this.state=n>>>0;return this.state/4294967296;}
+  snapshot(){return this.state;}
+  restore(state){this.state=state>>>0||1;}
+}
+
+__exports.DeterministicRNG=DeterministicRNG;
+},
+'src/effects/EffectPool.js':function(__exports,__require){
+
+// Fixed-capacity pool. Saturation recycles the oldest slot and produces no per-frame allocation.
+class EffectPool {
+  constructor(capacity){this.slots=Array.from({length:capacity},()=>({active:false,age:0,life:0,kind:0,x:0,y:0,z:0,vx:0,vy:0,vz:0,tx:0,ty:0,tz:0,size:1,f:0,yaw:0,pitch:0,roll:0,seed:0,heavy:false,alpha:1}));this.limit=capacity;this.cursor=0;this.recycled=0;}
+  take(kind,x,y,z,life,size,f,seed){const item=this.slots[this.cursor];this.cursor=(this.cursor+1)%this.limit;if(item.active)this.recycled++;item.active=true;item.age=0;item.life=life;item.kind=kind;item.x=x;item.y=y;item.z=z;item.size=size;item.f=f;item.seed=seed;item.vx=item.vy=item.vz=item.tx=item.ty=item.tz=item.yaw=item.pitch=item.roll=0;item.heavy=false;item.alpha=1;return item;}
+  setLimit(limit){this.limit=limit;this.cursor%=limit;for(let i=limit;i<this.slots.length;i++)this.slots[i].active=false;}
+  clear(){for(const item of this.slots)item.active=false;this.cursor=0;this.recycled=0;}
+  count(){let count=0;for(let i=0;i<this.limit;i++)if(this.slots[i].active)count++;return count;}
+}
+
+__exports.EffectPool=EffectPool;
+},
+'src/effects/ParticleSystem.js':function(__exports,__require){
+const __dep0=__require('src/effects/EffectPool.js');const EffectPool=__dep0.EffectPool;
+
+const PARTICLE=Object.freeze({TRACER:0,FLASH:1,SPARK:2,DIRT:3,FIRE:4,DEBRIS:5,TOXIC:6});
+class ParticleSystem extends EffectPool { constructor(){super(560);} }
+
+__exports.PARTICLE=PARTICLE;
+__exports.ParticleSystem=ParticleSystem;
+},
+'src/effects/SmokeSystem.js':function(__exports,__require){
+const __dep0=__require('src/effects/EffectPool.js');const EffectPool=__dep0.EffectPool;
+
+class SmokeSystem extends EffectPool { constructor(){super(120);} }
+
+__exports.SmokeSystem=SmokeSystem;
+},
+'src/effects/DecalSystem.js':function(__exports,__require){
+const __dep0=__require('src/effects/EffectPool.js');const EffectPool=__dep0.EffectPool;
+
+class DecalSystem extends EffectPool { constructor(){super(240);} }
+
+__exports.DecalSystem=DecalSystem;
+},
+'src/effects/CorpseManager.js':function(__exports,__require){
+const __dep0=__require('src/effects/EffectPool.js');const EffectPool=__dep0.EffectPool;
+
+class CorpseManager extends EffectPool { constructor(){super(144);} }
+
+__exports.CorpseManager=CorpseManager;
+},
+'src/render/art/EffectArt.js':function(__exports,__require){
+const __dep0=__require('src/data.js');const clamp=__dep0.clamp;const __dep1=__require('src/effects/EffectCoordinator.js');const PARTICLE=__dep1.PARTICLE;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;
+
+
+
+const DUST=[.39,.35,.28],SMOKE=[.32,.31,.27],SPORE=[.37,.42,.19];
+const ASH=[.09,.10,.085],BRUISE=[.17,.105,.085],ROT=[.18,.21,.10];
+const FIRE=[1,.48,.13],TOXIC=[.61,.75,.20],SPARK=[1,.78,.37],DIRT=[.25,.21,.15];
+function effectArt(fx,batch,transparent,renderer){
+  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1);
+  const visible=(p,margin=80)=>{const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
+  for(let i=0;i<fx.marks.limit;i++){
+    const p=fx.marks.slots[i];if(!p.active||!visible(p))continue;
+    const fade=Math.min(1,(p.life-p.age)/12),col=p.kind===1?(p.f?ROT:BRUISE):ASH;
+    batch.add('cylinder',p.x,p.y+.001*(i%6),p.z,p.size,.012,p.size*(.60+p.seed*.35),col,p.yaw,fade*.86);
+    if(p.kind===2&&lod>.15){
+      for(let j=0;j<5;j++){const a=j*1.257+p.yaw,r=p.size*.27;batch.add('sphere',p.x+Math.sin(a)*r,p.y+.12,p.z+Math.cos(a)*r,p.size*.20,.23,p.size*.12,DIRT,a,fade*lod);}
+    }
+  }
+  for(let i=0;i<fx.corpses.limit;i++){
+    const p=fx.corpses.slots[i];if(!p.active||!visible(p))continue;
+    const fall=clamp(p.age/.68,0,1),ease=fall*fall*(3-2*fall),fade=Math.min(1,(p.life-p.age)/5);
+    if(lod<.12&&p.age>1){
+      batch.add('box',p.x,.28,p.z,.46,.25,1.7,p.f?ROT:[.23,.26,.24],p.yaw,fade);
+      batch.add('sphere',p.x+Math.sin(p.yaw)*.9,.28,p.z+Math.cos(p.yaw)*.9,.38,.29,.38,[.32,.33,.27],0,fade);
+    }else soldierArt(batch,p.x,p.z,p.yaw,p.f,p.heavy,lod,0,false,ease,fade,p.seed);
+  }
+  for(let i=0;i<fx.particles.limit;i++){
+    const p=fx.particles.slots[i];if(!p.active||p.age<0||!visible(p,110))continue;
+    const t=p.age/p.life,fade=Math.min(1,(1-t)*3);
+    if(p.kind===PARTICLE.TRACER){
+      const h=clamp(t*1.6,0,1),tail=Math.max(0,h-.22),dx=p.tx-p.x,dy=p.ty-p.y,dz=p.tz-p.z;
+      const length=Math.hypot(dx,dy,dz)*(h-tail),yaw=Math.atan2(dx,dz),pitch=-Math.atan2(dy,Math.hypot(dx,dz));
+      batch.add('box',p.x+dx*(h+tail)*.5,p.y+dy*(h+tail)*.5,p.z+dz*(h+tail)*.5,p.size,p.size,length,p.f?TOXIC:SPARK,yaw,fade,pitch,0,1);
+    }else if(p.kind===PARTICLE.FLASH){
+      const scale=p.size*(1-t*.65);
+      batch.add('cone',p.x,p.y,p.z,scale,scale,scale,p.f?TOXIC:FIRE,p.yaw,fade,Math.PI*.5,0,1);
+      batch.add('sphere',p.x,p.y,p.z,scale*.45,scale*.45,scale*.45,[1,.91,.58],0,fade,0,0,1);
+    }else if(p.kind===PARTICLE.FIRE){
+      const size=p.size*(.5+t*1.5);
+      batch.add('sphere',p.x,p.y+t,p.z,size,size*.8,size,p.f?TOXIC:FIRE,0,fade,0,0,1);
+      if(t<.4)batch.add('sphere',p.x,p.y+t,p.z,size*.65,size*.65,size*.65,[1,.84,.37],0,fade,0,0,1);
+    }else{
+      const debris=p.kind===PARTICLE.DEBRIS,glow=p.kind===PARTICLE.SPARK||p.kind===PARTICLE.TOXIC;
+      const col=p.kind===PARTICLE.TOXIC?TOXIC:p.kind===PARTICLE.SPARK?SPARK:debris?(p.f?[.31,.19,.16]:[.32,.33,.28]):DIRT;
+      batch.add(debris?'box':'sphere',p.x,p.y,p.z,p.size*(debris?2.5:1),p.size,p.size*(debris?1.6:1),col,p.yaw,fade,p.pitch,p.roll,glow?1:0);
+    }
+  }
+  // Only soft smoke is transparent. Back-to-front order, depth writes disabled.
+  const order=fx.smokeOrder;order.length=0;
+  for(let i=0;i<fx.smoke.limit;i++){const p=fx.smoke.slots[i];if(p.active&&p.age>=0&&visible(p,180))order.push(i);}
+  order.sort((a,b)=>{const p=fx.smoke.slots[a],q=fx.smoke.slots[b];return(p.x+p.y+p.z)-(q.x+q.y+q.z);});
+  for(const i of order){
+    const p=fx.smoke.slots[i],t=p.age/p.life,size=p.size*(1+t*1.8),alpha=Math.min(1,p.age*8)*(1-t)*p.alpha;
+    const color=p.f?SPORE:p.kind===1?DUST:SMOKE;
+    transparent.add('quad',p.x,p.y,p.z,size,size,1,color,0,alpha*(p.kind===2?.13:.72),0,0,0,1);
+  }
+}
+
+__exports.effectArt=effectArt;
+},
+'src/data.js':function(__exports,__require){
+
+
+
+
+
+
+
+const SIZE=112,CELL=2,GRID=56,MAX_SQUADS=10;
+
+const __rex0=__require('data/buildings.js');__exports.BUILDINGS=__rex0.BUILDING_DEFINITIONS;__exports.BUILDING_BY_ID=__rex0.BUILDING_BY_ID;__exports.getBuildingDefinition=__rex0.getBuildingDefinition;
+const __rex1=__require('data/units.js');__exports.UNITS=__rex1.UNIT_DEFINITIONS;__exports.UNIT_BY_ID=__rex1.UNIT_BY_ID;__exports.getUnitDefinition=__rex1.getUnitDefinition;
+const __rex2=__require('data/factions.js');__exports.FACTIONS=__rex2.FACTION_DEFINITIONS;__exports.FACTION_BY_ID=__rex2.FACTION_BY_ID;
+const __rex3=__require('data/resources.js');__exports.RESOURCE_TYPES=__rex3.RESOURCE_TYPES;__exports.RESOURCE_DEFINITIONS=__rex3.RESOURCE_DEFINITIONS;__exports.RESOURCE_BY_ID=__rex3.RESOURCE_BY_ID;__exports.getResourceDefinition=__rex3.getResourceDefinition;__exports.RESOURCE_NODE_LAYOUT=__rex3.RESOURCE_NODE_LAYOUT;
+const __rex4=__require('src/core/math.js');__exports.clamp=__rex4.clamp;__exports.dist=__rex4.dist;__exports.hash=__rex4.hash;
+const __rex5=__require('data/balance.js');__exports.BALANCE=__rex5.BALANCE;
+__exports.SIZE=SIZE;
+},
+'data/buildings.js':function(__exports,__require){
+
+const BUILDING_DEFINITIONS = Object.freeze([
+  Object.freeze({id:'hq', names:Object.freeze(['Komuta Karargâhı','Çürüme Katedrali']), category:'SUPPORT', mainObjectiveForRole:'DEFENDER', cost:500,costs:Object.freeze({supply:0,material:0,manpower:0}), time:40,hp:1800,r:4,desc:'Üssün kalbi ve ana teslim noktası.',symbol:'⌂',production:Object.freeze([]),footprint:4,requires:Object.freeze([]),forceCap:32,storage:Object.freeze({supply:500,material:350,manpower:90})}),
+  Object.freeze({id:'barracks',names:Object.freeze(['Haçlı Kışlası','Kuluçka Ocağı']),cost:160,costs:Object.freeze({supply:40,material:140,manpower:0}),time:18,hp:800,r:3,desc:'Piyade ve ağır piyade mangaları üretir.',symbol:'⚑',production:Object.freeze(['infantry','heavy']),footprint:3,requires:Object.freeze(['hq']),forceCap:8}),
+  Object.freeze({id:'workshop',names:Object.freeze(['Mühendislik Atölyesi','Et Dokuma Yuvası']),cost:200,costs:Object.freeze({supply:55,material:180,manpower:0}),time:24,hp:850,r:3,desc:'Muharebe mühendisleri üretir ve ileri tahkimatları açar.',symbol:'⚒',production:Object.freeze(['engineer']),footprint:3,requires:Object.freeze(['hq']),forceCap:5}),
+  Object.freeze({id:'supply',names:Object.freeze(['İkmal Deposu','Safra Sarnıcı']),cost:130,costs:Object.freeze({supply:35,material:100,manpower:0}),time:15,hp:650,r:2.7,desc:'İkmal depolama ve kuvvet kapasitesi sağlar.',symbol:'▤',production:Object.freeze([]),footprint:2.7,requires:Object.freeze(['hq']),forceCap:8,storage:Object.freeze({supply:300,material:0,manpower:0})}),
+  Object.freeze({id:'materialDepot',names:Object.freeze(['Malzeme Deposu','—']),cost:145,costs:Object.freeze({supply:25,material:125,manpower:0}),time:17,hp:700,r:3.1,desc:'Toplanan metal ve tahkimat malzemesinin kapasitesini artırır.',symbol:'▦',production:Object.freeze([]),footprint:3.1,requires:Object.freeze(['workshop']),forceCap:0,storage:Object.freeze({supply:0,material:350,manpower:0}),factions:Object.freeze([0])}),
+  Object.freeze({id:'hospital',names:Object.freeze(['Saha Hastanesi','Veba Bahçesi']),cost:170,costs:Object.freeze({supply:75,material:110,manpower:0}),time:22,hp:650,r:3,desc:'Yakındaki çatışma dışı mangaları iyileştirir.',symbol:'✚',production:Object.freeze([]),footprint:3,requires:Object.freeze(['workshop']),forceCap:0}),
+  Object.freeze({id:'observation',names:Object.freeze(['Gözetleme Karakolu','—']),cost:125,costs:Object.freeze({supply:45,material:85,manpower:0}),time:16,hp:560,r:2.2,desc:'Cephe görüşü ve komuta varlığı sağlar.',symbol:'◉',production:Object.freeze([]),footprint:2.2,requires:Object.freeze(['barracks']),forceCap:4,factions:Object.freeze([0])}),
+  Object.freeze({id:'defense',names:Object.freeze(['Tahkimli Ateş Mevzisi','—']),cost:165,costs:Object.freeze({supply:65,material:130,manpower:0}),time:21,hp:760,r:2.4,desc:'22 m menzilli sabit savunma mevzisi.',symbol:'♜',production:Object.freeze([]),footprint:2.4,requires:Object.freeze(['workshop']),forceCap:0,factions:Object.freeze([0])}),
+  Object.freeze({id:'tower',names:Object.freeze(['Nöbet Kulesi','Diken Nöbetçisi']),cost:150,costs:Object.freeze({supply:50,material:120,manpower:0}),time:19,hp:700,r:2,desc:'22 m menzilli otomatik savunma.',symbol:'♜',production:Object.freeze([]),footprint:2,requires:Object.freeze([]),factions:Object.freeze([1])}),
+  Object.freeze({id:'chapel',names:Object.freeze(['Savaş Şapeli','Kara Kâse Sunağı']),cost:210,costs:Object.freeze({supply:80,material:150,manpower:0}),time:25,hp:900,r:3,desc:'18 m içindeki müttefiklere %20 ateş desteği.',symbol:'✠',production:Object.freeze([]),footprint:3,requires:Object.freeze([]),factions:Object.freeze([1])})
+]);
+
+const BUILDING_BY_ID = new Map(BUILDING_DEFINITIONS.map(definition => [definition.id, definition]));
+const getBuildingDefinition = id => BUILDING_BY_ID.get(id);
+
+__exports.BUILDING_DEFINITIONS=BUILDING_DEFINITIONS;
+__exports.BUILDING_BY_ID=BUILDING_BY_ID;
+__exports.getBuildingDefinition=getBuildingDefinition;
+},
+'data/units.js':function(__exports,__require){
+
+const UNIT_DEFINITIONS = Object.freeze([
+  Object.freeze({id:'infantry', names:Object.freeze(['Siper Muhafızları','Veba Müritleri']), cost:100, costs:Object.freeze({supply:80,material:0,manpower:8}), time:12, hp:100, damage:10, range:15, speed:4.3, period:1.1, squadSize:8,forceCost:8,producer:'barracks',requires:Object.freeze([])}),
+  Object.freeze({id:'heavy', names:Object.freeze(['Zırhlı Haçlılar','Çürük Muhafızlar']), cost:175, costs:Object.freeze({supply:120,material:40,manpower:8}), time:18, hp:155, damage:16, range:18, speed:3.3, period:1.45, squadSize:8,forceCost:8,producer:'barracks',requires:Object.freeze(['workshop'])}),
+  Object.freeze({id:'engineer',names:Object.freeze(['Muharebe Mühendisleri','—']),cost:90,costs:Object.freeze({supply:50,material:30,manpower:5}),time:15,hp:82,damage:4,range:9,speed:4,period:1.6,squadSize:5,forceCost:5,producer:'workshop',requires:Object.freeze(['workshop']),support:true})
+]);
+
+const UNIT_BY_ID = new Map(UNIT_DEFINITIONS.map(definition => [definition.id, definition]));
+const getUnitDefinition = id => UNIT_BY_ID.get(id);
+
+__exports.UNIT_DEFINITIONS=UNIT_DEFINITIONS;
+__exports.UNIT_BY_ID=UNIT_BY_ID;
+__exports.getUnitDefinition=getUnitDefinition;
+},
+'data/factions.js':function(__exports,__require){
+
+const FACTION_DEFINITIONS = Object.freeze([
+  Object.freeze({
+    id:'newAntioch', index:0, name:'New Antioch', short:'ANTIOCH', color:'#9ebdca', gameplayRole:'DEFENDER', deploymentZone:Object.freeze({minX:1,maxX:50}),
+    ink:Object.freeze([.46,.59,.62]), accent:Object.freeze([.64,.22,.12]), base:Object.freeze([19,82]), resource:'İkmal',
+    visualProfile:Object.freeze({strategy:'newAntioch', organic:false, smokeTint:'soot'}),
+    allowedUnits:Object.freeze(['infantry','heavy','engineer']), allowedBuildings:Object.freeze(['hq','barracks','workshop','supply','materialDepot','hospital','observation','defense']),
+    systems:Object.freeze({economy:'newAntioch', construction:'engineered'}),startingArmy:Object.freeze([Object.freeze({type:'infantry',count:4}),Object.freeze({type:'engineer',count:1})])
+  }),
+  Object.freeze({
+    id:'blackGrail', index:1, name:'Black Grail', short:'GRAIL', color:'#a4b56c', gameplayRole:'ATTACKER', deploymentZone:Object.freeze({minX:62,maxX:111}),
+    ink:Object.freeze([.35,.42,.22]), accent:Object.freeze([.5,.22,.23]), base:Object.freeze([93,30]), resource:'Öz',
+    visualProfile:Object.freeze({strategy:'blackGrail', organic:true, smokeTint:'toxic'}),
+    allowedUnits:Object.freeze(['infantry','heavy']), allowedBuildings:Object.freeze(['hq','barracks','workshop','supply','hospital','tower','chapel']),
+    systems:Object.freeze({economy:'legacyBlackGrail', construction:'growth'}),startingArmy:Object.freeze([Object.freeze({type:'infantry',count:4})])
+  })
+]);
+
+const FACTION_BY_ID = new Map(FACTION_DEFINITIONS.map(definition => [definition.id, definition]));
+
+__exports.FACTION_DEFINITIONS=FACTION_DEFINITIONS;
+__exports.FACTION_BY_ID=FACTION_BY_ID;
+},
+'data/resources.js':function(__exports,__require){
+
+const RESOURCE_TYPES=Object.freeze({SUPPLY:'supply',MATERIAL:'material',MANPOWER:'manpower'});
+const RESOURCE_DEFINITIONS=Object.freeze([
+  Object.freeze({id:'supply',name:'İkmal',symbol:'▣',nodeName:'Cephe İkmal Yığını',cargo:24,gatherTime:3.2,color:Object.freeze([.55,.48,.31])}),
+  Object.freeze({id:'material',name:'Malzeme',symbol:'⚙',nodeName:'Savaş Enkazı',cargo:20,gatherTime:4,color:Object.freeze([.38,.42,.40])}),
+  Object.freeze({id:'manpower',name:'İnsan Gücü',symbol:'✚',nodeName:'Sevk Noktası',cargo:6,gatherTime:5,color:Object.freeze([.50,.43,.34])})
+]);
+const RESOURCE_BY_ID=new Map(RESOURCE_DEFINITIONS.map(definition=>[definition.id,definition]));
+const getResourceDefinition=id=>RESOURCE_BY_ID.get(id);
+
+// Fixed authored positions keep matches deterministic and avoid runtime random placement.
+const RESOURCE_NODE_LAYOUT=Object.freeze([
+  Object.freeze({type:'supply',x:30,z:76,amount:280}),Object.freeze({type:'supply',x:39,z:18,amount:240}),
+  Object.freeze({type:'supply',x:75,z:55,amount:260}),Object.freeze({type:'supply',x:87,z:91,amount:240}),
+  Object.freeze({type:'material',x:31,z:59,amount:240}),Object.freeze({type:'material',x:48,z:43,amount:220}),
+  Object.freeze({type:'material',x:76,z:70,amount:260}),Object.freeze({type:'material',x:83,z:19,amount:220}),
+  Object.freeze({type:'manpower',x:17,z:63,amount:54}),Object.freeze({type:'manpower',x:46,z:96,amount:48}),
+  Object.freeze({type:'manpower',x:67,z:14,amount:48}),Object.freeze({type:'manpower',x:94,z:48,amount:54})
+]);
+
+__exports.RESOURCE_TYPES=RESOURCE_TYPES;
+__exports.RESOURCE_DEFINITIONS=RESOURCE_DEFINITIONS;
+__exports.RESOURCE_BY_ID=RESOURCE_BY_ID;
+__exports.getResourceDefinition=getResourceDefinition;
+__exports.RESOURCE_NODE_LAYOUT=RESOURCE_NODE_LAYOUT;
+},
+'src/render/art/SoldierArt.js':function(__exports,__require){
+const __dep0=__require('src/data.js');const FACTIONS=__dep0.FACTIONS;const clamp=__dep0.clamp;const __dep1=__require('src/render/factions/FactionVisualRegistry.js');const getFactionVisual=__dep1.getFactionVisual;
+
+
+const IRON=[.22,.28,.29],BOOT=[.075,.09,.085],BONE=[.66,.63,.43];
+const CLOTH=[.39,.36,.27],FLESH=[.35,.19,.19],SORE=[.46,.39,.16];
+// A shared pose builder keeps a casualty visually continuous with its live model.
+function soldierArt(batch,x,z,yaw,f,heavy,lod,time,walking=false,fall=0,fade=1,seed=0,hit=0,engineer=false){
+  const organic=getFactionVisual(f).organic,t=clamp(fall,0,1),angle=t*1.49,scale=heavy?1.17:1;
+  const cp=Math.cos(angle),sp=Math.sin(angle),c=Math.cos(yaw),s=Math.sin(yaw);
+  const bob=walking?Math.sin(time*9+seed*6)*.055:0;
+  const body=organic?FLESH:FACTIONS[0].ink;
+  const add=(kind,dx,y,dz,sx,sy,sz,color,alpha=1,pitch=0,roll=0,glow=0)=>{
+    y*=scale;dx*=scale;dz*=scale;
+    const py=y*cp-dz*sp+.16+t*.07+bob,pz=y*sp+dz*cp;
+    const color2=hit>0?[color[0]+hit*.22,color[1]+hit*.13,color[2]+hit*.06]:color;
+    batch.add(kind,x+dx*c+pz*s,py,z-dx*s+pz*c,sx*scale,sy*scale,sz*scale,color2,yaw,alpha*fade,angle+pitch,roll,glow);
+  };
+  batch.add('cylinder',x,.10,z,.8+t*.6,.014,.8+t*.7,BOOT,yaw,fade*.85);
+  const stride=walking?Math.sin(time*9+seed*6)*.32:0;
+  add('box',-.15,.30,0,.18,.57,.23,BOOT,1,stride);
+  add('box',.15,.30,0,.18,.57,.23,BOOT,1,-stride);
+  add(organic?'sphere':'box',0,.91,0,organic?.60:.54,.72,.39,body,1,organic?.17:0);
+  add(organic?'sphere':'cylinder',0,1.48,organic?.12:0,.44,.39,.44,organic?BONE:IRON);
+  // Faction identity survives the far LOD: tabard + helmet vs hunched back + horn.
+  if(!organic){
+    add('box',0,.63,.20,.35,.67,.06,CLOTH);
+    add('cone',0,1.77,0,.14,.32,.14,IRON);
+    add('box',.29,1,.32,.13,.13,.97,BOOT);
+    if(engineer){add('box',0,1.03,-.31,.62,.72,.24,[.38,.29,.17]);add('box',-.48,.82,.04,.12,.72,.14,[.72,.55,.25],1,0,.2);}
+  }else{
+    add('sphere',-.12,1.14,-.23,.63,.68,.47,SORE);
+    add('cone',.13,1.86,.07,.15,.66,.15,BONE,1,-.20);
+    add('box',.34,.87,.32,.13,.20,.78,FLESH,1,.17);
+  }
+  if(lod<=0)return;
+  add('sphere',-.32,1.07,.03,.30,.28,.31,organic?FLESH:IRON,lod);
+  add('sphere',.32,1.07,.03,.30,.28,.31,organic?SORE:IRON,lod);
+  add('box',0,1.41,.24,.29,.20,.14,organic?BONE:BOOT,lod);
+  add('sphere',-.10,1.49,.30,.085,.07,.07,organic?[.65,.73,.26]:[.79,.46,.18],lod,0,0,.35);
+  add('sphere',.10,1.49,.30,.085,.07,.07,organic?[.65,.73,.26]:[.79,.46,.18],lod,0,0,.35);
+  if(!organic){
+    add('box',0,1,-.26,.37,.42,.22,CLOTH,lod);
+    add('box',0,.79,.25,.055,.25,.022,BONE,lod);
+    add('box',0,.83,.255,.20,.055,.023,BONE,lod);
+    add('box',-.33,.77,0,.13,.50,.18,CLOTH,lod);
+    if(heavy){add('box',-.45,1.09,.05,.14,.52,.42,IRON,lod);add('box',.45,1.09,.05,.14,.52,.42,IRON,lod);}
+    if(engineer){add('cylinder',0,1.76,0,.55,.18,.55,[.73,.58,.27],lod);add('box',.43,.82,.2,.1,.18,.72,IRON,lod,0,.3);}
+  }else{
+    for(let i=0;i<3;i++)add('box',0,.83+i*.13,.25,.41,.055,.07,BONE,lod,0,(i-1)*.08);
+    add('cone',-.35,1.47,-.12,.15,.49,.15,BONE,lod,-.5);
+    add('sphere',-.28,.70,.03,.20,.27,.22,SORE,lod);
+    if(heavy)add('cone',.42,1.42,0,.24,.6,.24,BONE,lod,0,-.4);
+  }
+}
+
+__exports.soldierArt=soldierArt;
+},
+'src/render/factions/FactionVisualRegistry.js':function(__exports,__require){
+const __dep0=__require('src/render/factions/NewAntiochVisuals.js');const newAntiochVisuals=__dep0.newAntiochVisuals;const __dep1=__require('src/render/factions/BlackGrailVisuals.js');const blackGrailVisuals=__dep1.blackGrailVisuals;
+
+
+const visuals=new Map([[newAntiochVisuals.index,newAntiochVisuals],[blackGrailVisuals.index,blackGrailVisuals]]);
+const getFactionVisual=index=>visuals.get(index)??newAntiochVisuals;
+const FACTION_VISUALS=visuals;
+
+__exports.getFactionVisual=getFactionVisual;
+__exports.FACTION_VISUALS=FACTION_VISUALS;
+},
+'src/render/factions/NewAntiochVisuals.js':function(__exports,__require){
+
+const newAntiochVisuals=Object.freeze({id:'newAntioch',index:0,organic:false,bodyPrimitive:'box',headPrimitive:'cylinder',architecture:'fortified',palette:Object.freeze({material:[.24,.29,.29],structure:[.43,.44,.39]})});
+
+__exports.newAntiochVisuals=newAntiochVisuals;
+},
+'src/render/factions/BlackGrailVisuals.js':function(__exports,__require){
+
+const blackGrailVisuals=Object.freeze({id:'blackGrail',index:1,organic:true,bodyPrimitive:'sphere',headPrimitive:'sphere',architecture:'grown',palette:Object.freeze({material:[.34,.17,.19],structure:[.30,.23,.22]})});
+
+__exports.blackGrailVisuals=blackGrailVisuals;
+},
+'src/render/Batch.js':function(__exports,__require){
+
+const INSTANCE_STRIDE=15;
+class Batch {
+  constructor() {
+    this.data= {
+      box:[],sphere:[],cone:[],cylinder:[],ring:[],quad:[]
+    };
+  }
+  reset(){for(const a of Object.values(this.data))a.length=0;return this;}
+  add(kind,x,y,z,sx,sy,sz,color,rot=0,alpha=1,pitch=0,roll=0,glow=0,soft=0) {
+    this.data[kind].push(x,y,z,sx,sy,sz,color[0],color[1],color[2],alpha,rot,pitch,roll,glow,soft);
+  }
+}
+
+__exports.INSTANCE_STRIDE=INSTANCE_STRIDE;
+__exports.Batch=Batch;
+},
+'src/simulation/Simulation.js':function(__exports,__require){
+const __dep0=__require('src/core/GameState.js');const GameState=__dep0.GameState;const __dep1=__require('src/effects/VisualEvents.js');const VisualEvents=__dep1.VisualEvents;const __dep2=__require('data/factions.js');const FACTION_DEFINITIONS=__dep2.FACTION_DEFINITIONS;const __dep3=__require('src/simulation/SimulationClock.js');const SimulationClock=__dep3.SimulationClock;const __dep4=__require('src/simulation/EconomySystem.js');const EconomySystem=__dep4.EconomySystem;const __dep5=__require('src/simulation/CaptureSystem.js');const CaptureSystem=__dep5.CaptureSystem;const __dep6=__require('src/units/UnitManager.js');const UnitManager=__dep6.UnitManager;const __dep7=__require('src/buildings/BuildingManager.js');const BuildingManager=__dep7.BuildingManager;const __dep8=__require('src/units/MovementSystem.js');const MovementSystem=__dep8.MovementSystem;const __dep9=__require('src/combat/DamageSystem.js');const DamageSystem=__dep9.DamageSystem;const __dep10=__require('src/combat/CombatSystem.js');const CombatSystem=__dep10.CombatSystem;const __dep11=__require('src/buildings/ConstructionSystem.js');const ConstructionSystem=__dep11.ConstructionSystem;const __dep12=__require('src/ai/AIController.js');const AIController=__dep12.AIController;const __dep13=__require('src/world/ResourceNodeManager.js');const ResourceNodeManager=__dep13.ResourceNodeManager;const __dep14=__require('src/units/LogisticsSystem.js');const LogisticsSystem=__dep14.LogisticsSystem;const __dep15=__require('src/units/EngineeringSystem.js');const EngineeringSystem=__dep15.EngineeringSystem;const __dep16=__require('data/units.js');const getUnitDefinition=__dep16.getUnitDefinition;const __dep17=__require('src/simulation/MatchFlow.js');const MatchFlow=__dep17.MatchFlow;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Simulation {
+  constructor(player=0,initialize=true,options={}){Object.assign(this,GameState.create(player));this.visualEvents=new VisualEvents();this.events=[];this.attachSystems();if(initialize)this.initializeMatch(options);}
+  attachSystems(){this.clock=new SimulationClock();this.matchFlow=new MatchFlow(this);this.unitManager=new UnitManager(this);this.buildingManager=new BuildingManager(this);this.movementSystem=new MovementSystem(this);this.resourceNodeManager=new ResourceNodeManager(this);this.economySystem=new EconomySystem(this);this.logisticsSystem=new LogisticsSystem(this,this.resourceNodeManager,this.movementSystem);this.engineeringSystem=new EngineeringSystem(this,this.movementSystem);this.damageSystem=new DamageSystem(this);this.combatSystem=new CombatSystem(this,this.damageSystem);this.constructionSystem=new ConstructionSystem(this,this.buildingManager,this.unitManager,this.combatSystem,this.movementSystem,this.engineeringSystem);this.captureSystem=new CaptureSystem(this);this.aiController=new AIController(this);}
+  initializeMatch(options={}){this.matchFlow.setup(options.duration);this.resourceNodeManager.initialize();for(let faction=0;faction<FACTION_DEFINITIONS.length;faction++){const definition=FACTION_DEFINITIONS[faction],[x,z]=definition.base,direction=faction?-1:1;this.addBuilding(faction,'hq',x,z,true);this.addBuilding(faction,'barracks',x+direction*8,z-7,true);this.addBuilding(faction,'supply',x,z-direction*10,true);let slot=0;for(const group of definition.startingArmy)for(let index=0;index<group.count;index++,slot++)this.addSquad(faction,group.type,x+direction*(group.type==='engineer'?5:10),z+(group.type==='engineer'?-4:3+slot*3));}this.matchFlow.bindObjective();this.matchFlow.start();this.economySystem.update(0);}
+  notify(msg){this.events.push({t:this.time,msg});if(this.events.length>30)this.events.shift();}
+  addBuilding(...args){return this.buildingManager.add(...args);}
+  addSquad(...args){return this.unitManager.add(...args);}
+  count(faction){return this.unitManager.count(faction);}
+  placement(...args){return this.constructionSystem.placement(...args);}
+  build(...args){return this.constructionSystem.build(...args);}
+  train(...args){return this.constructionSystem.train(...args);}
+  cancel(...args){return this.constructionSystem.cancel(...args);}
+  repath(){return this.movementSystem.repath();}
+  move(...args){return this.movementSystem.move(...args);}
+  enemy(...args){return this.combatSystem.enemy(...args);}
+  damage(...args){return this.damageSystem.apply(...args);}
+  gather(...args){return this.logisticsSystem.gather(...args);}
+  setAutoGather(...args){return this.logisticsSystem.setAuto(...args);}
+  assistConstruction(...args){return this.engineeringSystem.assist(...args);}
+  repair(...args){return this.engineeringSystem.repair(...args);}
+  forceUsed(faction){let total=0;for(const squad of this.squads)if(squad.f===faction&&squad.hp>0)total+=getUnitDefinition(squad.type)?.forceCost||0;for(const building of this.buildings)if(building.f===faction&&building.hp>0)for(const queued of building.queue)total+=getUnitDefinition(queued.type)?.forceCost||0;return total;}
+  forceCap(faction){return this.economySystem.get(faction).forceCap();}
+  step(dt){if(this.winner!==null)return;this.tick++;this.clock.advance(this,dt);this.matchFlow.update(dt);this.economySystem.update(dt);this.constructionSystem.update(dt);for(const squad of this.squads){if(squad.hp<=0)continue;const combat=this.combatSystem.updateSquad(squad,dt);this.movementSystem.updateSquad(squad,combat.definition,combat.enemy,combat.target,dt);}this.logisticsSystem.update(dt);this.engineeringSystem.update(dt);const living=this.unitManager.living();this.movementSystem.separate(living,dt);if(this.match?.mode!=='SIEGE')this.captureSystem.update(living,dt);this.aiController.update(dt);this.unitManager.purge();}
+  serialize(){return GameState.serialize(this);}
+  static restore(raw){const data=GameState.parse(raw),simulation=new Simulation(data.player,false);Object.assign(simulation,data);simulation.visualEvents=new VisualEvents();simulation.events=[];simulation.attachSystems();simulation.resourceNodeManager.initialize();simulation.economySystem.update(0);return simulation;}
+}
+
+__exports.Simulation=Simulation;
+},
+'src/core/GameState.js':function(__exports,__require){
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;
+
+
+const points=()=>[
+  {x:48,z:24,owner:-1,progress:0,claim:-1},
+  {x:64,z:56,owner:-1,progress:0,claim:-1},
+  {x:48,z:88,owner:-1,progress:0,claim:-1}
+];
+
+class GameState {
+  static create(player=0){
+    return {player,time:0,tick:0,resources:[400,500],economies:[{strategy:'newAntioch',stock:{supply:400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0},population:{civilianPopulation:0,recruitablePopulation:60,housingCapacity:90,foodDemand:0,commandCapacity:32}},{strategy:'legacyBlackGrail',population:{reserve:0}}],resourceNodes:[],buildings:[],squads:[],points:points(),nextId:1,winner:null,gameplayEvents:[],match:null,ai:{tick:0,wave:45}};
+  }
+  static serialize(source){
+    return JSON.stringify({version:3,player:source.player,time:source.time,tick:source.tick,resources:source.resources,economies:source.economies,resourceNodes:source.resourceNodes,buildings:source.buildings,squads:source.squads,points:source.points,nextId:source.nextId,winner:source.winner,gameplayEvents:source.gameplayEvents,match:source.match,ai:source.ai});
+  }
+  static parse(raw){
+    const data=JSON.parse(raw);
+    if(![1,2,3].includes(data.version)||!Array.isArray(data.squads)||!Array.isArray(data.buildings))throw Error('Uyumsuz kayıt');
+    if(!FACTION_DEFINITIONS[data.player])throw Error('Bilinmeyen faction');
+    if(data.version===1){data.version=2;data.economies=[{strategy:'newAntioch',stock:{supply:data.resources[0]??400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0}},{strategy:'legacyBlackGrail'}];data.resourceNodes=[];for(const squad of data.squads)if(squad.type==='engineer'&&!squad.worker)squad.worker={state:'IDLE',nodeId:null,targetBuildingId:null,depotId:null,cargoType:null,cargo:0,timer:0,auto:false,autoResourceType:null,searchCooldown:0,effectCooldown:0};}
+    if(data.version<3){data.version=3;data.tick=Math.round((data.time||0)/.05);data.gameplayEvents=[];data.match=null;}
+    return data;
+  }
+  static isSerializable(source){try{const json=GameState.serialize(source);return !/(visualEvents|renderer|mesh|WebGL)/.test(json);}catch{return false;}}
+}
+
+__exports.GameState=GameState;
+},
+'src/simulation/SimulationClock.js':function(__exports,__require){
+
+class SimulationClock { advance(simulation,dt){simulation.time+=dt;} }
+
+__exports.SimulationClock=SimulationClock;
+},
+'src/simulation/EconomySystem.js':function(__exports,__require){
+const __dep0=__require('src/factions/FactionRegistry.js');const factionRegistry=__dep0.factionRegistry;const __dep1=__require('src/economy/EconomyRegistry.js');const EconomyRegistry=__dep1.EconomyRegistry;
+
+
+class EconomySystem {
+  constructor(simulation){this.simulation=simulation;this.registry=new EconomyRegistry(simulation,factionRegistry.all());}
+  update(dt){this.registry.update(dt);}
+  get(faction){return this.registry.get(faction);}
+}
+
+__exports.EconomySystem=EconomySystem;
+},
+'src/factions/FactionRegistry.js':function(__exports,__require){
+const __dep0=__require('src/factions/newAntioch/index.js');const newAntioch=__dep0.newAntioch;const __dep1=__require('src/factions/blackGrail/index.js');const blackGrail=__dep1.blackGrail;
+
+
+class FactionRegistry {
+  constructor(factions=[newAntioch,blackGrail]){this.byIndex=new Map();this.byId=new Map();for(const faction of factions){this.byIndex.set(faction.index,faction);this.byId.set(faction.id,faction);}}
+  get(value){return typeof value==='number'?this.byIndex.get(value):this.byId.get(value);}
+  all(){return [...this.byIndex.values()];}
+}
+const factionRegistry=new FactionRegistry();
+
+__exports.FactionRegistry=FactionRegistry;
+__exports.factionRegistry=factionRegistry;
+},
+'src/factions/newAntioch/index.js':function(__exports,__require){
+const __dep0=__require('src/factions/Faction.js');const Faction=__dep0.Faction;const __dep1=__require('data/factions.js');const FACTION_BY_ID=__dep1.FACTION_BY_ID;
+
+
+const newAntioch = new Faction(FACTION_BY_ID.get('newAntioch'),{
+  income:({defaultIncome})=>defaultIncome,
+  construction:context=>context
+});
+
+__exports.newAntioch=newAntioch;
+},
+'src/factions/Faction.js':function(__exports,__require){
+
+class Faction {
+  constructor(definition,hooks={}){this.definition=definition;this.hooks=Object.freeze({...hooks});}
+  get id(){return this.definition.id;}
+  get index(){return this.definition.index;}
+  allowsUnit(type){return this.definition.allowedUnits.includes(type);}
+  allowsBuilding(type){return this.definition.allowedBuildings.includes(type);}
+  income(context){return this.hooks.income?.(context)??context.defaultIncome;}
+  construction(context){return this.hooks.construction?.(context)??context;}
+  serialize(){return this.definition.id;}
+}
+
+__exports.Faction=Faction;
+},
+'src/factions/blackGrail/index.js':function(__exports,__require){
+const __dep0=__require('src/factions/Faction.js');const Faction=__dep0.Faction;const __dep1=__require('data/factions.js');const FACTION_BY_ID=__dep1.FACTION_BY_ID;
+
+
+const blackGrail = new Faction(FACTION_BY_ID.get('blackGrail'),{
+  income:({defaultIncome})=>defaultIncome,
+  construction:context=>context
+});
+
+__exports.blackGrail=blackGrail;
+},
+'src/economy/EconomyRegistry.js':function(__exports,__require){
+const __dep0=__require('src/economy/NewAntiochEconomy.js');const NewAntiochEconomy=__dep0.NewAntiochEconomy;const __dep1=__require('src/economy/LegacyBlackGrailEconomy.js');const LegacyBlackGrailEconomy=__dep1.LegacyBlackGrailEconomy;
+
+
+const TYPES={newAntioch:NewAntiochEconomy,legacyBlackGrail:LegacyBlackGrailEconomy};
+class EconomyRegistry {
+  constructor(simulation,factions){this.strategies=factions.map(faction=>new (TYPES[faction.definition.systems.economy]||LegacyBlackGrailEconomy)(simulation,faction.index));}
+  get(faction){return this.strategies[faction];}
+  update(dt){for(const strategy of this.strategies)strategy.update(dt);}
+}
+
+__exports.EconomyRegistry=EconomyRegistry;
+},
+'src/economy/NewAntiochEconomy.js':function(__exports,__require){
+const __dep0=__require('src/economy/FactionEconomyStrategy.js');const FactionEconomyStrategy=__dep0.FactionEconomyStrategy;
+
+class NewAntiochEconomy extends FactionEconomyStrategy {
+  engineeredConstruction=true;
+  activeGathering=true;
+  get state(){return this.simulation.economies[this.faction];}
+  cost(definition){return definition.costs;}
+  capacity(){
+    const capacity={supply:0,material:0,manpower:0};
+    for(const building of this.simulation.buildings)if(building.f===this.faction&&building.hp>0&&building.progress===1&&building.storage)for(const key of Object.keys(capacity))capacity[key]+=building.storage[key]||0;
+    return capacity;
+  }
+  update(){const capacity=this.capacity();for(const key of Object.keys(this.state.stock))this.state.stock[key]=Math.min(this.state.stock[key],capacity[key]||this.state.stock[key]);this.simulation.resources[this.faction]=this.state.stock.supply;this.state.capacity=capacity;this.state.forceCap=this.forceCap();}
+  normalize(cost){return typeof cost==='number'?{supply:cost,material:0,manpower:0}:{supply:0,material:0,manpower:0,...cost};}
+  canAfford(cost){const value=this.normalize(cost);return Object.keys(value).every(key=>(this.state.stock[key]||0)>=value[key]);}
+  missing(cost){const value=this.normalize(cost);return Object.keys(value).filter(key=>(this.state.stock[key]||0)<value[key]);}
+  charge(cost){const value=this.normalize(cost);if(!this.canAfford(value))return false;for(const key of Object.keys(value))this.state.stock[key]-=value[key];this.simulation.resources[this.faction]=this.state.stock.supply;return true;}
+  refund(cost,factor=1){const value=this.normalize(cost),capacity=this.capacity();for(const key of Object.keys(value))this.state.stock[key]=Math.min(capacity[key]??Infinity,this.state.stock[key]+Math.floor(value[key]*factor));this.simulation.resources[this.faction]=this.state.stock.supply;}
+  credit(type,amount){const capacity=this.capacity(),space=Math.max(0,(capacity[type]??0)-this.state.stock[type]),accepted=Math.min(space,amount);this.state.stock[type]+=accepted;this.state.delivered[type]=(this.state.delivered[type]||0)+accepted;this.simulation.resources[this.faction]=this.state.stock.supply;return accepted;}
+  forceCap(){let total=0;for(const building of this.simulation.buildings)if(building.f===this.faction&&building.hp>0&&building.progress===1)total+=building.forceCap||0;return total;}
+}
+
+__exports.NewAntiochEconomy=NewAntiochEconomy;
+},
+'src/economy/FactionEconomyStrategy.js':function(__exports,__require){
+
+class FactionEconomyStrategy {
+  constructor(simulation,faction){this.simulation=simulation;this.faction=faction;}
+  engineeredConstruction=false;
+  activeGathering=false;
+  update(){}
+  cost(definition){return definition.cost;}
+  canAfford(){return true;}
+  charge(){return true;}
+  refund(){}
+  credit(){}
+  forceCap(){return 80;}
+  capacity(){return {};}
+}
+
+__exports.FactionEconomyStrategy=FactionEconomyStrategy;
+},
+'src/economy/LegacyBlackGrailEconomy.js':function(__exports,__require){
+const __dep0=__require('src/economy/FactionEconomyStrategy.js');const FactionEconomyStrategy=__dep0.FactionEconomyStrategy;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;
+
+
+class LegacyBlackGrailEconomy extends FactionEconomyStrategy {
+  update(dt){const buildings=this.simulation.buildings,points=this.simulation.points;this.simulation.resources[this.faction]+=dt*(BALANCE.economy.baseIncome+buildings.filter(b=>b.f===this.faction&&b.hp>0&&b.progress===1&&b.type==='supply').length*BALANCE.economy.supplyIncome+points.filter(p=>p.owner===this.faction).length*BALANCE.economy.controlIncome);}
+  canAfford(cost){const value=typeof cost==='number'?cost:cost.supply||0;return this.simulation.resources[this.faction]>=value;}
+  charge(cost){const value=typeof cost==='number'?cost:cost.supply||0;if(!this.canAfford(value))return false;this.simulation.resources[this.faction]-=value;return true;}
+  refund(cost,factor=1){const value=typeof cost==='number'?cost:cost.supply||0;this.simulation.resources[this.faction]+=Math.floor(value*factor);}
+  credit(_type,amount){this.simulation.resources[this.faction]+=amount;return amount;}
+  forceCap(){return BALANCE.army.maxSquads*BALANCE.army.squadSize;}
+}
+
+__exports.LegacyBlackGrailEconomy=LegacyBlackGrailEconomy;
+},
+'src/simulation/CaptureSystem.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('src/core/math.js');const dist=__dep1.dist;
+
+
+class CaptureSystem {
+  constructor(simulation){this.simulation=simulation;}
+  update(living,dt){for(const point of this.simulation.points){const near=[0,1].map(faction=>living.some(squad=>squad.f===faction&&dist(squad,point)<BALANCE.capture.radius)),faction=near[0]&&!near[1]?0:near[1]&&!near[0]?1:-1;if(faction!==-1&&faction!==point.owner){if(point.claim!==faction){point.claim=faction;point.progress=0;}point.progress+=dt;if(point.progress>=BALANCE.capture.duration){point.owner=faction;point.progress=0;this.simulation.notify(faction===this.simulation.player?'İkmal noktası ele geçirildi: +3/sn':'Düşman bir ikmal noktası ele geçirdi');}}else if(faction===-1)point.progress=Math.max(0,point.progress-dt*BALANCE.capture.decay);}}
+}
+
+__exports.CaptureSystem=CaptureSystem;
+},
+'src/units/UnitManager.js':function(__exports,__require){
+const __dep0=__require('src/units/Squad.js');const createSquad=__dep0.createSquad;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;
+
+
+class UnitManager {
+  constructor(simulation){this.simulation=simulation;}
+  add(faction,type,x,z){const squad=createSquad(this.simulation.nextId++,faction,type,x,z);this.simulation.squads.push(squad);return squad;}
+  count(faction){let count=0;for(const squad of this.simulation.squads)if(squad.f===faction&&squad.hp>0)count++;return count;}
+  living(){return this.simulation.squads.filter(squad=>squad.hp>0);}
+  purge(){const now=this.simulation.time;this.simulation.squads=this.simulation.squads.filter(squad=>squad.hp>0||now-(squad.diedAt??now)<BALANCE.lifecycle.deadSquadRetention);}
+}
+
+__exports.UnitManager=UnitManager;
+},
+'src/units/Squad.js':function(__exports,__require){
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;
+
+function createSquad(id,faction,type,x,z){
+  const definition=getUnitDefinition(type);
+  if(!definition)throw Error('Bilinmeyen birlik: '+type);
+  const squad={id,f:faction,type,x,z,hp:definition.hp*definition.squadSize,maxHp:definition.hp*definition.squadSize,alive:definition.squadSize,path:[],order:'hold',target:null,cooldown:0,yaw:0,firing:0,lastHit:-100,stuck:0,formation:{type:'LINE',spacing:1}};
+  if(type==='engineer')squad.worker={state:'IDLE',nodeId:null,targetBuildingId:null,depotId:null,cargoType:null,cargo:0,timer:0,auto:false,autoResourceType:null,searchCooldown:0,effectCooldown:0};
+  return squad;
+}
+
+__exports.createSquad=createSquad;
+},
+'src/buildings/BuildingManager.js':function(__exports,__require){
+const __dep0=__require('src/buildings/Building.js');const createBuilding=__dep0.createBuilding;
+
+class BuildingManager {
+  constructor(simulation){this.simulation=simulation;}
+  add(faction,type,x,z,ready=false){const building=createBuilding(this.simulation.nextId++,faction,type,x,z,ready);this.simulation.buildings.push(building);return building;}
+}
+
+__exports.BuildingManager=BuildingManager;
+},
+'src/buildings/Building.js':function(__exports,__require){
+const __dep0=__require('data/buildings.js');const getBuildingDefinition=__dep0.getBuildingDefinition;
+
+function createBuilding(id,faction,type,x,z,ready=false){
+  const definition=getBuildingDefinition(type);
+  if(!definition)throw Error('Bilinmeyen yapı: '+type);
+  const {names,cost,costs,time,hp,r,desc,symbol,production,footprint,requires,forceCap=0,storage=null,category='SUPPORT',mainObjectiveForRole=null}=definition;
+  return {id,names,cost,costs,time,hp,r,desc,symbol,production,footprint,requires,forceCap,storage,category,mainObjectiveForRole,type,f:faction,x,z,maxHp:hp,progress:ready?1:0,queue:[],cooldown:0,assignedEngineers:[]};
+}
+
+__exports.createBuilding=createBuilding;
+},
+'src/units/MovementSystem.js':function(__exports,__require){
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/core/math.js');const dist=__dep2.dist;const __dep3=__require('src/world/World.js');const terrain=__dep3.terrain;const walkable=__dep3.walkable;const pathfind=__dep3.pathfind;const __dep4=__require('src/units/FormationSystem.js');const FormationSystem=__dep4.FormationSystem;const __dep5=__require('data/factions.js');const FACTION_DEFINITIONS=__dep5.FACTION_DEFINITIONS;
+
+
+
+
+
+
+
+class MovementSystem {
+  constructor(simulation){this.simulation=simulation;this.formation=new FormationSystem();}
+  move(ids,x,z,target=null){
+    let failed=0;
+    const list=this.simulation.squads.filter(s=>ids.includes(s.id)&&s.hp>0);
+    if(this.simulation.match?.state==='PREPARATION'&&list.some(s=>{const zone=FACTION_DEFINITIONS[s.f].deploymentZone;return x<zone.minX||x>zone.maxX;}))return list.length||1;
+    list.forEach((s,index)=>{
+      const formation=this.formation.goal(index,list.length,x,z);
+      s.target=target?.id||null;s.order=target?'attack':'move';
+      let goal=formation;
+      if(target){const radius=target.r?target.r+3:3;const angle=Math.atan2(s.z-target.z,s.x-target.x);goal={x:target.x+Math.cos(angle)*radius,z:target.z+Math.sin(angle)*radius};}
+      const path=pathfind(s.x,s.z,goal.x,goal.z,this.simulation.buildings);s.path=path||[];if(!path)failed++;
+    });
+    return failed;
+  }
+  repath(){for(const squad of this.simulation.squads)if(squad.hp>0&&squad.path.length){const target=squad.path.at(-1);squad.path=pathfind(squad.x,squad.z,target.x,target.z,this.simulation.buildings)||[];}}
+  updateSquad(squad,definition,enemy,target,dt){
+    if(!(enemy&&squad.order!=='move')&&squad.path.length){
+      const point=squad.path[0],distance=dist(squad,point),kind=terrain(squad.x,squad.z);
+      const multiplier=kind==='mud'?BALANCE.terrain.mudSpeed:kind==='forest'?BALANCE.terrain.forestSpeed:kind==='trench'?BALANCE.terrain.trenchSpeed:1;
+      const travel=definition.speed*multiplier*dt;
+      if(distance<=travel){squad.x=point.x;squad.z=point.z;squad.path.shift();if(!squad.path.length)squad.order=squad.target?'attack':'hold';}
+      else{squad.x+=(point.x-squad.x)/distance*travel;squad.z+=(point.z-squad.z)/distance*travel;squad.yaw=Math.atan2(point.x-squad.x,point.z-squad.z);}
+    }else if(target&&!enemy&&Math.floor(this.simulation.time*2)!==squad.replan){squad.replan=Math.floor(this.simulation.time*2);this.move([squad.id],target.x,target.z,target);}
+  }
+  separate(living,dt){
+    const limit=BALANCE.army.separation;
+    for(let i=0;i<living.length;i++)for(let j=i+1;j<living.length;j++){
+      const a=living[i],b=living[j],distance=dist(a,b);
+      if(distance>0&&distance<limit){const force=(limit-distance)*dt*BALANCE.army.separationForce;for(const [squad,sign] of [[a,1],[b,-1]]){const x=squad.x+(a.x-b.x)/distance*force*sign,z=squad.z+(a.z-b.z)/distance*force*sign;if(walkable(x,z,this.simulation.buildings)){squad.x=x;squad.z=z;}}}
+    }
+  }
+}
+
+__exports.MovementSystem=MovementSystem;
+},
+'src/world/World.js':function(__exports,__require){
+
+
+
+
+const __rex0=__require('src/world/Terrain.js');__exports.terrain=__rex0.terrain;__exports.crossings=__rex0.crossings;__exports.forests=__rex0.forests;__exports.craters=__rex0.craters;
+const __rex1=__require('src/world/Map.js');__exports.walkable=__rex1.walkable;__exports.pathfind=__rex1.pathfind;
+},
+'src/world/Map.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('src/world/Terrain.js');const terrain=__dep1.terrain;
+
+
+function walkable(x,z,buildings=[],ignoreId=0){const kind=terrain(x,z);return kind!=='river'&&kind!=='edge'&&!buildings.some(b=>b.hp>0&&b.id!==ignoreId&&Math.hypot(x-b.x,z-b.z)<b.r+.8);}
+function pathfind(sx,sz,tx,tz,buildings=[]){
+  const {grid,cell}=BALANCE.world,coord=value=>Math.max(0,Math.min(grid-1,Math.floor(value/cell))),start=coord(sz)*grid+coord(sx),end=coord(tz)*grid+coord(tx),blocked=new Uint8Array(grid*grid);
+  for(let z=0;z<grid;z++)for(let x=0;x<grid;x++)blocked[z*grid+x]=!walkable(x*cell+1,z*cell+1,buildings);
+  if(blocked[end])return null;blocked[start]=0;
+  const costs=new Float32Array(grid*grid).fill(Infinity),parent=new Int32Array(grid*grid).fill(-1),closed=new Uint8Array(grid*grid),open=[start];costs[start]=0;
+  const heuristic=index=>Math.hypot(index%grid-end%grid,Math.floor(index/grid)-Math.floor(end/grid));
+  while(open.length){let best=0;for(let i=1;i<open.length;i++)if(costs[open[i]]+heuristic(open[i])<costs[open[best]]+heuristic(open[best]))best=i;const node=open.splice(best,1)[0];if(node===end){const path=[];let current=end;while(current!==start){path.push({x:(current%grid)*cell+1,z:Math.floor(current/grid)*cell+1});current=parent[current];}path.reverse();return path;}closed[node]=1;const x=node%grid,z=Math.floor(node/grid);for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dz)continue;const nx=x+dx,nz=z+dz,index=nz*grid+nx;if(nx<0||nz<0||nx>=grid||nz>=grid||blocked[index]||closed[index])continue;if(dx&&dz&&(blocked[z*grid+nx]||blocked[nz*grid+x]))continue;const kind=terrain(nx*cell+1,nz*cell+1),next=costs[node]+(dx&&dz?1.414:1)*(kind==='mud'?1.7:kind==='forest'?1.25:1);if(next<costs[index]){costs[index]=next;parent[index]=node;if(!open.includes(index))open.push(index);}}}
+  return null;
+}
+
+__exports.walkable=walkable;
+__exports.pathfind=pathfind;
+},
+'src/units/FormationSystem.js':function(__exports,__require){
+const __dep0=__require('src/core/math.js');const clamp=__dep0.clamp;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;
+
+
+class FormationSystem {
+  goal(index,count,x,z){const margin=2,max=BALANCE.world.size-margin;return {x:clamp(x+(count>1?(index%3-1)*3.5:0),margin,max),z:clamp(z+(count>1?(Math.floor(index/3)-Math.floor(count/6))*3.5:0),margin,max)};}
+}
+
+__exports.FormationSystem=FormationSystem;
+},
+'src/combat/DamageSystem.js':function(__exports,__require){
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/world/World.js');const terrain=__dep2.terrain;const __dep3=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep3.VFX_EVENT;const __dep4=__require('src/combat/DeathSystem.js');const DeathSystem=__dep4.DeathSystem;
+
+
+
+
+
+
+class DamageSystem {
+  constructor(simulation){this.simulation=simulation;this.death=new DeathSystem(simulation);}
+  apply(attacker,target,power){
+    if(this.simulation.match?.state!=='WAR')return false;
+    const ground=target.path!==undefined?terrain(target.x,target.z):'';
+    const cover=ground==='trench'?BALANCE.terrain.trenchDamage:1;
+    const conceal=ground==='forest'?BALANCE.terrain.forestDamage:1;
+    if(target.hp<=0)return;
+    const unitTarget=target.path!==undefined,before=unitTarget?(target.alive??8):0;
+    target.hp=Math.max(0,target.hp-power*cover*conceal);target.lastHit=this.simulation.time;
+    this.simulation.matchFlow.objectiveDamaged(target);
+    if(unitTarget)target.alive=Math.min(before,Math.ceil(target.hp/getUnitDefinition(target.type).hp));
+    this.simulation.visualEvents.emit(VFX_EVENT.SHOT,attacker.x,attacker.path?1.15:5.1,attacker.z,target.x,unitTarget?1:2,target.z,attacker.f,target.f,attacker.alive??1,target.r??1,attacker.yaw??0,attacker.type==='heavy'||attacker.type==='tower',!unitTarget,target.id);
+    if(unitTarget)for(let index=target.alive;index<before;index++){
+      const ox=(index%4-1.5)*.9,oz=(Math.floor(index/4)-.5)*1.3,yaw=target.yaw;
+      this.simulation.visualEvents.emit(VFX_EVENT.CASUALTY,target.x+ox*Math.cos(yaw)+oz*Math.sin(yaw),0,target.z-ox*Math.sin(yaw)+oz*Math.cos(yaw),attacker.x,0,attacker.z,target.f,attacker.f,1,1,yaw,target.type==='heavy',false,target.id);
+    }
+    if(target.hp===0)this.death.resolve(attacker,target,unitTarget);
+    return true;
+  }
+}
+
+__exports.DamageSystem=DamageSystem;
+},
+'src/combat/DeathSystem.js':function(__exports,__require){
+const __dep0=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep0.VFX_EVENT;
+
+class DeathSystem {
+  constructor(simulation){this.simulation=simulation;}
+  resolve(attacker,target,unitTarget){
+    target.diedAt=this.simulation.time;
+    this.simulation.visualEvents.emit(unitTarget?VFX_EVENT.SQUAD_LOST:VFX_EVENT.COLLAPSE,target.x,0,target.z,0,0,0,target.f,attacker.f,1,target.r??2,target.yaw??0,false,!unitTarget,target.id);
+    if(target.id===this.simulation.match?.mainObjectiveId)this.simulation.matchFlow.objectiveDestroyed(target);
+    else if(target.f===this.simulation.player)this.simulation.notify(target.path?'Bir manga kaybedildi.':target.names[target.f]+' yıkıldı.');
+  }
+}
+
+__exports.DeathSystem=DeathSystem;
+},
+'src/combat/CombatSystem.js':function(__exports,__require){
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/core/math.js');const dist=__dep2.dist;
+
+
+
+class CombatSystem {
+  constructor(simulation,damageSystem){this.simulation=simulation;this.damageSystem=damageSystem;}
+  enemy(source,range){let best=null,bestDistance=range;for(const candidate of [...this.simulation.squads,...this.simulation.buildings]){if(candidate.hp<=0||candidate.f===source.f||candidate.progress<1)continue;const distance=dist(source,candidate)-(candidate.r||0);if(distance<bestDistance){best=candidate;bestDistance=distance;}}return best;}
+  updateSquad(squad,dt){
+    const definition=getUnitDefinition(squad.type);squad.cooldown-=dt;squad.firing=Math.max(0,squad.firing-dt);
+    const target=squad.target?[...this.simulation.squads,...this.simulation.buildings].find(entity=>entity.id===squad.target&&entity.hp>0):null;
+    const enemy=target&&dist(squad,target)-(target.r||0)<definition.range?target:this.enemy(squad,definition.range);
+    if(enemy){squad.yaw=Math.atan2(enemy.x-squad.x,enemy.z-squad.z);if(squad.cooldown<=0){const aura=this.simulation.buildings.some(building=>building.f===squad.f&&building.type==='chapel'&&building.hp>0&&building.progress===1&&dist(squad,building)<BALANCE.support.chapelRadius);this.damageSystem.apply(squad,enemy,definition.damage*Math.ceil(squad.hp/definition.hp)*(aura?BALANCE.support.chapelDamage:1));squad.cooldown=definition.period;squad.firing=.16;}}
+    return {definition,target,enemy};
+  }
+}
+
+__exports.CombatSystem=CombatSystem;
+},
+'src/buildings/ConstructionSystem.js':function(__exports,__require){
+const __dep0=__require('data/buildings.js');const getBuildingDefinition=__dep0.getBuildingDefinition;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;const __dep2=__require('data/factions.js');const FACTION_DEFINITIONS=__dep2.FACTION_DEFINITIONS;const __dep3=__require('src/world/World.js');const crossings=__dep3.crossings;const terrain=__dep3.terrain;const walkable=__dep3.walkable;const __dep4=__require('src/core/Config.js');const BALANCE=__dep4.BALANCE;const __dep5=__require('src/core/math.js');const dist=__dep5.dist;const __dep6=__require('src/units/LogisticsSystem.js');const WORKER_STATE=__dep6.WORKER_STATE;const __dep7=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep7.VFX_EVENT;
+
+
+
+
+
+
+
+
+
+class ConstructionSystem {
+  constructor(simulation,buildingManager,unitManager,combatSystem,movementSystem,engineeringSystem){Object.assign(this,{simulation,buildingManager,unitManager,combatSystem,movementSystem,engineeringSystem});}
+  definitionAllowed(faction,definition){return !!definition&&FACTION_DEFINITIONS[faction].allowedBuildings.includes(definition.id)&&(!definition.factions||definition.factions.includes(faction));}
+  complete(faction,type){return this.simulation.buildings.some(building=>building.f===faction&&building.type===type&&building.hp>0&&building.progress===1);}
+  missingRequirement(faction,definition){return (definition.requires||[]).find(type=>!this.complete(faction,type));}
+  buildCost(faction,definition){return this.simulation.economySystem.get(faction).cost(definition);}
+  unitCost(faction,definition){return this.simulation.economySystem.get(faction).cost(definition);}
+  placement(faction,type,x,z){
+    const definition=getBuildingDefinition(type),rules=BALANCE.construction,world=BALANCE.world;
+    if(!this.definitionAllowed(faction,definition)||type==='hq')return 'Bu yapı bu faction tarafından kurulamaz';
+    const missing=this.missingRequirement(faction,definition);if(missing)return getBuildingDefinition(missing).names[faction]+' gerekli';
+    if(!this.simulation.economySystem.get(faction).canAfford(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
+    if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=rules.maxSameType)return 'Bu yapıdan en fazla 3 tane';
+    if(!this.simulation.buildings.some(building=>building.hp>0&&building.progress===1&&building.f===faction&&dist(building,{x,z})<rules.baseRadius))return 'Tamamlanmış üssüne 20 m yakın olmalı';
+    const footprint=definition.footprint||definition.r;if(x-footprint<1||z-footprint<1||x+footprint>world.size-1||z+footprint>world.size-1)return 'Harita sınırına çok yakın';
+    for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
+    if(x>47&&x<65&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
+    if(this.simulation.buildings.some(building=>building.hp>0&&dist(building,{x,z})<(building.footprint||building.r)+footprint+rules.obstacleMargin))return 'Başka yapıya çok yakın';
+    if(this.simulation.resourceNodes.some(node=>!node.depleted&&dist(node,{x,z})<node.r+footprint+1))return 'Kaynak alanını kapatamazsın';
+    if(this.simulation.points.some(point=>dist(point,{x,z})<footprint+rules.pointMargin))return 'İkmal noktasını kapatamazsın';
+    if(this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<footprint+rules.obstacleMargin))return 'Manganın yolu üzerinde';
+    return '';
+  }
+  build(faction,type,x,z,engineerIds=[]){
+    const error=this.placement(faction,type,x,z);if(error)return error;const definition=getBuildingDefinition(type),economy=this.simulation.economySystem.get(faction);
+    if(economy.engineeredConstruction&&!this.engineeringSystem.engineers(engineerIds,faction).length)return 'Şantiye için muharebe mühendisi seçilmeli';
+    if(!economy.charge(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
+    const building=this.buildingManager.add(faction,type,x,z);building.workEffectCooldown=0;
+    if(economy.engineeredConstruction)this.engineeringSystem.assist(engineerIds,building.id);
+    if(faction===this.simulation.player)this.simulation.notify(definition.names[faction]+' şantiyesi kuruldu');this.movementSystem.repath();return '';
+  }
+  train(building,type){
+    if(!building||building.hp<=0||building.progress<1)return 'Tamamlanmış üretim yapısı seç';const definition=getUnitDefinition(type);
+    if(!definition||!FACTION_DEFINITIONS[building.f].allowedUnits.includes(type))return 'Bilinmeyen birlik';
+    if(definition.producer!==building.type||!building.production?.includes(type))return definition.names[building.f]+' bu yapıda üretilemez';
+    const missing=(definition.requires||[]).find(required=>!this.complete(building.f,required));if(missing)return 'Önce '+getBuildingDefinition(missing).names[building.f]+' kur';
+    if(this.simulation.forceUsed(building.f)+definition.forceCost>this.simulation.forceCap(building.f))return 'Kuvvet kapasitesine ulaşıldı';
+    const economy=this.simulation.economySystem.get(building.f),cost=this.unitCost(building.f,definition);if(!economy.canAfford(cost))return 'Yetersiz kaynak';
+    if(building.queue.length>=BALANCE.construction.queueLimit)return 'Üretim kuyruğu dolu';economy.charge(cost);building.queue.push({type,time:0});return '';
+  }
+  cancel(building){if(!building||building.hp<=0)return;const economy=this.simulation.economySystem.get(building.f);if(building.progress<1&&building.type!=='hq'){economy.refund(this.buildCost(building.f,building),BALANCE.construction.cancelRefund);building.hp=0;for(const id of building.assignedEngineers||[])this.engineeringSystem.stop([id]);this.movementSystem.repath();}else if(building.queue.length){const queued=building.queue.pop(),definition=getUnitDefinition(queued.type);economy.refund(this.unitCost(building.f,definition));}}
+  workers(building){const result=[];for(const id of building.assignedEngineers||[]){const squad=this.simulation.squads.find(item=>item.id===id&&item.hp>0&&item.type==='engineer'&&item.worker?.targetBuildingId===building.id);if(squad&&dist(squad,building)<=building.r+BALANCE.construction.engineerRadius)result.push(squad);if(result.length>=BALANCE.construction.engineerCap)break;}return result;}
+  constructionRate(workers){let multiplier=0;for(let index=0;index<workers.length;index++)multiplier+=BALANCE.construction.engineerFactors[index]||0;return multiplier;}
+  finish(building){building.progress=1;for(const id of building.assignedEngineers||[]){const squad=this.simulation.squads.find(item=>item.id===id);if(squad?.worker?.targetBuildingId===building.id){squad.worker.state=WORKER_STATE.IDLE;squad.worker.targetBuildingId=null;squad.path=[];}}building.assignedEngineers=[];if(building.f===this.simulation.player)this.simulation.notify(building.names[building.f]+' hazır');this.simulation.economySystem.update(0);}
+  updateConstruction(building,dt){
+    if(!this.simulation.economySystem.get(building.f).engineeredConstruction){building.progress=Math.min(1,building.progress+dt/building.time);if(building.progress===1)this.finish(building);return;}
+    const workers=this.workers(building);if(!workers.length)return;const rate=this.constructionRate(workers);building.progress=Math.min(1,building.progress+dt/building.time*rate);building.workEffectCooldown-=dt;
+    if(building.workEffectCooldown<=0){const worker=workers[0];this.simulation.visualEvents.emit(VFX_EVENT.WORK,worker.x,.4,worker.z,building.x,.3,building.z,building.f,building.f,workers.length,building.r,worker.yaw,false,true,building.id);building.workEffectCooldown=BALANCE.construction.workEffectPeriod;}
+    if(building.progress===1)this.finish(building);
+  }
+  updateProduction(building,dt){if(!building.queue.length)return;const queued=building.queue[0],definition=getUnitDefinition(queued.type);queued.time+=dt;if(queued.time<definition.time)return;let position=null;for(let index=0;index<16;index++){const angle=index/16*6.283,x=building.x+Math.cos(angle)*(building.r+3),z=building.z+Math.sin(angle)*(building.r+3);if(walkable(x,z,this.simulation.buildings)&&!this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<2)){position={x,z};break;}}if(position){const squad=this.unitManager.add(building.f,queued.type,position.x,position.z);building.queue.shift();if(building.rally)this.movementSystem.move([squad.id],building.rally.x,building.rally.z);if(building.f===this.simulation.player)this.simulation.notify(definition.names[building.f]+' göreve hazır');}}
+  update(dt){
+    for(const building of this.simulation.buildings){if(building.hp<=0)continue;if(building.progress<1){this.updateConstruction(building,dt);continue;}building.cooldown-=dt;this.updateProduction(building,dt);
+      if(['tower','defense'].includes(building.type)&&building.cooldown<=0){const enemy=this.combatSystem.enemy(building,BALANCE.tower.range);if(enemy){this.combatSystem.damageSystem.apply(building,enemy,BALANCE.tower.damage);building.cooldown=BALANCE.tower.period;}}
+      if(building.type==='hospital')for(const squad of this.simulation.squads)if(squad.f===building.f&&squad.hp>0&&dist(squad,building)<BALANCE.support.hospitalRadius&&this.simulation.time-squad.lastHit>BALANCE.support.hospitalDelay)squad.hp=Math.min((squad.alive??8)*getUnitDefinition(squad.type).hp,squad.hp+dt*BALANCE.support.hospitalHeal);
+      if(building.type==='workshop'&&building.f===1)for(const target of this.simulation.buildings)if(target.f===building.f&&target.hp>0&&target.progress===1&&dist(target,building)<BALANCE.support.workshopRadius)target.hp=Math.min(target.maxHp,target.hp+dt*BALANCE.support.workshopRepair);
+    }
+  }
+}
+
+__exports.ConstructionSystem=ConstructionSystem;
+},
+'src/units/LogisticsSystem.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('src/core/math.js');const dist=__dep1.dist;const __dep2=__require('data/resources.js');const getResourceDefinition=__dep2.getResourceDefinition;const __dep3=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep3.VFX_EVENT;
+
+
+
+
+
+const WORKER_STATE=Object.freeze({IDLE:'IDLE',MOVING_TO_RESOURCE:'MOVING_TO_RESOURCE',GATHERING:'GATHERING',RETURNING:'RETURNING',DELIVERING:'DELIVERING',CONSTRUCTING:'CONSTRUCTING',REPAIRING:'REPAIRING'});
+
+class LogisticsSystem {
+  constructor(simulation,nodeManager,movementSystem){Object.assign(this,{simulation,nodeManager,movementSystem});}
+  engineers(ids,faction=null){return this.simulation.squads.filter(squad=>ids.includes(squad.id)&&(faction===null||squad.f===faction)&&squad.type==='engineer'&&squad.hp>0);}
+  reset(worker){worker.state=WORKER_STATE.IDLE;worker.nodeId=null;worker.targetBuildingId=null;worker.depotId=null;worker.timer=0;}
+  gather(ids,nodeId,auto=false){const node=this.nodeManager.get(nodeId);if(!node||node.depleted)return 'Kaynak tükenmiş';const engineers=this.engineers(ids);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){const worker=squad.worker;worker.state=WORKER_STATE.MOVING_TO_RESOURCE;worker.nodeId=node.id;worker.targetBuildingId=null;worker.auto=auto||worker.auto;worker.autoResourceType=node.type;worker.timer=0;this.movementSystem.move([squad.id],node.x,node.z);}return '';}
+  setAuto(ids,enabled,resourceType=null){const engineers=this.engineers(ids);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){squad.worker.auto=enabled;squad.worker.autoResourceType=resourceType||squad.worker.autoResourceType;squad.worker.searchCooldown=0;if(enabled&&squad.worker.state===WORKER_STATE.IDLE)this.findNext(squad);}return '';}
+  stop(ids){for(const squad of this.engineers(ids)){const worker=squad.worker;if(worker.cargo>0){const depot=this.depot(squad,worker.cargoType);if(depot){worker.depotId=depot.id;worker.state=WORKER_STATE.RETURNING;this.moveToDepot(squad,depot);continue;}}this.reset(worker);worker.auto=false;}}
+  findNext(squad){const worker=squad.worker,node=this.nodeManager.nearest(squad,worker.autoResourceType);worker.searchCooldown=BALANCE.logistics.autoSearchPeriod;if(!node){this.reset(worker);worker.auto=true;return false;}worker.state=WORKER_STATE.MOVING_TO_RESOURCE;worker.nodeId=node.id;worker.autoResourceType=node.type;this.movementSystem.move([squad.id],node.x,node.z);return true;}
+  depot(squad,type){let best=null,bestDistance=Infinity;for(const building of this.simulation.buildings){if(building.f!==squad.f||building.hp<=0||building.progress<1||!['hq','supply','materialDepot'].includes(building.type))continue;if(type==='material'&&!['hq','materialDepot'].includes(building.type))continue;const distance=dist(squad,building);if(distance<bestDistance){best=building;bestDistance=distance;}}return best;}
+  moveToDepot(squad,depot){const angle=Math.atan2(squad.z-depot.z,squad.x-depot.x),radius=depot.r+2;this.movementSystem.move([squad.id],depot.x+Math.cos(angle)*radius,depot.z+Math.sin(angle)*radius);}
+  update(dt){
+    for(const squad of this.simulation.squads){if(squad.hp<=0||squad.type!=='engineer'||!squad.worker)continue;const worker=squad.worker;worker.effectCooldown=Math.max(0,worker.effectCooldown-dt);
+      if(worker.state===WORKER_STATE.IDLE){if(worker.auto){worker.searchCooldown-=dt;if(worker.searchCooldown<=0)this.findNext(squad);}continue;}
+      if(worker.state===WORKER_STATE.MOVING_TO_RESOURCE){const node=this.nodeManager.get(worker.nodeId);if(!node||node.depleted){this.reset(worker);if(worker.auto)this.findNext(squad);continue;}if(dist(squad,node)<=BALANCE.logistics.arrivalRadius){squad.path=[];squad.order='hold';worker.state=WORKER_STATE.GATHERING;worker.timer=0;}continue;}
+      if(worker.state===WORKER_STATE.GATHERING){const node=this.nodeManager.get(worker.nodeId);if(!node||node.depleted){this.reset(worker);if(worker.auto)this.findNext(squad);continue;}worker.timer+=dt;const definition=getResourceDefinition(node.type);if(worker.effectCooldown<=0){this.simulation.visualEvents.emit(VFX_EVENT.WORK,squad.x,.4,squad.z,node.x,.2,node.z,squad.f,squad.f,1,.6,squad.yaw,false,false,squad.id);worker.effectCooldown=.7;}if(worker.timer>=definition.gatherTime){worker.cargoType=node.type;worker.cargo=this.nodeManager.take(node,definition.cargo);worker.timer=0;const depot=this.depot(squad,node.type);if(!depot){this.reset(worker);continue;}worker.depotId=depot.id;worker.state=WORKER_STATE.RETURNING;this.moveToDepot(squad,depot);}continue;}
+      if(worker.state===WORKER_STATE.RETURNING){const depot=this.simulation.buildings.find(building=>building.id===worker.depotId&&building.hp>0&&building.progress===1);if(!depot){const replacement=this.depot(squad,worker.cargoType);if(!replacement){this.reset(worker);continue;}worker.depotId=replacement.id;this.moveToDepot(squad,replacement);continue;}if(dist(squad,depot)<=depot.r+BALANCE.logistics.deliveryRadius){squad.path=[];worker.state=WORKER_STATE.DELIVERING;worker.timer=0;}continue;}
+      if(worker.state===WORKER_STATE.DELIVERING){worker.timer+=dt;if(worker.timer>=.35){const economy=this.simulation.economySystem.get(squad.f),accepted=economy.credit(worker.cargoType,worker.cargo);worker.cargo-=accepted;if(accepted>0)this.simulation.visualEvents.emit(VFX_EVENT.DELIVERY,squad.x,.3,squad.z,0,0,0,squad.f,squad.f,1,.5,squad.yaw,false,false,squad.id);if(worker.cargo<=0){worker.cargo=0;worker.cargoType=null;this.reset(worker);if(worker.auto)this.findNext(squad);}else worker.timer=0;}continue;}
+    }
+  }
+}
+
+__exports.WORKER_STATE=WORKER_STATE;
+__exports.LogisticsSystem=LogisticsSystem;
+},
+'src/ai/AIController.js':function(__exports,__require){
+const __dep0=__require('src/core/math.js');const dist=__dep0.dist;const __dep1=__require('src/ai/AIOrders.js');const AIOrders=__dep1.AIOrders;
+
+
+class AIController {
+  constructor(simulation){this.simulation=simulation;}
+  update(dt){
+    const sim=this.simulation,faction=1-sim.player;sim.ai.tick-=dt;sim.ai.wave-=dt;
+    if(sim.ai.tick<=0){
+      sim.ai.tick=6;const buildings=sim.buildings.filter(b=>b.f===faction&&b.hp>0),engineers=sim.squads.filter(s=>s.f===faction&&s.type==='engineer'&&s.hp>0);
+      if(faction===0)for(const [index,engineer] of engineers.entries())if(engineer.worker.state==='IDLE'&&!engineer.worker.auto)sim.setAutoGather([engineer.id],true,index%2?'material':'supply');
+      const wants=faction===0?['workshop','materialDepot','observation','hospital','defense','supply']:['supply','tower','workshop','hospital','chapel'];
+      const type=wants.find(wanted=>!buildings.some(b=>b.type===wanted))||(buildings.filter(b=>b.type==='supply').length<2?'supply':null);
+      if(type){const hq=buildings.find(b=>b.type==='hq'),workerIds=engineers.slice(0,2).map(s=>s.id);if(hq&&(faction!==0||workerIds.length))for(let i=0;i<20;i++){const angle=i*2.399,radius=10+Math.floor(i/7)*5,x=hq.x+Math.cos(angle)*radius,z=hq.z+Math.sin(angle)*radius;if(!AIOrders.build(sim,faction,type,x,z,workerIds))break;}}
+      for(const barracks of buildings.filter(b=>b.type==='barracks'&&b.progress===1&&b.queue.length<1))AIOrders.train(sim,barracks,buildings.some(v=>v.type==='workshop'&&v.progress===1)&&sim.count(faction)%3===0?'heavy':'infantry');
+      const workshop=buildings.find(b=>b.type==='workshop'&&b.progress===1&&b.queue.length<1);if(faction===0&&workshop&&engineers.length<2)AIOrders.train(sim,workshop,'engineer');
+      const threat=sim.squads.find(s=>s.f!==faction&&s.hp>0&&buildings.some(b=>dist(b,s)<22));if(threat)AIOrders.move(sim,sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer').slice(0,3).map(s=>s.id),threat.x,threat.z,threat);
+    }
+    if(sim.ai.wave<=0){sim.ai.wave=45;const squads=sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer'),goal=sim.points.find(p=>p.owner!==faction),hq=sim.buildings.find(b=>b.f!==faction&&b.type==='hq'&&b.hp>0);if(sim.time>180&&squads.length>=5&&hq)AIOrders.move(sim,squads.map(s=>s.id),hq.x,hq.z,hq);else if(goal)AIOrders.move(sim,squads.slice(0,Math.max(2,squads.length-2)).map(s=>s.id),goal.x,goal.z);}
+  }
+}
+
+__exports.AIController=AIController;
+},
+'src/ai/AIOrders.js':function(__exports,__require){
+
+const AIOrders=Object.freeze({
+  build:(simulation,faction,type,x,z,engineerIds=[])=>simulation.build(faction,type,x,z,engineerIds),
+  train:(simulation,building,type)=>simulation.train(building,type),
+  move:(simulation,ids,x,z,target)=>simulation.move(ids,x,z,target)
+});
+
+__exports.AIOrders=AIOrders;
+},
+'src/world/ResourceNodeManager.js':function(__exports,__require){
+const __dep0=__require('data/resources.js');const RESOURCE_NODE_LAYOUT=__dep0.RESOURCE_NODE_LAYOUT;const getResourceDefinition=__dep0.getResourceDefinition;const __dep1=__require('src/core/math.js');const dist=__dep1.dist;
+
+
+class ResourceNodeManager {
+  constructor(simulation){this.simulation=simulation;}
+  initialize(){if(this.simulation.resourceNodes.length)return;this.simulation.resourceNodes=RESOURCE_NODE_LAYOUT.map((item,index)=>({id:'resource-'+(index+1),type:item.type,x:item.x,z:item.z,r:1.8,amount:item.amount,maxAmount:item.amount,depleted:false}));}
+  get(id){return this.simulation.resourceNodes.find(node=>node.id===id);}
+  nearest(origin,type=null,maxDistance=48){let best=null,bestDistance=maxDistance;for(const node of this.simulation.resourceNodes){if(node.depleted||node.amount<=0||type&&node.type!==type)continue;const distance=dist(origin,node);if(distance<bestDistance){best=node;bestDistance=distance;}}return best;}
+  take(node,requested){const amount=Math.min(requested,node.amount);node.amount-=amount;if(node.amount<=0){node.amount=0;node.depleted=true;}return amount;}
+  definition(node){return getResourceDefinition(node.type);}
+}
+
+__exports.ResourceNodeManager=ResourceNodeManager;
+},
+'src/units/EngineeringSystem.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('src/core/math.js');const dist=__dep1.dist;const __dep2=__require('src/units/LogisticsSystem.js');const WORKER_STATE=__dep2.WORKER_STATE;const __dep3=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep3.VFX_EVENT;
+
+
+
+
+class EngineeringSystem {
+  constructor(simulation,movementSystem){Object.assign(this,{simulation,movementSystem});}
+  engineers(ids,faction=null){return this.simulation.squads.filter(squad=>ids.includes(squad.id)&&(faction===null||squad.f===faction)&&squad.type==='engineer'&&squad.hp>0);}
+  approach(squad,building){const angle=Math.atan2(squad.z-building.z,squad.x-building.x),radius=building.r+2;return{x:building.x+Math.cos(angle)*radius,z:building.z+Math.sin(angle)*radius};}
+  assist(ids,buildingId){const building=this.simulation.buildings.find(item=>item.id===buildingId&&item.hp>0&&item.progress<1);if(!building)return 'Aktif şantiye bulunamadı';const engineers=this.engineers(ids,building.f);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){if(!building.assignedEngineers.includes(squad.id))building.assignedEngineers.push(squad.id);squad.worker.state=WORKER_STATE.CONSTRUCTING;squad.worker.targetBuildingId=building.id;squad.worker.nodeId=null;const goal=this.approach(squad,building);this.movementSystem.move([squad.id],goal.x,goal.z);}return '';}
+  repair(ids,buildingId){const building=this.simulation.buildings.find(item=>item.id===buildingId&&item.hp>0&&item.progress===1);if(!building)return 'Tamir edilecek yapı bulunamadı';if(building.hp>=building.maxHp)return 'Yapı zaten sağlam';const engineers=this.engineers(ids,building.f);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){squad.worker.state=WORKER_STATE.REPAIRING;squad.worker.targetBuildingId=building.id;squad.worker.nodeId=null;const goal=this.approach(squad,building);this.movementSystem.move([squad.id],goal.x,goal.z);}return '';}
+  stop(ids){for(const squad of this.engineers(ids)){const worker=squad.worker,building=this.simulation.buildings.find(item=>item.id===worker.targetBuildingId);if(building?.assignedEngineers)building.assignedEngineers=building.assignedEngineers.filter(id=>id!==squad.id);worker.state=WORKER_STATE.IDLE;worker.targetBuildingId=null;worker.nodeId=null;worker.timer=0;}}
+  update(dt){for(const squad of this.simulation.squads){if(squad.hp<=0||squad.type!=='engineer'||squad.worker?.state!==WORKER_STATE.REPAIRING)continue;const worker=squad.worker,building=this.simulation.buildings.find(item=>item.id===worker.targetBuildingId&&item.hp>0&&item.progress===1);if(!building||building.hp>=building.maxHp){worker.state=WORKER_STATE.IDLE;worker.targetBuildingId=null;continue;}if(dist(squad,building)>building.r+BALANCE.repair.radius)continue;if(this.simulation.time-(building.lastHit??-100)<BALANCE.repair.combatDelay)continue;const economy=this.simulation.economySystem.get(squad.f),hp=Math.min(BALANCE.repair.rate*dt,building.maxHp-building.hp),cost={material:hp*BALANCE.repair.materialPerHp};if(!economy.charge(cost))continue;building.hp+=hp;squad.path=[];worker.effectCooldown-=dt;if(worker.effectCooldown<=0){this.simulation.visualEvents.emit(VFX_EVENT.REPAIR,squad.x,.6,squad.z,building.x,1,building.z,squad.f,squad.f,1,.7,squad.yaw,false,true,building.id);worker.effectCooldown=BALANCE.repair.effectPeriod;}}}
+}
+
+__exports.EngineeringSystem=EngineeringSystem;
+},
+'src/simulation/MatchFlow.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('data/factions.js');const FACTION_DEFINITIONS=__dep1.FACTION_DEFINITIONS;
+
+
+
+const MATCH_STATE=Object.freeze({SETUP:'SETUP',PREPARATION:'PREPARATION',WAR:'WAR',VICTORY:'VICTORY',DEFEAT:'DEFEAT'});
+const MATCH_EVENT=Object.freeze({MATCH_SETUP:'MATCH_SETUP',PREPARATION_STARTED:'PREPARATION_STARTED',PREPARATION_WARNING:'PREPARATION_WARNING',WAR_STARTED:'WAR_STARTED',MAIN_OBJECTIVE_DAMAGED:'MAIN_OBJECTIVE_DAMAGED',MAIN_OBJECTIVE_CRITICAL:'MAIN_OBJECTIVE_CRITICAL',DEFENDER_VICTORY:'DEFENDER_VICTORY',ATTACKER_VICTORY:'ATTACKER_VICTORY'});
+
+function validateSiegeRoles(definitions=FACTION_DEFINITIONS){
+  if(!definitions.some(f=>f.gameplayRole==='ATTACKER')||!definitions.some(f=>f.gameplayRole==='DEFENDER'))throw Error('SIEGE modu en az bir ATTACKER ve DEFENDER gerektirir');
+  return true;
+}
+
+class MatchFlow {
+  constructor(simulation){this.simulation=simulation;}
+  emit(type,data={}){this.simulation.gameplayEvents.push({tick:this.simulation.tick,type,...data});if(this.simulation.gameplayEvents.length>64)this.simulation.gameplayEvents.shift();}
+  setup(duration=BALANCE.match.durationSeconds){validateSiegeRoles();const s=this.simulation;s.match={mode:BALANCE.match.mode,state:MATCH_STATE.SETUP,preparationRemaining:BALANCE.match.preparationSeconds,matchRemaining:duration,duration,warningEmitted:false,roles:FACTION_DEFINITIONS.map(f=>f.gameplayRole),mainObjectiveId:null,outcome:null};this.emit(MATCH_EVENT.MATCH_SETUP);}
+  start(){const s=this.simulation;s.match.state=MATCH_STATE.PREPARATION;this.emit(MATCH_EVENT.PREPARATION_STARTED);s.notify('HAZIRLIK — birliklerini konuşlandır.');}
+  bindObjective(){const s=this.simulation,defender=s.match.roles.indexOf('DEFENDER');s.match.mainObjectiveId=s.buildings.find(b=>b.f===defender&&b.mainObjectiveForRole==='DEFENDER')?.id??null;}
+  update(dt){const s=this.simulation,m=s.match;if(!m||[MATCH_STATE.VICTORY,MATCH_STATE.DEFEAT].includes(m.state))return;if(m.state===MATCH_STATE.PREPARATION){m.preparationRemaining=Math.max(0,m.preparationRemaining-dt);if(m.preparationRemaining<1e-9)m.preparationRemaining=0;if(!m.warningEmitted&&m.preparationRemaining<=BALANCE.match.warningSeconds){m.warningEmitted=true;this.emit(MATCH_EVENT.PREPARATION_WARNING,{remaining:Math.ceil(m.preparationRemaining)});s.notify('HAZIRLIK BİTİYOR — '+Math.ceil(m.preparationRemaining));}if(m.preparationRemaining===0){m.state=MATCH_STATE.WAR;this.emit(MATCH_EVENT.WAR_STARTED);s.notify('SAVAŞ BAŞLADI');}}else if(m.state===MATCH_STATE.WAR){m.matchRemaining=Math.max(0,m.matchRemaining-dt);if(m.matchRemaining<1e-9)m.matchRemaining=0;if(m.matchRemaining===0)this.resolve('DEFENDER');}}
+  objectiveDamaged(target){const m=this.simulation.match;if(!m||target.id!==m.mainObjectiveId||m.state!==MATCH_STATE.WAR)return;this.emit(MATCH_EVENT.MAIN_OBJECTIVE_DAMAGED,{health:target.hp});if(target.hp/target.maxHp<=.25&&!m.criticalEmitted){m.criticalEmitted=true;this.emit(MATCH_EVENT.MAIN_OBJECTIVE_CRITICAL,{health:target.hp});}}
+  objectiveDestroyed(target){const m=this.simulation.match;if(m&&target.id===m.mainObjectiveId&&m.state===MATCH_STATE.WAR)this.resolve('ATTACKER');}
+  resolve(role){const s=this.simulation,m=s.match,winner=m.roles.indexOf(role);m.outcome=role;m.state=winner===s.player?MATCH_STATE.VICTORY:MATCH_STATE.DEFEAT;s.winner=winner;this.emit(role==='ATTACKER'?MATCH_EVENT.ATTACKER_VICTORY:MATCH_EVENT.DEFENDER_VICTORY);s.notify(role==='ATTACKER'?'SALDIRAN ZAFERİ — ana savunma merkezi düştü.':'SAVUNAN ZAFERİ — kuşatma süresi doldu.');}
+}
+
+__exports.MATCH_STATE=MATCH_STATE;
+__exports.MATCH_EVENT=MATCH_EVENT;
+__exports.validateSiegeRoles=validateSiegeRoles;
+__exports.MatchFlow=MatchFlow;
+},
+'src/render/Renderer.js':function(__exports,__require){
+const __dep0=__require('src/render/Materials.js');const VERTEX_SHADER=__dep0.VERTEX_SHADER;const FRAGMENT_SHADER=__dep0.FRAGMENT_SHADER;const __dep1=__require('src/render/MeshFactory.js');const createMesh=__dep1.createMesh;const __dep2=__require('src/render/Camera.js');const Camera=__dep2.Camera;const __dep3=__require('src/render/Batch.js');const INSTANCE_STRIDE=__dep3.INSTANCE_STRIDE;const Batch=__dep3.Batch;
+
+
+
+
+
+class Renderer {
+  constructor(canvas) {
+    this.canvas=canvas;
+    const gl=this.gl=canvas.getContext('webgl2', {
+      antialias:false,alpha:false,powerPreference:'high-performance'
+    });
+    if(!gl)throw Error('Bu cihazda WebGL 2 kullanılamıyor. Chrome veya güncel Android tarayıcısı gerekli.');
+    const sh=(type,src)=> {
+      let s=gl.createShader(type);
+      gl.shaderSource(s,src);
+      gl.compileShader(s);
+      if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));
+      return s;
+    };
+    const p=this.program=gl.createProgram();
+    gl.attachShader(p,sh(gl.VERTEX_SHADER,VERTEX_SHADER));
+    gl.attachShader(p,sh(gl.FRAGMENT_SHADER,FRAGMENT_SHADER));
+    gl.linkProgram(p);
+    if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));
+    this.uniform=gl.getUniformLocation(p,'vp');
+    this.meshes= {
+    };
+    for(const kind of['box','sphere','cone','cylinder','ring','quad']) {
+      const data=createMesh(kind);
+      const buffer=gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+      gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
+      this.meshes[kind]= {
+        buffer,count:data.length/6
+      };
+    }
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    this.camera=new Camera({x:30,z:74,zoom:52});
+    this.cam=this.camera.state;
+    this.quality=1.4;
+    this.drawCalls=0;
+    this.instances=0;
+    this.static=null;
+    this.vp=new Float32Array(16);
+    this.resize();
+  }
+  resize() {
+    const d=Math.min(devicePixelRatio||1,this.quality);
+    this.width=this.canvas.clientWidth;
+    this.height=this.canvas.clientHeight;
+    this.canvas.width=Math.round(this.width*d);
+    this.canvas.height=Math.round(this.height*d);
+    this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
+    this.updateCamera();
+  }
+  ensureCamera(){
+    if(!this.camera)this.camera=new Camera(this.cam||{x:30,z:74,zoom:52},this.vp);
+    this.camera.state=this.cam;this.camera.vp=this.vp;this.camera.resize(this.width,this.height);return this.camera;
+  }
+  updateCamera(){const camera=this.ensureCamera();this.right=camera.right;this.up=camera.up;this.forward=camera.forward;}
+  project(x,y,z){return this.ensureCamera().project(x,y,z);}
+  ground(px,py){return this.ensureCamera().ground(px,py);}
+  pan(dx,dy){this.ensureCamera().pan(dx,dy);this.updateCamera();}
+  zoom(delta){this.ensureCamera().zoomBy(delta);this.updateCamera();}
+  upload(batch,usage) {
+    const gl=this.gl,out= {
+    };
+    for(const[kind,arr]of Object.entries(batch.data)) {
+      if(!arr.length)continue;
+      const data=new Float32Array(arr),buffer=gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+      gl.bufferData(gl.ARRAY_BUFFER,data,usage);
+      out[kind]= {
+        buffer,count:arr.length/INSTANCE_STRIDE
+      };
+    }
+    return out;
+  }
+  setStatic(batch) {
+    if(this.static)for(const x of Object.values(this.static))this.gl.deleteBuffer(x.buffer);
+    this.static=this.upload(batch,this.gl.STATIC_DRAW);
+  }
+  drawGroup(group) {
+    const gl=this.gl;
+    for(const[kind,g]of Object.entries(group)) {
+      if(!g.count)continue;
+      const m=this.meshes[kind];
+      gl.bindBuffer(gl.ARRAY_BUFFER,m.buffer);
+      for(let i=0; i<2; i++) {
+        gl.enableVertexAttribArray(i);
+        gl.vertexAttribPointer(i,3,gl.FLOAT,false,24,i*12);
+        gl.vertexAttribDivisor(i,0);
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER,g.buffer);
+      for(const[i,n,offset]of[[2,3,0],[3,3,12],[4,4,24],[5,1,40],[6,2,44],[7,2,52]]) {
+        gl.enableVertexAttribArray(i);
+        gl.vertexAttribPointer(i,n,gl.FLOAT,false,INSTANCE_STRIDE*4,offset);
+        gl.vertexAttribDivisor(i,1);
+      }
+      gl.drawArraysInstanced(gl.TRIANGLES,0,m.count,g.count);
+      this.drawCalls++;
+      this.instances+=g.count;
+    }
+  }
+  updateGroup(batch,group) {
+    const gl=this.gl;
+    for(const [kind,arr] of Object.entries(batch.data)) {
+      let g=group[kind];
+      if(!arr.length){if(g)g.count=0;continue;}
+      if(!g)g=group[kind]={buffer:gl.createBuffer(),count:0,staging:new Float32Array(0)};
+      gl.bindBuffer(gl.ARRAY_BUFFER,g.buffer);
+      if(g.staging.length<arr.length){
+        g.staging=new Float32Array(2**Math.ceil(Math.log2(arr.length)));
+        gl.bufferData(gl.ARRAY_BUFFER,g.staging.byteLength,gl.DYNAMIC_DRAW);
+      }
+      g.staging.set(arr);g.count=arr.length/INSTANCE_STRIDE;
+      gl.bufferSubData(gl.ARRAY_BUFFER,0,g.staging,0,arr.length);
+    }
+  }
+  render(batch,transparent=null) {
+    const gl=this.gl;
+    gl.clearColor(.092,.107,.103,1);
+    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    gl.useProgram(this.program);
+    gl.uniformMatrix4fv(this.uniform,false,this.vp);
+    this.drawCalls=0;this.instances=0;
+    gl.disable(gl.BLEND);gl.depthMask(true);
+    if(this.static)this.drawGroup(this.static);
+    this.dynamic ||= {};this.updateGroup(batch,this.dynamic);this.drawGroup(this.dynamic);
+    if(transparent){
+      this.transparent ||= {};this.updateGroup(transparent,this.transparent);
+      gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
+      this.drawGroup(this.transparent);
+      gl.depthMask(true);gl.disable(gl.BLEND);
+    }
+  }
+}
+
+__exports.INSTANCE_STRIDE=INSTANCE_STRIDE;
+__exports.Batch=Batch;
+__exports.Renderer=Renderer;
+},
+'src/render/Materials.js':function(__exports,__require){
+
+const VERTEX_SHADER=`#version 300 es
+precision highp float;
+layout(location=0) in vec3 p;layout(location=1) in vec3 n;
+layout(location=2) in vec3 pos;layout(location=3) in vec3 scl;
+layout(location=4) in vec4 color;layout(location=5) in float rot;
+layout(location=6) in vec2 tilt;layout(location=7) in vec2 style;
+uniform mat4 vp;out vec3 normal;out vec4 col;out vec3 world;
+out vec2 uv;out vec2 material;
+vec3 rotate(vec3 v){
+ float cp=cos(tilt.x),sp=sin(tilt.x),cr=cos(tilt.y),sr=sin(tilt.y);
+ v=vec3(v.x,cp*v.y-sp*v.z,sp*v.y+cp*v.z);
+ v=vec3(cr*v.x-sr*v.y,sr*v.x+cr*v.y,v.z);
+ float c=cos(rot),s=sin(rot);return vec3(v.x*c+v.z*s,v.y,-v.x*s+v.z*c);
+}
+void main(){
+ vec3 q=p*scl;
+ if(style.y>0.)world=pos+vec3(.7071,0.,-.7071)*q.x+vec3(-.4082,.8165,-.4082)*q.y;
+ else world=rotate(q)+pos;
+ normal=normalize(rotate(n/max(abs(scl),vec3(.001))));
+ col=color;uv=p.xy+.5;material=style;gl_Position=vp*vec4(world,1.);
+}`;
+const FRAGMENT_SHADER=`#version 300 es
+precision highp float;
+in vec3 normal;in vec4 col;in vec3 world;in vec2 uv;in vec2 material;
+out vec4 outColor;
+float noise(vec2 p){
+ vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);vec2 k=vec2(127.1,311.7);
+ float a=fract(sin(dot(i,k))*43758.5453),b=fract(sin(dot(i+vec2(1.,0.),k))*43758.5453);
+ float c=fract(sin(dot(i+vec2(0.,1.),k))*43758.5453),d=fract(sin(dot(i+vec2(1.,1.),k))*43758.5453);
+ return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
+}
+void main(){
+ if(material.y>0.){
+   float radius=length((uv-.5)*2.);
+   float edge=1.-smoothstep(.25,1.,radius);
+   float turbulence=.62+.38*noise(uv*7.+world.xz*.08);
+   float alpha=col.a*edge*edge*turbulence;
+   if(alpha<.004)discard;
+   outColor=vec4(col.rgb,alpha);return;
+ }
+ float dither=fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233)))*43758.5453);
+ if(dither>col.a)discard;
+ float light=.42+.58*max(0.,dot(normal,normalize(vec3(-.5,1.,.35))));
+ vec3 c=col.rgb*light;
+ float grain=noise(world.xz*11.+world.y*2.);c*=.93+grain*.12;
+ if(world.y<.16&&normal.y>.7){
+   float mottling=noise(world.xz*.22)*.7+noise(world.xz*1.8)*.3;
+   c*=.67+mottling*.57;
+   float field=1.-smoothstep(10.,19.,abs(world.x-56.));
+   c=mix(c,c*vec3(.74,.70,.67),field*noise(world.xz*.48)*.62);
+   float rut=pow(max(0.,sin(world.z*8.+sin(world.x*.3)*3.)),16.)*.13;
+   c*=1.-rut;
+ }else if(world.y>.4){
+   float stain=noise(world.xz*1.4+world.y*.21);
+   c*=.90+.1*stain;
+ }
+ float haze=smoothstep(25.,135.,world.z)*.16;
+ c=mix(c,vec3(.25,.27,.25),haze);
+ c=mix(c,col.rgb*1.22,material.x);
+ c=pow(c,vec3(.91));
+ outColor=vec4(c,1.);
+}`;
+
+__exports.VERTEX_SHADER=VERTEX_SHADER;
+__exports.FRAGMENT_SHADER=FRAGMENT_SHADER;
+},
+'src/render/MeshFactory.js':function(__exports,__require){
+
+function createMesh(kind) {
+  const out=[];
+  const tri=(a,b,c)=> {
+    let u=b.map((v,i)=>v-a[i]),v=c.map((v,i)=>v-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],l=Math.hypot(...n)||1;
+    n=n.map(v=>v/l*(kind==='box'?1:-1));
+    for(const p of[a,b,c])out.push(...p,...n);
+  };
+  if(kind==='quad') {
+    for(const p of [[-.5,-.5,0],[.5,-.5,0],[.5,.5,0],[-.5,-.5,0],[.5,.5,0],[-.5,.5,0]])out.push(...p,0,0,1);
+  }else if(kind==='box') {
+    const p=[[-.5,-.5,-.5],[.5,-.5,-.5],[.5,.5,-.5],[-.5,.5,-.5],[-.5,-.5,.5],[.5,-.5,.5],[.5,.5,.5],[-.5,.5,.5]];
+    for(const f of[[0,3,2,1],[4,5,6,7],[0,4,7,3],[1,2,6,5],[3,7,6,2],[0,1,5,4]]) {
+      tri(p[f[0]],p[f[1]],p[f[2]]);
+      tri(p[f[0]],p[f[2]],p[f[3]]);
+    }
+  } else if(kind==='sphere') {
+    const rings=4,seg=8;
+    const p=(j,i)=> {
+      const a=j/rings*Math.PI,b=i/seg*Math.PI*2;
+      return[Math.sin(a)*Math.cos(b)*.5,Math.cos(a)*.5,Math.sin(a)*Math.sin(b)*.5];
+    };
+    for(let j=0; j<rings; j++)for(let i=0; i<seg; i++) {
+      tri(p(j,i),p(j+1,i),p(j+1,i+1));
+      tri(p(j,i),p(j+1,i+1),p(j,i+1));
+    }
+  } else {
+    const seg=kind==='ring'?28:8;
+    for(let i=0; i<seg; i++) {
+      const a=i/seg*Math.PI*2,b=(i+1)/seg*Math.PI*2;
+      const p=(angle,r,y)=>[Math.cos(angle)*r,y,Math.sin(angle)*r];
+      if(kind==='ring') {
+        tri(p(a,.5,0),p(b,.5,0),p(a,.44,0));
+        tri(p(b,.5,0),p(b,.44,0),p(a,.44,0));
+      }else {
+        const rt=kind==='cone'?0:.5;
+        tri(p(a,.5,-.5),p(b,.5,-.5),p(a,rt,.5));
+        tri(p(b,.5,-.5),p(b,rt,.5),p(a,rt,.5));
+        tri([0,.5,0],p(a,rt,.5),p(b,rt,.5));
+        tri([0,-.5,0],p(b,.5,-.5),p(a,.5,-.5));
+      }
+    }
+  }
+  return new Float32Array(out);
+}
+
+__exports.createMesh=createMesh;
+},
+'src/render/Camera.js':function(__exports,__require){
+const __dep0=__require('src/core/math.js');const clamp=__dep0.clamp;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;
+
+
+class Camera {
+  constructor(state={x:30,z:74,zoom:52},vp=new Float32Array(16)){this.state=state;this.vp=vp;this.width=1;this.height=1;}
+  resize(width,height){this.width=width||1;this.height=height||1;this.update();}
+  update(){const a=Math.SQRT1_2,b=.577350269,c=.40824829;this.right=[a,0,-a];this.up=[-c,.81649658,-c];this.forward=[b,b,b];const sy=2/this.state.zoom,sx=sy/(this.width/this.height),sz=-2/300,m=this.vp;m.set([a*sx,-c*sy,b*sz,0,0,.81649658*sy,b*sz,0,-a*sx,-c*sy,b*sz,0,(-a*this.state.x+a*this.state.z)*sx,(c*this.state.x+c*this.state.z)*sy,-(b*this.state.x+b*this.state.z)*sz,1]);}
+  project(x,y,z){const m=this.vp;return{x:((m[0]*x+m[4]*y+m[8]*z+m[12])*.5+.5)*this.width,y:(.5-(m[1]*x+m[5]*y+m[9]*z+m[13])*.5)*this.height};}
+  ground(px,py){const nx=(px/this.width-.5)*this.state.zoom*(this.width/this.height),ny=(.5-py/this.height)*this.state.zoom;return{x:this.state.x+nx*.70710678-ny*1.22474487,z:this.state.z-nx*.70710678-ny*1.22474487};}
+  pan(dx,dy){const a=this.ground(0,0),b=this.ground(dx,dy),min=BALANCE.camera.edgeMargin,max=BALANCE.world.size-min;this.state.x=clamp(this.state.x+a.x-b.x,min,max);this.state.z=clamp(this.state.z+a.z-b.z,min,max);this.update();}
+  zoomBy(delta){this.state.zoom=clamp(this.state.zoom*delta,BALANCE.camera.minZoom,BALANCE.camera.maxZoom);this.update();}
+}
+
+__exports.Camera=Camera;
+},
+'src/render/art/BattlefieldArt.js':function(__exports,__require){
+const __dep0=__require('src/render/art/AtmosphereArt.js');const atmosphereArt=__dep0.atmosphereArt;const __dep1=__require('src/render/factions/FactionVisualRegistry.js');const getFactionVisual=__dep1.getFactionVisual;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/render/art/ResourceArt.js');const resourceNodeArt=__dep3.resourceNodeArt;const __dep4=__require('src/render/art/ConstructionArt.js');const constructionSiteArt=__dep4.constructionSiteArt;const placementFeedbackArt=__dep4.placementFeedbackArt;const __dep5=__require('src/render/Batch.js');const Batch=__dep5.Batch;const __dep6=__require('src/data.js');const hash=__dep6.hash;const FACTIONS=__dep6.FACTIONS;const UNITS=__dep6.UNITS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const forests=__dep7.forests;const craters=__dep7.craters;const crossings=__dep7.crossings;
+
+
+
+
+
+
+
+
+const C= {
+  earth:[.27,.255,.215],mud:[.16,.145,.115],stone:[.43,.44,.39],metal:[.24,.29,.29],sand:[.49,.43,.31],bone:[.68,.64,.43],flesh:[.34,.17,.19],black:[.10,.13,.13]
+};
+const tint=(c,v)=>c.map(x=>x*v);
+function landscape() {
+  const b=new Batch(),add=(...a)=>b.add(...a);
+  add('box',56,-1.1,56,114,2,114,C.earth);
+  for(let z=1; z<112; z+=2)for(let x=1; x<112; x+=2) {
+    const t=terrain(x,z),h=hash(x,z),c=t==='river'?[.21,.29,.28]:t==='trench'?[.13,.14,.12]:t==='mud'?C.mud:t==='forest'?[.22,.25,.18]:C.earth;
+    add('box',x,t==='river'?-.08:t==='trench'?-.02:.015, z,2.02,.12,2.02,tint(c,.985+h*.03));
+    if(t==='land'&&h>.91)add('sphere',x,.06,z,.5+h,.25,.7,C.stone);
+  }
+  for(const c of craters) {
+    add('cylinder',c.x,.13,c.z,c.r*2,.22,c.r*2,[.20,.19,.15]);
+    add('cylinder',c.x,.26,c.z,c.r*1.65,.08,c.r*1.65,[.12,.14,.12]);
+    add('cylinder',c.x,.31,c.z,c.r,.02,c.r,[.20,.25,.23]);
+  }
+  for(const x of[43,69])for(let z=12; z<101; z+=1.35) {
+    if(crossings.some(v=>Math.abs(v-z)<4))continue;
+    for(const dx of[-2,2]) {
+      add('sphere',x+dx,.35,z,1.2,.66,1.6,C.sand);
+      if(hash(x,z)>.48)add('sphere',x+dx,.77,z,1,.5,1.3,tint(C.sand,.85));
+    }
+    if(z%4<1.5)add('box',x,.10,z,2.8,.12,.45,[.29,.24,.17]);
+  }
+  for(const z of crossings) {
+    for(let x=51; x<=61; x+=.65)add('box',x,.23,z,.58,.26,7.5,[.35,.30,.22]);
+    for(const side of[-1,1]) {
+      add('box',56,.5,z+side*3.5,11,.3,.25,C.metal);
+      for(const x of[51,54,58,61])add('box',x,.9,z+side*3.5,.18,1.8,.18,C.metal);
+    }
+  }
+  for(const f of forests)for(let i=0; i<23; i++) {
+    const a=hash(i,f.x)*6.28,r=Math.sqrt(hash(i,f.z))*f.r,x=f.x+Math.cos(a)*r,z=f.z+Math.sin(a)*r,h=3+hash(x,z)*4;
+    add('sphere',x+1,.12,z-.5,3,.035,2,[.15,.17,.13]);
+    add('cone',x,h*.5,z,.65,h,.65,[.20,.21,.16]);
+    add('box',x+.6,h*.65,z,1.8,.2,.25,[.22,.24,.17],.7);
+    if(i%3!==0) {
+      add('cone',x,h*.65,z,2.6,h*.65,2.6,[.14,.20,.16]);
+      add('cone',x,h*.88,z,1.9,h*.45,1.9,[.19,.24,.17]);
+    }
+  }
+  for(let i=0; i<95; i++) {
+    const x=8+hash(i,51)*96,z=7+hash(i,52)*98;
+    if(['river','bridge'].includes(terrain(x,z)))continue;
+    if(i%4===0) {
+      add('box',x,.65,z,.12,1.5,.14,[.28,.29,.24],.12);
+      add('box',x,1,z,.85,.14,.15,[.29,.30,.25]);
+    }else {
+      add('box',x,.35,z,1.6,.2,.2,C.metal,.7);
+      add('box',x,.35,z,.2,.8,1.6,C.metal,.7);
+    }
+  }
+  // shattered shrine and armoured wrecks
+  for(const [x,z]of[[33,59],[78,47],[60,102]]) {
+    add('box',x,.7,z,4,1.3,2.2,[.27,.28,.23],.35);
+    add('box',x,1.5,z,2,.8,1.5,[.32,.31,.24],.35);
+    add('box',x+1.5,1.5,z,3,.25,.25,C.black,.35);
+    for(const s of[-1,1])add('box',x,.45,z+s*1.2,4.5,.6,.5,C.black,.35);
+  }
+  for(const [x,z]of[[18,15],[91,96]]) {
+    add('box',x,.3,z,9,.5,6,C.stone);
+    for(let i=0; i<4; i++)add('box',x-4+i*2.6,1.8+hash(i,x),z,1,3+hash(i,x)*2,1,C.stone);
+    add('box',x-4,1.8,z+2,1,3.5,4,C.stone);
+  }
+  atmosphereArt(b);
+  return b;
+}
+function buildingArt(b,v,time,ghost=false) {
+  const f=v.f,organic=getFactionVisual(f).organic,p=ghost?1:v.progress,health=ghost?1:v.hp/v.maxHp;
+  const dead=v.hp<=0,deathAge=dead?Math.max(0,time-(v.diedAt??time-5)):0;
+  const collapse=dead?clamp(deathAge/1.15,0,1):0;
+  const scale=(.2+.8*p)*(1-collapse*.84),baseY=.2;
+  const col=ghost?(v.valid?[.38,.65,.51]:[.70,.22,.16]):null;
+  const hit=!ghost&&time-(v.lastHit??-10)<.16;
+  const shade=ghost?1:.58+.42*clamp(health,0,1);
+  const breath=organic&&!dead?1+Math.sin(time*1.45+v.id)*.018:1;
+  const add=(kind,dx,y,dz,sx,sy,sz,c,rot=0,pitch=0,roll=0,glow=0)=>{
+    const material=col||[c[0]*shade+(hit?.15:0),c[1]*shade+(hit?.10:0),c[2]*shade+(hit?.045:0)];
+    b.add(kind,v.x+dx+collapse*y*.17,baseY+y*scale,v.z+dz,
+      sx*breath,sy*scale,sz*breath,material,rot,ghost?.62:1,pitch,roll+collapse*.25,glow);
+  };
+  const stone=organic?[.30,.23,.22]:C.stone,metal=organic?C.flesh:C.metal,accent=FACTIONS[f].accent;
+  if(!organic&&p<1&&!ghost){constructionSiteArt(b,v);return;}
+  if(dead&&collapse>=1){
+    // A bounded visual ruin pass is selected by dynamicArt; not a collision object.
+    b.add('cylinder',v.x,.11,v.z,v.r*2.7,.03,v.r*2.4,[.075,.075,.065]);
+    for(let i=0;i<9;i++){
+      const a=i*2.399+v.id,d=(.25+hash(i,v.id)*.7)*v.r;
+      const size=.5+hash(i+2,v.id)*1.7;
+      b.add(organic?'sphere':'box',v.x+Math.cos(a)*d,.25+size*.13,v.z+Math.sin(a)*d,size,size*.4,size*.65,organic?[.22,.115,.12]:[.27,.28,.24],a,1,hash(i,5)*.35,hash(i,8)*.25);
+    }
+    if(organic){
+      b.add('sphere',v.x,.35,v.z,v.r*1.7,.7,v.r*1.2,[.28,.15,.16]);
+      b.add('cone',v.x+.5,.8,v.z,.3,1.5,.3,C.bone,.5,1,.6,.5);
+    }else{
+      b.add('box',v.x-v.r*.55,.65,v.z,.6,1.3,v.r*1.7,[.28,.29,.26],0,1,0,.15);
+      b.add('box',v.x,.33,v.z,2.6,.25,1.4,[.20,.24,.23],.4,1,.15,.14);
+    }
+    return;
+  }
+  b.add('sphere',v.x+1,.14,v.z-.7,v.r*2.5,.04,v.r*2.1,[.15,.17,.14]);
+  add(organic?'sphere':'box',0,.14,0,v.r*2.25,.3,v.r*2.25,organic?[.25,.21,.19]:[.27,.29,.26]);
+  const cross=(x,y,z,size)=> {
+    add('box',x,y,z,.19,size,.18,C.bone);
+    add('box',x,y+size*.16,z,size*.65,.19,.2,C.bone);
+  };
+  if(!organic) {
+    const wall=(w,h,d)=> {
+      add('box',0,h/2,0,w,h,d,stone);
+      add('box',0,h*.57,0,w+.08,.2,d+.08,[.24,.27,.25]);
+      for(const side of[-1,1])add('box',side*w*.46,h*.45,0,.4,h*.9,d+.5,tint(stone,.8));
+      add('box',0,.9,d/2+.05,.85,1.8,.12,C.black);
+    };
+    if(v.type==='hq') {
+      wall(6,3.8,4.8);
+      add('box',0,4.2,0,6.6,.7,5.2,metal);
+      add('box',-2,5,0,1.4,2,1.7,stone);
+      add('cone',-2,6.3,0,2,1,2,metal);
+      cross(-2,7.3,0,1.5);
+      for(let i=-1; i<=1; i++)add('box',i*1.6,4.9,-1.8,.5,.85,.5,stone);
+    }
+    if(v.type==='barracks') {
+      wall(5,1.7,3.8);
+      add('cylinder',0,2,0,5.5,1,4.2,metal);
+      for(let i=-1; i<=1; i++)add('box',i*1.5,1.9,2.14,.7,.35,.08,C.black);
+    }
+    if(v.type==='workshop') {
+      wall(4.8,2.5,4);
+      add('box',0,3,0,5.2,.6,4.4,metal);
+      add('cylinder',-1.5,4,-1, .65,4,.65,C.black);
+      add('cylinder',-.3,3.5,-1,.6,3,.6,metal);
+      add('box',3,3,0,.22,5,.22,C.sand);
+      add('box',1.6,5.4,0,3,.2,.2,C.sand);
+      add('box',.3,4.8,0,.1,1,.1,metal);
+    }
+    if(v.type==='supply') {
+      for(const x of[-1,1]) {
+        add('cylinder',x,1.5,0,1.6,2.8,1.6,metal);
+        add('cone',x,3,0,1.7,.55,1.7,C.sand);
+      }
+      for(const z of[-1.6,1.6])add('box',0,.6,z,3.5,1.2,.9,C.sand);
+    }
+    if(v.type==='materialDepot') {
+      add('box',0,1.45,0,5.7,2.6,4.5,stone);add('box',0,2.95,0,6.1,.45,4.9,metal);
+      for(const x of[-1.7,0,1.7]){add('cylinder',x,1.15,2.35,.72,2.1,.72,metal);add('box',x,.45,-2.4,1.2,.75,.9,C.sand);}
+      add('box',2.55,3.8,0,.18,3,.18,C.metal);add('box',1.5,5.1,0,2.2,.16,.16,C.sand);
+    }
+    if(v.type==='hospital') {
+      wall(5,1.2,4);
+      add('cone',0,2.2,0,7,2.2,5.7,[.56,.51,.39]);
+      add('box',0,1.1,2.4,1,.8,.12,[.63,.59,.46]);
+      add('box',0,1.1,2.48,.65,.18,.03,accent);
+      add('box',0,1.1,2.48,.18,.65,.03,accent);
+    }
+    if(v.type==='tower') {
+      for(const x of[-1,1])for(const z of[-1,1])add('box',x,2.3,z,.4,4.5,.4,metal);
+      add('box',0,4.5,0,3,.5,3,stone);
+      add('box',0,5,0,2.7,.7,2.7,metal);
+      add('box',0,5.1,1.8,.3,.3,2.6,C.black);
+      add('cone',0,6.3,0,3.6,1.2,3.6,metal);
+    }
+    if(v.type==='observation') {
+      for(const x of[-1,1])for(const z of[-1,1])add('box',x,2.1,z,.32,4.2,.32,metal);
+      add('box',0,4.15,0,3.4,.45,3.4,stone);add('box',0,4.75,0,2.8,.8,2.8,metal);
+      add('cylinder',0,6,0,.18,2.7,.18,C.sand);add('box',.6,6.8,0,1.2,.75,.06,accent);
+    }
+    if(v.type==='defense') {
+      add('box',0,.75,0,5.2,1.2,3.4,stone);for(const x of[-1.9,-.65,.65,1.9])add('sphere',x,1.35,1.25,1.2,.65,1,C.sand);
+      add('cylinder',0,1.75,0,2.4,.8,2.4,metal);add('box',0,2.15,1.75,.32,.32,3.4,C.black);
+    }
+    if(v.type==='chapel') {
+      wall(3.2,3.3,4.6);
+      add('cone',0,4.1,0,5,2,6,metal);
+      add('box',0,5, -1,1.4,3,1.4,stone);
+      add('cone',0,6.9,-1,2,1.3,2,metal);
+      cross(0,8,-1,1.4);
+      add('box',0,2.5,2.4,.55,.9,.09,accent);
+    }
+    if(v.type!=='hospital'&&v.type!=='tower'){
+      for(const side of [-1,1]){
+        add('box',side*v.r*.73,1.5,v.r*.56,.32,2.8,.6,[.33,.35,.31]);
+        add('cone',side*v.r*.73,3,v.r*.56,.55,.6,.65,metal);
+      }
+      add('box',0,1.55,v.r*.65,.75,.25,.06,C.bone);
+      add('box',0,1.55,v.r*.67,.20,.95,.06,C.bone);
+    }
+    for(let i=0;i<4;i++)add('sphere',v.r*.6-i*.8,.3,-v.r*.83,1,.5,.65,C.sand);
+    add('cylinder',v.r*.83,2.5,-v.r*.6,.10,5,.10,metal);
+    add('box',v.r*.83+.6,4.4,-v.r*.6,1.1,1.2,.08,accent);
+    cross(v.r*.83+.6,4.4,-v.r*.6, .65);
+  }else {
+    const body=(w,h,d)=> {
+      add('sphere',0,h*.45,0,w,h,d,C.flesh);
+      add('sphere',-.5,h*.65,.2,w*.7,h*.75,d*.7,[.38,.23,.23]);
+      for(let i=0;i<5;i++){
+        const y=.7+i*h*.13,width=w*(.84-i*.07);
+        add('box',0,y,d*.40,width,.16,.22,C.bone,0,0,(i%2-.5)*.05);
+        add('cone',-width*.5,y+.25,d*.35,.24,.7,.25,C.bone,0,0,-.3);
+        add('cone',width*.5,y+.25,d*.35,.24,.7,.25,C.bone,0,0,.3);
+      }
+      add('sphere',w*.25,h*.6,d*.38,.75,.9,.55,[.47,.46,.18]);
+      add('sphere',w*.25,h*.6,d*.63,.30,.40,.12,[.63,.69,.23],0,0,0,.3);
+      for(let i=0; i<6; i++) {
+        const a=i/6*6.28;
+        add('cone',Math.cos(a)*w*.38,h*.25,Math.sin(a)*d*.38,.8,h*.8,.8,C.bone,a);
+        add('sphere',Math.cos(a)*w*.5,.45,Math.sin(a)*d*.5,2.6,.7,1,[.30,.27,.19],-a);
+      }
+    };
+    if(v.type==='hq') {
+      body(7,6,6);
+      for(let i=0; i<3; i++) {
+        add('cone',(i-1)*1.7,6+i%2,0,1,4+i%2,1,C.bone);
+        add('sphere',(i-1)*1.5,4.5,2.1,1.4,1.6,1,[.39,.44,.20]);
+      }
+      add('sphere',0,2,2.8,2.4,2.8,.6,C.black);
+    }
+    if(v.type==='barracks') {
+      body(5.4,3.5,4.5);
+      for(let i=0; i<4; i++)add('sphere',(i%2-.5)*2.1,1.4,2+Math.floor(i/2)*.4,1.4,2,1.3,[.43,.45,.23]);
+    }
+    if(v.type==='workshop') {
+      body(4,4,4);
+      for(let i=0; i<3; i++) {
+        add('cone',(i-1)*1.3,4.4,0,.7,4,.7,C.bone);
+        add('sphere',(i-1)*1.3,3.1,0,1.1,1.9,1.1,[.29,.38,.22]);
+      }
+      add('sphere',2,.8,1,2,1.6,2,C.flesh);
+    }
+    if(v.type==='supply') {
+      for(let i=0; i<3; i++) {
+        const a=i*2.1;
+        add('sphere',Math.cos(a),1.8,Math.sin(a),2.5,3.5,2.5,[.36,.42,.21]);
+        add('cone',Math.cos(a),3.4,Math.sin(a),.6,1.6,.6,C.bone);
+      }
+      add('sphere',0,.2,0,6,.4,6,[.23,.29,.15]);
+    }
+    if(v.type==='hospital') {
+      body(3,2,3);
+      for(let i=0; i<7; i++) {
+        const a=i*.9;
+        add('cylinder',Math.cos(a)*2,1.5,Math.sin(a)*2,.25,3,.25,C.bone);
+        add('sphere',Math.cos(a)*2,3,Math.sin(a)*2,1.8,.8,1.8,[.47,.39,.24]);
+      }
+    }
+    if(v.type==='tower') {
+      body(2.7,4,2.7);
+      add('cone',0,5,0,2.2,5,2.2,C.flesh);
+      for(let i=0; i<4; i++) {
+        const a=i*1.57;
+        add('cone',Math.cos(a),5,Math.sin(a),.6,3,.6,C.bone);
+      }
+      add('sphere',0,5.1,.8,1.4,1.4,1.2,[.57,.57,.25]);
+    }
+    if(v.type==='chapel') {
+      add('cylinder',0,.5,0,5.6,1,5.6,C.flesh);
+      for(const x of[-1.7,1.7]) {
+        add('cone',x,2.5,0,1.2,5,1.2,C.bone);
+        add('sphere',x,3,0,1.2,2,1,C.flesh);
+      }
+      add('cone',0,2,0,3,2.8,3,[.36,.40,.22]);
+      add('cylinder',0,3.4,0,3.1,.45,3.1,C.bone);
+      add('sphere',0,3.7,0,2.5,.5,2.5,[.26,.38,.17]);
+    }
+  }
+  if(!ghost&&health<.68&&!dead){
+    const count=health<.3?6:3;
+    for(let i=0;i<count;i++){
+      const dx=(hash(i,v.id)-.5)*v.r*1.5,y=.6+hash(i+8,v.id)*1.8;
+      add(organic?'sphere':'box',dx,y,v.r*.68,.17,.7,.10,[.07,.065,.055],0,0,(hash(i,7)-.5)*1.3);
+    }
+    if(health<.3){
+      add('box',v.r*.4,2.7,v.r*.15,1.7,.13,.45,organic?C.bone:C.metal,.4,.12,.45);
+      add('sphere',-.6,.18,v.r*.85,1.8,.28,1,[.12,.105,.085]);
+    }
+  }
+  if(p<1&&!ghost) {
+    b.add('ring',v.x,.4,v.z,v.r*2.7,.1,v.r*2.7,[.70,.49,.21]);
+    if(!organic) {
+      for(let i=-1; i<=1; i+=2)add('box',i*v.r,2,0,.12,4,v.r*2.2,C.sand);
+      add('box',0,3,0,v.r*2.2,.14,v.r*2.2,C.sand);
+    }
+  }
+  if(ghost)placementFeedbackArt(b,v);
+}
+function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.time) {
+  const b=targetBatch?targetBatch.reset():new Batch();
+  let visible=0,near=0,far=0;
+  let ruins=0;
+  for(const node of sim.resourceNodes||[]){if(node.depleted)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
+  for(let bi=sim.buildings.length-1;bi>=0;bi--) {
+    const v=sim.buildings[bi];
+    if(v.hp<=0&&(!Number.isFinite(v.diedAt)||visualTime-v.diedAt>180||ruins++>=32))continue;
+    const p=r.project(v.x,0,v.z);
+    if(p.x< -150||p.x>r.width+150||p.y< -160||p.y>r.height+160)continue;
+    buildingArt(b,v,visualTime);
+    visible++;
+    if(selected.has(v.id))b.add('ring',v.x,.3,v.z,v.r*2.8,.1,v.r*2.8,[.77,.73,.47]);
+  }
+  for(const s of sim.squads) {
+    if(s.hp<=0)continue;
+    const p=r.project(s.x,0,s.z);
+    if(p.x< -80||p.x>r.width+80||p.y< -100||p.y>r.height+100)continue;
+    visible++;
+    const d=UNITS.find(u=>u.id===s.type),n=Math.ceil(s.hp/d.hp),col=FACTIONS[s.f].ink,selectedS=selected.has(s.id),pixel=r.height/r.cam.zoom,lod=clamp((pixel-6)/6,0,1);
+    if(lod>.5)near+=n;
+    else far+=n;
+    if(selectedS)b.add('ring',s.x,.27,s.z,5.9,.1,5.9,[.72,.75,.48]);
+    if(selectedS) {
+      const span=2.8;
+      for(const dx of [-span,span])for(const dz of [-span,span]){
+        b.add('box',s.x+dx,.3,s.z+dz,.7,.035,.08,[.83,.78,.50]);
+        b.add('box',s.x+dx,.3,s.z+dz,.08,.035,.7,[.83,.78,.50]);
+      }
+    }
+    for(let i=0;i<n;i++){
+      const ox=(i%4-1.5)*.9,oz=(Math.floor(i/4)-.5)*1.3,a=s.yaw;
+      const x=s.x+ox*Math.cos(a)+oz*Math.sin(a),z=s.z-ox*Math.sin(a)+oz*Math.cos(a);
+      const hit=clamp(1-(visualTime-(s.lastHit??-100))/.15,0,1);
+      soldierArt(b,x,z,a,s.f,s.type==='heavy',lod,visualTime,s.path.length>0,0,1,i*.13,hit,s.type==='engineer');
+    }
+    if(s.type==='engineer'&&s.worker?.cargo>0){const cargoColor=s.worker.cargoType==='supply'?[.55,.48,.31]:s.worker.cargoType==='material'?[.38,.42,.40]:[.50,.43,.34];b.add('box',s.x,.9,s.z-.8,1.4,.65,.8,cargoColor,s.yaw);}
+  }
+  if(sim.match?.mode!=='SIEGE')for(const p of sim.points) {
+    const c=p.owner===-1?[.59,.52,.33]:FACTIONS[p.owner].ink;
+    b.add('ring',p.x,.25,p.z,8,.1,8,c);
+    b.add('cylinder',p.x,1.7,p.z,.12,3.4,.12,C.metal);
+    b.add('box',p.x+.55,2.9,p.z,1.1,.7,.05,c);
+    b.add('box',p.x, .4,p.z,1.7,.8,1.3,C.sand);
+  }
+  if(ghost)buildingArt(b, {
+    ...ghost,hp:100,progress:1
+  },sim.time,true);
+  return {
+    batch:b,visible,near,far
+  };
+}
+
+__exports.landscape=landscape;
+__exports.buildingArt=buildingArt;
+__exports.dynamicArt=dynamicArt;
+},
+'src/render/art/AtmosphereArt.js':function(__exports,__require){
+const __dep0=__require('src/data.js');const hash=__dep0.hash;const __dep1=__require('src/world/World.js');const terrain=__dep1.terrain;const crossings=__dep1.crossings;const forests=__dep1.forests;
+
+
+const RUST=[.27,.20,.135],CHAR=[.105,.115,.103],MUD=[.18,.16,.12],STONE=[.30,.31,.27];
+// Decoration never changes the walkability grid or battlefield layout.
+function atmosphereArt(b){
+  for(let i=0;i<72;i++){
+    const x=34+hash(i,150)*44,z=7+hash(i,151)*98;
+    if(['river','bridge'].includes(terrain(x,z)))continue;
+    const r=.8+hash(i,152)*2.7;
+    b.add('cylinder',x,.085,z,r*2,.012,r*1.3,MUD,hash(i,153)*6.28);
+    if(i%3===0){
+      b.add('cylinder',x,.103,z,r*1.2,.015,r*.8,CHAR);
+      for(let j=0;j<4;j++){const a=j*1.57+hash(i,155);b.add('sphere',x+Math.cos(a)*r*.65,.19,z+Math.sin(a)*r*.65,r*.46,.22,r*.38,STONE,a);}
+    }
+    if(i%2===0)b.add('box',x,.16,z,1.3,.12,.24,RUST,hash(i,156)*6.28,1,.1,.13);
+  }
+  // Broken wire sections leave every bridge approach open.
+  for(const x of [39,73])for(let z=14;z<100;z+=5.3){
+    if(crossings.some(c=>Math.abs(z-c)<6))continue;
+    const lean=(hash(x,z)-.5)*.65;
+    b.add('box',x,.65,z,.13,1.6,.13,RUST,0,1,0,lean);
+    b.add('box',x,.44,z+1.8,.065,.065,3.8,CHAR,0,1,.1,0);
+    b.add('box',x,.95,z+1.8,.055,.055,3.8,CHAR,0,1,-.07,0);
+    for(let j=0;j<4;j++){
+      b.add('box',x,.7,z+j*.9,.42,.035,.035,RUST,.7,1,.7,.5);
+      b.add('box',x,.7,z+j*.9,.035,.42,.035,RUST,0,1,.5,.5);
+    }
+  }
+  for(const f of forests)for(let i=0;i<8;i++){
+    const a=hash(i,f.x+170)*6.28,r=hash(i,f.z+170)*f.r,x=f.x+Math.cos(a)*r,z=f.z+Math.sin(a)*r,h=3+hash(x,z)*3;
+    b.add('cone',x,h*.5,z,.45,h,.48,CHAR,0,1,0,.1);
+    b.add('box',x+.6,h*.7,z,.16,2.2,.16,CHAR,.3,1,0,-.9);
+    b.add('box',x-.4,h*.6,z+.2,.12,1.7,.12,CHAR,.8,1,.9,.5);
+    b.add('box',x,.18,z,3.4,.30,.45,CHAR,a,1,.03,.05);
+  }
+  for(const z of crossings)for(const x of [49,63]){
+    b.add('cylinder',x,.09,z-4,4,.025,2.7,CHAR,.4);
+    for(let j=0;j<3;j++){
+      b.add('box',x+j*.7,.32,z-4,.55,.58,.6,[.30,.28,.21],.1);
+      b.add('box',x+j*.7,.65,z-4,.65,.08,.68,RUST,.1);
+    }
+    b.add('box',x,.22,z+4,2,.14,.23,[.29,.24,.16],.5);
+  }
+  // Shattered buttresses, shell cases and discarded armour.
+  for(const [x,z] of [[36,39],[76,70],[46,103],[67,7]]){
+    b.add('box',x,.23,z,4.8,.45,3.2,CHAR);
+    b.add('box',x-1,1.1,z,.7,2.2,3.1,STONE,.07,1,0,.12);
+    b.add('box',x+1.4,.9,z-.8,1,1.8,1.1,STONE,-.2,1,.12,.25);
+    for(let j=0;j<6;j++)b.add('box',x+(hash(j,x)-.5)*5,.2,z+(hash(j,z)-.5)*4,.5,.35,.7,STONE,hash(j,190)*6.28);
+  }
+}
+
+__exports.atmosphereArt=atmosphereArt;
+},
+'src/render/art/ResourceArt.js':function(__exports,__require){
+const __dep0=__require('data/resources.js');const getResourceDefinition=__dep0.getResourceDefinition;
+
+function resourceNodeArt(batch,node){
+  if(node.depleted)return;const definition=getResourceDefinition(node.type),ratio=Math.max(.18,node.amount/node.maxAmount),x=node.x,z=node.z,color=definition.color;
+  batch.add('ring',x,.12,z,3.8,.06,3.8,color);
+  if(node.type==='supply'){for(let i=0;i<Math.ceil(5*ratio);i++){const dx=(i%3-1)*.75,dz=(Math.floor(i/3)-.5)*.8;batch.add('box',x+dx,.35,z+dz,1.1,.65,.75,color,i*.12);batch.add('box',x+dx,.69,z+dz,.7,.08,.08,[.16,.18,.16],i*.12);}}
+  else if(node.type==='material'){for(let i=0;i<Math.ceil(7*ratio);i++){const a=i*2.399,d=.3+(i%3)*.55;batch.add(i%2?'cylinder':'box',x+Math.cos(a)*d,.28+i%2*.18,z+Math.sin(a)*d,.55,.35+.3*(i%2),1.15,color,a);}}
+  else{batch.add('box',x,.5,z,3.2,.15,2.5,[.32,.29,.22]);batch.add('cone',x,1.5,z,3.6,2.2,3,[.45,.39,.28]);batch.add('box',x,1.55,z+1.5,.16,2.2,.16,[.63,.58,.42]);batch.add('box',x+.55,2.25,z+1.5,1.1,.65,.05,color);}
+}
+
+__exports.resourceNodeArt=resourceNodeArt;
+},
+'src/render/art/ConstructionArt.js':function(__exports,__require){
+
+function constructionSiteArt(batch,building){
+  const {x,z,r}=building,p=building.progress,stone=[.34,.34,.29],wood=[.35,.27,.17],metal=[.27,.31,.30],supply=[.50,.42,.27];
+  batch.add('ring',x,.14,z,r*2.7,.08,r*2.7,[.72,.56,.25]);
+  batch.add('box',x,.16,z,r*2.1,.22,r*2.1,stone);
+  for(const dx of[-r*.82,r*.82])for(const dz of[-r*.82,r*.82])batch.add('box',x+dx,.65,z+dz,.16,1.2,.16,wood);
+  if(p>=.25){for(const side of[-1,1]){batch.add('box',x+side*r*.72,1.45,z,.18,2.7,r*1.7,metal);batch.add('box',x,1.2,z+side*r*.72,r*1.7,2.1,.18,metal);}for(let i=0;i<3;i++)batch.add('box',x-r*.55+i*r*.55,.42,z+r*.88,.75,.55,.65,supply,.08*i);}
+  if(p>=.55){const height=1.2+(p-.55)*4.6;batch.add('box',x,.25+height/2,z,r*1.55,height,r*1.4,[.38,.39,.34]);batch.add('box',x,.25+height,z,r*1.8,.18,r*1.65,metal);}
+  if(p>=.82){batch.add('box',x-r*.45,3.5,z,.25,2.7,.25,metal);batch.add('box',x-r*.45,4.7,z,1.2,.18,.18,[.60,.52,.31]);}
+}
+function placementFeedbackArt(batch,building){const color=building.valid?[.63,.78,.49]:[.82,.28,.18],x=building.x,z=building.z,r=building.r;batch.add('ring',x,.28,z,r*2.9,.12,r*2.9,color);if(building.valid){batch.add('box',x-.35,2.9,z,.18,1.3,.18,color,0,.9,0,.65);batch.add('box',x+.28,3.15,z,.18,2,.18,color,0,.9,0,-.65);}else{for(const rot of[.78,-.78])batch.add('box',x,3,z,.18,2.4,.18,color,0,.9,0,rot);}}
+
+__exports.constructionSiteArt=constructionSiteArt;
+__exports.placementFeedbackArt=placementFeedbackArt;
+},
+'src/audio/AudioManager.js':function(__exports,__require){
+
+// All sound is synthesized. A single noise buffer is shared by capped voices.
+class AudioEngine {
+  constructor(){this.enabled=false;this.ctx=null;this.last=0;this.lastBlast=-1;this.voices=0;}
+  toggle(){
+    this.enabled=!this.enabled;
+    if(this.enabled){
+      if(!this.ctx){
+        this.ctx=new (window.AudioContext||window.webkitAudioContext)();
+        const c=this.ctx;this.noise=c.createBuffer(1,c.sampleRate,c.sampleRate);
+        const data=this.noise.getChannelData(0);
+        for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.6;
+      }
+      this.ctx.resume();
+    }
+    return this.enabled;
+  }
+  noiseVoice(duration,volume,frequency){
+    if(!this.enabled||!this.ctx||this.voices>=6)return;
+    const c=this.ctx,source=c.createBufferSource(),filter=c.createBiquadFilter(),gain=c.createGain();
+    source.buffer=this.noise;filter.type='lowpass';filter.frequency.value=frequency;
+    gain.gain.setValueAtTime(volume,c.currentTime);gain.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);
+    source.connect(filter).connect(gain).connect(c.destination);this.voices++;
+    source.onended=()=>{this.voices--;source.disconnect();filter.disconnect();gain.disconnect();};
+    source.start();source.stop(c.currentTime+duration);
+  }
+  shot(f){if(!this.enabled||!this.ctx||this.ctx.currentTime-this.last<.09)return;this.last=this.ctx.currentTime;this.noiseVoice(f?.17:.075,f?.06:.09,f?650:2300);}
+  explosion(size){if(!this.enabled||!this.ctx||this.ctx.currentTime-this.lastBlast<.3)return;this.lastBlast=this.ctx.currentTime;this.noiseVoice(size>1?.85:.4,size>1?.19:.11,290);}
+}
+
+__exports.AudioEngine=AudioEngine;
+},
+'src/input/CommandSystem.js':function(__exports,__require){
+const __dep0=__require('src/input/Commands.js');const COMMAND=__dep0.COMMAND;
+
+class CommandSystem {
+  constructor(simulation){this.simulation=simulation;this.sequence=0;this.history=[];}
+  bind(simulation){this.simulation=simulation;}
+  dispatch(command){
+    const sim=this.simulation;this.sequence++;if(this.history.length>=64)this.history.shift();this.history.push({sequence:this.sequence,command:JSON.parse(JSON.stringify(command))});
+    if(command.type===COMMAND.MOVE)return sim.move(command.ids,command.x,command.z);
+    if(command.type===COMMAND.ATTACK){const target=[...sim.squads,...sim.buildings].find(entity=>entity.id===command.targetId&&entity.hp>0);return sim.move(command.ids,command.x,command.z,target||null);}
+    if(command.type===COMMAND.BUILD)return sim.build(command.faction,command.buildingType,command.x,command.z,command.engineerIds||[]);
+    if(command.type===COMMAND.GATHER)return sim.gather(command.ids,command.nodeId,command.auto);
+    if(command.type===COMMAND.REPAIR)return sim.repair(command.ids,command.buildingId);
+    if(command.type===COMMAND.ASSIST_CONSTRUCTION)return sim.assistConstruction(command.ids,command.buildingId);
+    if(command.type===COMMAND.SET_AUTO_GATHER)return sim.setAutoGather(command.ids,command.enabled,command.resourceType);
+    if(command.type===COMMAND.STOP){sim.engineeringSystem.stop(command.ids);sim.logisticsSystem.stop(command.ids);for(const squad of sim.squads)if(command.ids.includes(squad.id)&&squad.hp>0){squad.path=[];squad.target=null;squad.order='hold';}return '';}
+    const building=sim.buildings.find(item=>item.id===command.buildingId);
+    if(command.type===COMMAND.TRAIN)return sim.train(building,command.unitType);
+    if(command.type===COMMAND.CANCEL)return sim.cancel(building);
+    if(command.type===COMMAND.SET_RALLY){if(building)building.rally={x:command.x,z:command.z};return '';}
+    throw Error('Bilinmeyen komut: '+command.type);
+  }
+}
+
+__exports.CommandSystem=CommandSystem;
+},
+'src/input/Commands.js':function(__exports,__require){
+
+const COMMAND=Object.freeze({MOVE:'MOVE',ATTACK:'ATTACK',BUILD:'BUILD',STOP:'STOP',TRAIN:'TRAIN',CANCEL:'CANCEL',SET_RALLY:'SET_RALLY',GATHER:'GATHER',REPAIR:'REPAIR',ASSIST_CONSTRUCTION:'ASSIST_CONSTRUCTION',SET_AUTO_GATHER:'SET_AUTO_GATHER'});
+const MoveCommand=(ids,x,z)=>({type:COMMAND.MOVE,ids:[...ids],x,z});
+const AttackCommand=(ids,targetId,x,z)=>({type:COMMAND.ATTACK,ids:[...ids],targetId,x,z});
+const BuildCommand=(faction,buildingType,x,z,engineerIds=[])=>({type:COMMAND.BUILD,faction,buildingType,x,z,engineerIds:[...engineerIds]});
+const StopCommand=ids=>({type:COMMAND.STOP,ids:[...ids]});
+const TrainCommand=(buildingId,unitType)=>({type:COMMAND.TRAIN,buildingId,unitType});
+const CancelCommand=buildingId=>({type:COMMAND.CANCEL,buildingId});
+const SetRallyCommand=(buildingId,x,z)=>({type:COMMAND.SET_RALLY,buildingId,x,z});
+const GatherCommand=(ids,nodeId,auto=false)=>({type:COMMAND.GATHER,ids:[...ids],nodeId,auto:!!auto});
+const RepairCommand=(ids,buildingId)=>({type:COMMAND.REPAIR,ids:[...ids],buildingId});
+const AssistConstructionCommand=(ids,buildingId)=>({type:COMMAND.ASSIST_CONSTRUCTION,ids:[...ids],buildingId});
+const SetAutoGatherCommand=(ids,enabled,resourceType=null)=>({type:COMMAND.SET_AUTO_GATHER,ids:[...ids],enabled:!!enabled,resourceType});
+const isSerializableCommand=command=>{try{return JSON.parse(JSON.stringify(command)).type===command.type;}catch{return false;}};
+
+__exports.COMMAND=COMMAND;
+__exports.MoveCommand=MoveCommand;
+__exports.AttackCommand=AttackCommand;
+__exports.BuildCommand=BuildCommand;
+__exports.StopCommand=StopCommand;
+__exports.TrainCommand=TrainCommand;
+__exports.CancelCommand=CancelCommand;
+__exports.SetRallyCommand=SetRallyCommand;
+__exports.GatherCommand=GatherCommand;
+__exports.RepairCommand=RepairCommand;
+__exports.AssistConstructionCommand=AssistConstructionCommand;
+__exports.SetAutoGatherCommand=SetAutoGatherCommand;
+__exports.isSerializableCommand=isSerializableCommand;
+},
+'src/input/SelectionSystem.js':function(__exports,__require){
+
+class SelectionSystem {
+  constructor(){this.ids=new Set();}
+  clear(){this.ids.clear();}
+  replace(ids){this.ids=new Set(ids);return this.ids;}
+  add(id){this.ids.add(id);}
+  has(id){return this.ids.has(id);}
+  array(){return [...this.ids];}
+  prune(simulation){for(const id of this.ids)if(!simulation.squads.some(s=>s.id===id&&s.hp>0)&&!simulation.buildings.some(b=>b.id===id&&b.hp>0))this.ids.delete(id);}
+  selectAll(simulation){return this.replace(simulation.squads.filter(s=>s.f===simulation.player&&s.hp>0).map(s=>s.id));}
+}
+
+__exports.SelectionSystem=SelectionSystem;
+},
+'src/input/TouchControls.js':function(__exports,__require){
+
+class TouchControls {
+  constructor(element,handlers){this.element=element;this.handlers=handlers;this.pointers=new Map();this.bind();}
+  bind(){for(const type of ['pointerdown','pointermove','pointerup','pointercancel'])this.element.addEventListener(type,event=>this.handle(type,event));}
+  handle(type,event){const point={x:event.clientX,y:event.clientY,id:event.pointerId,button:event.button};if(type==='pointerdown'){this.pointers.set(event.pointerId,point);this.element.setPointerCapture?.(event.pointerId);this.handlers.down?.(point,event,this.pointers);}else if(type==='pointermove'){const previous=this.pointers.get(event.pointerId);if(previous){this.pointers.set(event.pointerId,point);this.handlers.move?.(point,previous,event,this.pointers);}}else{const previous=this.pointers.get(event.pointerId);this.pointers.delete(event.pointerId);this.handlers.up?.(point,previous,event,this.pointers);}}
+}
+
+__exports.TouchControls=TouchControls;
+},
+'src/ui/Notifications.js':function(__exports,__require){
+
+class Notifications {
+  constructor(element,duration=3800){this.element=element;this.duration=duration;this.until=0;}
+  show(message,now=performance.now()){this.element.textContent=message;this.element.style.opacity='1';this.until=now+this.duration;return this.until;}
+  update(now=performance.now()){if(now>this.until)this.element.style.opacity='0';}
+}
+
+__exports.Notifications=Notifications;
+},
+'src/ui/BuildMenu.js':function(__exports,__require){
+
+class BuildMenu {
+  constructor(panel,list){this.panel=panel;this.list=list;}
+  cost(definition,faction){if(faction!==0)return definition.cost+' öz';const cost=definition.costs;return [`▣ ${cost.supply||0}`,`⚙ ${cost.material||0}`,cost.manpower?`✚ ${cost.manpower}`:''].filter(Boolean).join(' · ');}
+  toggle(definitions,faction,simulation,onChoose){this.panel.hidden=!this.panel.hidden;this.list.innerHTML='';for(const definition of definitions.filter(item=>item.id!=='hq'&&simulation.constructionSystem.definitionAllowed(faction,item))){const missing=simulation.constructionSystem.missingRequirement(faction,definition),button=document.createElement('button');button.classList.toggle('locked',!!missing);button.disabled=!!missing;const requirement=missing?`⛓ ${definitions.find(item=>item.id===missing).names[faction]} gerekli`:(definition.requires?.length?'Gereksinim karşılandı':'Temel yapı');button.innerHTML=`<b>${definition.symbol} ${definition.names[faction]}</b><small>${definition.desc}</small><em>${this.cost(definition,faction)} · ${definition.time} sn</em><small>${requirement}</small>`;button.onclick=()=>onChoose(definition);this.list.append(button);}}
+  close(){this.panel.hidden=true;}
+}
+
+__exports.BuildMenu=BuildMenu;
+},
+'src/ui/HUD.js':function(__exports,__require){
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;const __dep2=__require('src/world/Terrain.js');const terrain=__dep2.terrain;const __dep3=__require('src/core/Config.js');const BALANCE=__dep3.BALANCE;
+
+
+
+
+class HUD {
+  constructor(get){this.get=get;}
+  update(sim,selected){
+    const $=this.get;for(const id of selected)if(![...sim.squads,...sim.buildings].some(entity=>entity.id===id&&entity.hp>0))selected.delete(id);
+    const newAntioch=sim.economySystem.get(sim.player).activeGathering,economy=sim.economies?.[sim.player];
+    $('resource').textContent=Math.floor(newAntioch?economy.stock.supply:sim.resources[sim.player]);
+    $('materialBox').hidden=!newAntioch;$('manpowerBox').hidden=!newAntioch;
+    if(newAntioch){$('material').textContent=Math.floor(economy.stock.material);$('manpower').textContent=Math.floor(economy.stock.manpower);}
+    $('army').textContent=sim.forceUsed(sim.player)+' / '+sim.forceCap(sim.player);$('time').textContent=String(Math.floor(sim.time/60)).padStart(2,'0')+':'+String(Math.floor(sim.time%60)).padStart(2,'0');
+    const match=sim.match,remaining=match?.state==='PREPARATION'?match.preparationRemaining:match?.matchRemaining??0,objective=sim.buildings.find(b=>b.id===match?.mainObjectiveId),role=match?.roles?.[sim.player]||'—';
+    $('matchPhase').textContent=match?.state==='PREPARATION'?'HAZIRLIK':match?.state==='WAR'?'SAVAŞ':match?.state||'KURULUM';$('matchClock').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(Math.max(0,Math.ceil(remaining)%60)).padStart(2,'0');$('matchClock').classList.toggle('warning',match?.state==='PREPARATION'&&remaining<=10);$('missionText').textContent=role==='DEFENDER'?'SAVUNAN · Ana savunma merkezini süre sonuna kadar koru.':'SALDIRAN · Süre dolmadan ana savunma merkezini yok et.';$('objectives').innerHTML=`<span>ANA MERKEZ ${objective?Math.ceil(objective.hp/objective.maxHp*100):0}%</span><span>${role}</span>`;
+    const entities=[...sim.squads,...sim.buildings].filter(entity=>selected.has(entity.id)),building=entities.find(entity=>entity.queue),squads=entities.filter(entity=>entity.path);
+    if(building){$('selectionType').textContent=FACTION_DEFINITIONS[building.f].name.toUpperCase()+' / YAPI';$('selectionName').textContent=building.names[building.f];$('selectionInfo').textContent=`${Math.ceil(building.hp)} / ${building.maxHp} CAN · `+(building.progress<1?'İnşa %'+Math.floor(building.progress*100)+' · '+(building.assignedEngineers?.length||0)+' mühendis':building.queue.length?'Sıra '+building.queue.length+' · '+getUnitDefinition(building.queue[0].type).names[building.f]+' · '+Math.ceil(getUnitDefinition(building.queue[0].type).time-building.queue[0].time)+' sn':building.desc);}
+    else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),kind=terrain(squads[0].x,squads[0].z),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');}
+    else{$('selectionType').textContent=FACTION_DEFINITIONS[sim.player].name.toUpperCase()+' / SEFER KUVVETİ';$('selectionName').textContent='Cephe seni bekliyor.';$('selectionInfo').textContent='Mangaya dokun, ardından bir hedef seç.';}
+    $('deselect').hidden=entities.length===0;const friendly=squads.filter(item=>item.f===sim.player),engineers=friendly.filter(item=>item.type==='engineer');
+    $('stop').querySelector('span').textContent=building?'İptal':'Dur';$('stop').disabled=!(friendly.length||building&&building.f===sim.player&&(building.progress<1||building.queue.length));$('trainHeavy').disabled=!sim.buildings.some(item=>item.f===sim.player&&item.type==='workshop'&&item.progress===1&&item.hp>0);$('trainEngineer').hidden=!newAntioch;$('autoGather').hidden=!newAntioch;$('autoGather').disabled=!engineers.length;$('autoGather').classList.toggle('active',engineers.length>0&&engineers.every(item=>item.worker.auto));$('buildMenu').disabled=sim.economySystem.get(sim.player).engineeredConstruction&&!sim.squads.some(item=>item.f===sim.player&&item.type==='engineer'&&item.hp>0);
+  }
+}
+
+__exports.HUD=HUD;
+},
+'src/ui/Minimap.js':function(__exports,__require){
+const __dep0=__require('src/world/Terrain.js');const terrain=__dep0.terrain;const __dep1=__require('data/factions.js');const FACTION_DEFINITIONS=__dep1.FACTION_DEFINITIONS;const __dep2=__require('src/core/Config.js');const BALANCE=__dep2.BALANCE;
+
+
+
+class Minimap {
+  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('2d');this.background=document.createElement('canvas');this.background.width=224;this.background.height=224;const context=this.background.getContext('2d');for(let z=0;z<BALANCE.world.size;z+=BALANCE.world.cell)for(let x=0;x<BALANCE.world.size;x+=BALANCE.world.cell){const kind=terrain(x,z);context.fillStyle=({river:'#425b59',bridge:'#998458',forest:'#374c35',trench:'#8b805f',mud:'#3c3d30'})[kind]||'#535744';context.fillRect(x*2,z*2,4,4);}}
+  draw(sim,renderer){const context=this.context;context.drawImage(this.background,0,0);for(const node of sim.resourceNodes||[])if(!node.depleted){context.fillStyle=node.type==='supply'?'#c0a25f':node.type==='material'?'#8f9a91':'#b18a74';context.fillRect(node.x*2-2,node.z*2-2,4,4);}for(const point of sim.points){context.strokeStyle=point.owner<0?'#e1c288':FACTION_DEFINITIONS[point.owner].color;context.lineWidth=2;context.strokeRect(point.x*2-5,point.z*2-5,10,10);}for(const building of sim.buildings)if(building.hp>0){context.fillStyle=FACTION_DEFINITIONS[building.f].color;context.fillRect(building.x*2-4,building.z*2-4,8,8);}for(const squad of sim.squads)if(squad.hp>0){context.fillStyle=squad.f===sim.player?'#e2e9d9':'#d57c5c';context.beginPath();context.arc(squad.x*2,squad.z*2,2.7,0,7);context.fill();}context.strokeStyle='#f2e8c8';context.lineWidth=1.5;context.beginPath();for(const [index,point] of [[0,[0,0]],[1,[renderer.width,0]],[2,[renderer.width,renderer.height]],[3,[0,renderer.height]]]){const world=renderer.ground(...point);if(!index)context.moveTo(world.x*2,world.z*2);else context.lineTo(world.x*2,world.z*2);}context.closePath();context.stroke();}
+}
+
+__exports.Minimap=Minimap;
+},
+'src/ui/PerformancePanel.js':function(__exports,__require){
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;
+
+class PerformancePanel {
+  constructor(element){this.element=element;}
+  update(fps,sim,renderer,art,effects){const living=sim.squads.filter(squad=>squad.hp>0),soldiers=living.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0);this.element.innerHTML=Math.round(fps)+' FPS · '+living.length+' MANGA / '+soldiers+' ASKER<br>'+art.visible+' GÖRÜNÜR BİRİM/YAPI · '+renderer.drawCalls+' ÇİZİM<br>LOD '+art.near+' YAKIN / '+art.far+' UZAK · '+renderer.instances+' PARÇA<br>FX '+effects.particles.count()+'/'+effects.particles.limit+' · DUMAN '+effects.smoke.count()+' · İZ '+effects.marks.count()+' · CESET '+effects.corpses.count();}
+}
+
+__exports.PerformancePanel=PerformancePanel;
+},
+'src/ui/OverlayRenderer.js':function(__exports,__require){
+
+class OverlayRenderer {
+  constructor(context){this.context=context;}
+  draw(sim,renderer,selected,drag,orderMarker,now=performance.now()){
+    const context=this.context;context.clearRect(0,0,renderer.width,renderer.height);
+    for(const entity of [...sim.squads,...sim.buildings]){if(entity.hp<=0)continue;if(!selected.has(entity.id)&&entity.hp===entity.maxHp&&!(entity.progress<1)&&!entity.path)continue;const point=renderer.project(entity.x,entity.path?2.4:7,entity.z);if(point.x<0||point.x>renderer.width||point.y<0||point.y>renderer.height)continue;const width=entity.path?27:45;context.fillStyle='#0c1412df';context.fillRect(point.x-width/2-1,point.y-1,width+2,5);context.fillStyle=entity.f===sim.player?'#bed095':'#cb7960';context.fillRect(point.x-width/2,point.y,width*entity.hp/entity.maxHp,3);if(entity.progress<1){context.fillStyle='#cdb078';context.fillRect(point.x-width/2,point.y+5,width*entity.progress,2);}if(selected.has(entity.id)&&entity.path?.length){context.strokeStyle='#d6c98c66';context.setLineDash([4,5]);context.beginPath();const origin=renderer.project(entity.x,.3,entity.z);context.moveTo(origin.x,origin.y);for(const waypoint of entity.path){const projected=renderer.project(waypoint.x,.3,waypoint.z);context.lineTo(projected.x,projected.y);}context.stroke();context.setLineDash([]);}}
+    for(const [point,index] of sim.points.map((point,index)=>[point,index])){const projected=renderer.project(point.x,4,point.z);context.font='10px Arial';context.textAlign='center';context.fillStyle='#e0d4ab';context.fillText(['I · KUZEY','II · MERKEZ','III · GÜNEY'][index],projected.x,projected.y);}
+    if(drag?.select&&drag.moved){context.fillStyle='#c9ca7420';context.strokeStyle='#d0c58c';context.fillRect(drag.x,drag.y,drag.cx-drag.x,drag.cy-drag.y);context.strokeRect(drag.x,drag.y,drag.cx-drag.x,drag.cy-drag.y);}
+    if(orderMarker){const age=(now-orderMarker.t)/1000;if(age>1)return null;const point=renderer.project(orderMarker.x,.3,orderMarker.z);context.strokeStyle=orderMarker.attack?'#e89a6f':'#e5d397';if(orderMarker.attack){context.beginPath();context.moveTo(point.x-15,point.y-8);context.lineTo(point.x+15,point.y+8);context.moveTo(point.x+15,point.y-8);context.lineTo(point.x-15,point.y+8);context.stroke();}context.beginPath();context.ellipse(point.x,point.y,12+age*14,6+age*7,0,0,7);context.stroke();}
+    return orderMarker;
+  }
+}
+
+__exports.OverlayRenderer=OverlayRenderer;
+}};
+const __cache=Object.create(null);
+function __require(id){if(__cache[id])return __cache[id];const exports=__cache[id]={};const factory=__factories[id];if(!factory)throw Error('Missing module '+id);factory(exports,__require);return exports;}
+__require('src/main.js');
+
+</script></body></html>

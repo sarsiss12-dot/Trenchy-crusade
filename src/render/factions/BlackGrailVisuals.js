@@ -1,0 +1,1 @@
+export const blackGrailVisuals=Object.freeze({id:'blackGrail',index:1,organic:true,bodyPrimitive:'sphere',headPrimitive:'sphere',architecture:'grown',palette:Object.freeze({material:[.34,.17,.19],structure:[.30,.23,.22]})});
