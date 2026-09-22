@@ -33,10 +33,10 @@ export class MovementSystem {
     }else if(target&&!enemy&&Math.floor(this.simulation.time*2)!==squad.replan){squad.replan=Math.floor(this.simulation.time*2);this.move([squad.id],target.x,target.z,target);}
   }
   separate(living,dt){
-    const limit=BALANCE.army.separation;
+    const limit=BALANCE.army.separation,preparation=this.simulation.match?.state==='PREPARATION';
     for(let i=0;i<living.length;i++)for(let j=i+1;j<living.length;j++){
       const a=living[i],b=living[j],distance=dist(a,b);
-      if(distance>0&&distance<limit){const force=(limit-distance)*dt*BALANCE.army.separationForce;for(const [squad,sign] of [[a,1],[b,-1]]){const x=squad.x+(a.x-b.x)/distance*force*sign,z=squad.z+(a.z-b.z)/distance*force*sign;if(walkable(x,z,this.simulation.buildings)){squad.x=x;squad.z=z;}}}
+      if(distance>0&&distance<limit){const force=(limit-distance)*dt*BALANCE.army.separationForce;for(const [squad,sign] of [[a,1],[b,-1]]){let x=squad.x+(a.x-b.x)/distance*force*sign,z=squad.z+(a.z-b.z)/distance*force*sign;if(preparation){const zone=FACTION_DEFINITIONS[squad.f].deploymentZone;x=Math.max(zone.minX,Math.min(zone.maxX,x));}if(walkable(x,z,this.simulation.buildings)){squad.x=x;squad.z=z;}}}
     }
   }
 }
