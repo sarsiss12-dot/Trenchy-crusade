@@ -1092,9 +1092,24 @@ class Simulation {
 __exports.Simulation=Simulation;
 },
 'src/core/GameState.js':function(__exports,__require){
-const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep1.createSiegeMatchState;
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/buildings.js');const getBuildingDefinition=__dep1.getBuildingDefinition;const __dep2=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep2.createSiegeMatchState;
 
 
+
+
+const hydrateLegacyBuilding=building=>{
+  const definition=getBuildingDefinition(building.type);
+  if(!definition)return building;
+  return {...building,
+    names:definition.names,cost:definition.cost,costs:definition.costs,time:definition.time,r:definition.r,desc:definition.desc,symbol:definition.symbol,
+    production:definition.production,footprint:definition.footprint,requires:definition.requires,forceCap:definition.forceCap??0,storage:definition.storage??null,
+    category:definition.category??'SUPPORT',mainObjectiveForRole:definition.mainObjectiveForRole??null,
+    hp:building.hp??definition.hp,maxHp:building.maxHp??definition.hp,progress:building.progress??1,
+    queue:Array.isArray(building.queue)?building.queue:[],cooldown:building.cooldown??0,
+    assignedEngineers:Array.isArray(building.assignedEngineers)?building.assignedEngineers:[]
+  };
+};
+const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';}};
 
 const points=()=>[
   {x:48,z:24,owner:-1,progress:0,claim:-1},
@@ -1118,6 +1133,8 @@ class GameState {
       data.version=3;
       data.tick=Math.round((data.time||0)/.05);
       data.gameplayEvents=[];
+      data.buildings=data.buildings.map(hydrateLegacyBuilding);
+      redeployLegacySquads(data.squads);
       data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
     }
     return data;
@@ -1566,7 +1583,7 @@ class LogisticsSystem {
   constructor(simulation,nodeManager,movementSystem){Object.assign(this,{simulation,nodeManager,movementSystem});}
   engineers(ids,faction=null){return this.simulation.squads.filter(squad=>ids.includes(squad.id)&&(faction===null||squad.f===faction)&&squad.type==='engineer'&&squad.hp>0);}
   reset(worker){worker.state=WORKER_STATE.IDLE;worker.nodeId=null;worker.targetBuildingId=null;worker.depotId=null;worker.timer=0;}
-  gather(ids,nodeId,auto=false){const node=this.nodeManager.get(nodeId);if(!node||node.depleted)return 'Kaynak tükenmiş';const engineers=this.engineers(ids);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){const worker=squad.worker;worker.state=WORKER_STATE.MOVING_TO_RESOURCE;worker.nodeId=node.id;worker.targetBuildingId=null;worker.auto=auto||worker.auto;worker.autoResourceType=node.type;worker.timer=0;this.movementSystem.move([squad.id],node.x,node.z);}return '';}
+  gather(ids,nodeId,auto=false){const node=this.nodeManager.get(nodeId);if(!node||node.depleted)return 'Kaynak tükenmiş';const engineers=this.engineers(ids);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){const worker=squad.worker,previous=this.simulation.buildings.find(item=>item.id===worker.targetBuildingId);if(previous?.assignedEngineers)previous.assignedEngineers=previous.assignedEngineers.filter(id=>id!==squad.id);worker.state=WORKER_STATE.MOVING_TO_RESOURCE;worker.nodeId=node.id;worker.targetBuildingId=null;worker.auto=auto||worker.auto;worker.autoResourceType=node.type;worker.timer=0;this.movementSystem.move([squad.id],node.x,node.z);}return '';}
   setAuto(ids,enabled,resourceType=null){const engineers=this.engineers(ids);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){squad.worker.auto=enabled;squad.worker.autoResourceType=resourceType||squad.worker.autoResourceType;squad.worker.searchCooldown=0;if(enabled&&squad.worker.state===WORKER_STATE.IDLE)this.findNext(squad);}return '';}
   stop(ids){for(const squad of this.engineers(ids)){const worker=squad.worker;if(worker.cargo>0){const depot=this.depot(squad,worker.cargoType);if(depot){worker.depotId=depot.id;worker.state=WORKER_STATE.RETURNING;this.moveToDepot(squad,depot);continue;}}this.reset(worker);worker.auto=false;}}
   findNext(squad){const worker=squad.worker,node=this.nodeManager.nearest(squad,worker.autoResourceType);worker.searchCooldown=BALANCE.logistics.autoSearchPeriod;if(!node){this.reset(worker);worker.auto=true;return false;}worker.state=WORKER_STATE.MOVING_TO_RESOURCE;worker.nodeId=node.id;worker.autoResourceType=node.type;this.movementSystem.move([squad.id],node.x,node.z);return true;}
@@ -1645,8 +1662,9 @@ class EngineeringSystem {
   constructor(simulation,movementSystem){Object.assign(this,{simulation,movementSystem});}
   engineers(ids,faction=null){return this.simulation.squads.filter(squad=>ids.includes(squad.id)&&(faction===null||squad.f===faction)&&squad.type==='engineer'&&squad.hp>0);}
   approach(squad,building){const angle=Math.atan2(squad.z-building.z,squad.x-building.x),radius=building.r+2;return{x:building.x+Math.cos(angle)*radius,z:building.z+Math.sin(angle)*radius};}
-  assist(ids,buildingId){const building=this.simulation.buildings.find(item=>item.id===buildingId&&item.hp>0&&item.progress<1);if(!building)return 'Aktif şantiye bulunamadı';const engineers=this.engineers(ids,building.f);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){if(!building.assignedEngineers.includes(squad.id))building.assignedEngineers.push(squad.id);squad.worker.state=WORKER_STATE.CONSTRUCTING;squad.worker.targetBuildingId=building.id;squad.worker.nodeId=null;const goal=this.approach(squad,building);this.movementSystem.move([squad.id],goal.x,goal.z);}return '';}
-  repair(ids,buildingId){const building=this.simulation.buildings.find(item=>item.id===buildingId&&item.hp>0&&item.progress===1);if(!building)return 'Tamir edilecek yapı bulunamadı';if(building.hp>=building.maxHp)return 'Yapı zaten sağlam';const engineers=this.engineers(ids,building.f);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){squad.worker.state=WORKER_STATE.REPAIRING;squad.worker.targetBuildingId=building.id;squad.worker.nodeId=null;const goal=this.approach(squad,building);this.movementSystem.move([squad.id],goal.x,goal.z);}return '';}
+  detach(squad){const previous=this.simulation.buildings.find(item=>item.id===squad.worker?.targetBuildingId);if(previous?.assignedEngineers)previous.assignedEngineers=previous.assignedEngineers.filter(id=>id!==squad.id);}
+  assist(ids,buildingId){const building=this.simulation.buildings.find(item=>item.id===buildingId&&item.hp>0&&item.progress<1);if(!building)return 'Aktif şantiye bulunamadı';const engineers=this.engineers(ids,building.f);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){this.detach(squad);if(!building.assignedEngineers.includes(squad.id))building.assignedEngineers.push(squad.id);squad.worker.state=WORKER_STATE.CONSTRUCTING;squad.worker.targetBuildingId=building.id;squad.worker.nodeId=null;const goal=this.approach(squad,building);this.movementSystem.move([squad.id],goal.x,goal.z);}return '';}
+  repair(ids,buildingId){const building=this.simulation.buildings.find(item=>item.id===buildingId&&item.hp>0&&item.progress===1);if(!building)return 'Tamir edilecek yapı bulunamadı';if(building.hp>=building.maxHp)return 'Yapı zaten sağlam';const engineers=this.engineers(ids,building.f);if(!engineers.length)return 'Muharebe mühendisi seçilmeli';for(const squad of engineers){this.detach(squad);squad.worker.state=WORKER_STATE.REPAIRING;squad.worker.targetBuildingId=building.id;squad.worker.nodeId=null;const goal=this.approach(squad,building);this.movementSystem.move([squad.id],goal.x,goal.z);}return '';}
   stop(ids){for(const squad of this.engineers(ids)){const worker=squad.worker,building=this.simulation.buildings.find(item=>item.id===worker.targetBuildingId);if(building?.assignedEngineers)building.assignedEngineers=building.assignedEngineers.filter(id=>id!==squad.id);worker.state=WORKER_STATE.IDLE;worker.targetBuildingId=null;worker.nodeId=null;worker.timer=0;}}
   update(dt){for(const squad of this.simulation.squads){if(squad.hp<=0||squad.type!=='engineer'||squad.worker?.state!==WORKER_STATE.REPAIRING)continue;const worker=squad.worker,building=this.simulation.buildings.find(item=>item.id===worker.targetBuildingId&&item.hp>0&&item.progress===1);if(!building||building.hp>=building.maxHp){worker.state=WORKER_STATE.IDLE;worker.targetBuildingId=null;continue;}if(dist(squad,building)>building.r+BALANCE.repair.radius)continue;if(this.simulation.time-(building.lastHit??-100)<BALANCE.repair.combatDelay)continue;const economy=this.simulation.economySystem.get(squad.f),hp=Math.min(BALANCE.repair.rate*dt,building.maxHp-building.hp),cost={material:hp*BALANCE.repair.materialPerHp};if(!economy.charge(cost))continue;building.hp+=hp;squad.path=[];worker.effectCooldown-=dt;if(worker.effectCooldown<=0){this.simulation.visualEvents.emit(VFX_EVENT.REPAIR,squad.x,.6,squad.z,building.x,1,building.z,squad.f,squad.f,1,.7,squad.yaw,false,true,building.id);worker.effectCooldown=BALANCE.repair.effectPeriod;}}}
 }
