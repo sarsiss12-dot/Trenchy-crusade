@@ -8,6 +8,7 @@ import {ParticleSystem,PARTICLE} from './ParticleSystem.js';
 import {SmokeSystem} from './SmokeSystem.js';
 import {DecalSystem} from './DecalSystem.js';
 import {CorpseManager} from './CorpseManager.js';
+import {VISIBILITY} from '../world/FogOfWar.js';
 export const EFFECT_QUALITY=BALANCE.effects.quality;
 export {EffectPool,PARTICLE};
 export class EffectCoordinator {
@@ -22,7 +23,7 @@ export class EffectCoordinator {
   random(){return this.rng.next();}
   setQuality(index){this.quality=clamp(index|0,0,2);this.budget=EFFECT_QUALITY[this.quality];for(const k of ['particles','smoke','corpses','marks'])this[k].setLimit(this.budget[k]);}
   clear(){for(const k of ['particles','smoke','corpses','marks'])this[k].clear();this.flash=0;this.soundShot=-1;this.soundExplosion=0;this.clock=0;this.environmentTimer=0;}
-  visible(x,z,margin=100){if(!this.camera)return true;const p=this.camera.project(x,1,z);return p.x>-margin&&p.x<this.camera.width+margin&&p.y>-margin&&p.y<this.camera.height+margin;}
+  visible(x,z,margin=100){if(this.fog&&this.fog.state(this.player,x,z)!==VISIBILITY.VISIBLE)return false;if(!this.camera)return true;const p=this.camera.project(x,1,z);return p.x>-margin&&p.x<this.camera.width+margin&&p.y>-margin&&p.y<this.camera.height+margin;}
   puff(x,y,z,size,life,f,kind=0){
     const p=this.smoke.take(kind,x,y,z,life,size,f,this.random());
     p.vx=.18+this.random()*.18;p.vz=-.08;p.vy=kind===2?.04:.35+this.random()*.25;
@@ -96,7 +97,7 @@ export class EffectCoordinator {
     }
   }
   update(dt,sim,camera=null){
-    this.camera=camera;this.clock+=dt;this.flash=Math.max(0,this.flash-dt*.3);
+    this.camera=camera;this.fog=sim.fogOfWar||null;this.player=sim.player??0;this.clock+=dt;this.flash=Math.max(0,this.flash-dt*.3);
     this.soundShot=-1;this.soundExplosion=0;
     sim.visualEvents.drain(this.consume);
     for(const pool of [this.particles,this.smoke,this.corpses,this.marks]){
