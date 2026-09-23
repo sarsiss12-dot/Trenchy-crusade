@@ -27,6 +27,7 @@ const migrateExpandedBattlefield=data=>{
   const scale=1.5,clamp=value=>Math.max(1.5,Math.min(166.5,value*scale));
   for(const building of data.buildings||[]){building.x=clamp(building.x);building.z=clamp(building.z);building.assignedEngineers=[];if(building.rally)building.rally={x:clamp(building.rally.x),z:clamp(building.rally.z)};}
   for(const squad of data.squads||[]){squad.x=clamp(squad.x);squad.z=clamp(squad.z);resetMigratedSquad(squad);}
+  if(data.match?.state==='PREPARATION'){redeployLegacyBuildings(data.buildings||[]);redeployLegacySquads(data.squads||[]);}
   if(Array.isArray(data.points))for(const point of data.points){point.x=clamp(point.x);point.z=clamp(point.z);}
   const previous=new Map((data.resourceNodes||[]).map(node=>[node.id,node]));
   data.resourceNodes=RESOURCE_NODE_LAYOUT.map((item,index)=>{const id='resource-'+(index+1),saved=previous.get(id),depleted=!!saved?.depleted||Number(saved?.amount)<=0,amount=depleted?0:Math.max(0,Math.min(item.amount,Number.isFinite(saved?.amount)?saved.amount:item.amount));return{id,type:item.type,x:item.x,z:item.z,r:1.8,amount,maxAmount:item.amount,depleted};});
