@@ -174,7 +174,7 @@ $('buildMenu').onclick=()=>buildMenu.toggle(BUILDINGS,sim.player,sim,definition=
 $('closeBuild').onclick=()=>buildMenu.close();
 function checkGhost() {
   if(!ghost)return;
-  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z);
+  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z,ghost.yaw);
   ghost.valid=!err;
   $('placementText').textContent=err||ghost.names[sim.player]+' · '+buildMenu.cost(ghost,sim.player)+' · ✓ geçerli zemin';
   $('confirmBuild').disabled=!!err;
@@ -407,7 +407,7 @@ function frame(now) {
     notifications.update();
   }
   const art=dynamicArt(sim,renderer,selected,ghost,frameBatch,playing?effects.clock:sim.time);
-  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer);
+  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer,sim.fogOfWar,sim.player);
   renderer.render(art.batch,smokeBatch);
   orderMarker=overlayRenderer.draw(sim,renderer,selected,drag,orderMarker);
   if(effects.flash>0){ctx.strokeStyle='rgba(207,151,77,'+effects.flash+')';ctx.lineWidth=12;ctx.strokeRect(6,6,renderer.width-12,renderer.height-12);ctx.lineWidth=1;}
