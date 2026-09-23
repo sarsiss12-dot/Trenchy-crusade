@@ -3,7 +3,8 @@ name: Sync standalone
 on:
   push:
     branches:
-      - codex/establish-asymmetric-match-flow
+      - 'codex/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,7 +18,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
-          ref: codex/establish-asymmetric-match-flow
+          ref: ${{ github.ref_name }}
       - name: Rebuild standalone
         run: python3 build.py
       - name: Commit generated standalone when changed
