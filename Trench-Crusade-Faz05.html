@@ -44,7 +44,8 @@ const game=new Game();
 __exports.game=game;
 },
 'src/core/Game.js':function(__exports,__require){
-const __dep0=__require('src/effects/EffectCoordinator.js');const Effects=__dep0.EffectCoordinator;const __dep1=__require('src/render/art/EffectArt.js');const effectArt=__dep1.effectArt;const __dep2=__require('src/render/Batch.js');const Batch=__dep2.Batch;const __dep3=__require('src/simulation/Simulation.js');const Simulation=__dep3.Simulation;const __dep4=__require('src/render/Renderer.js');const Renderer=__dep4.Renderer;const __dep5=__require('src/render/art/BattlefieldArt.js');const landscape=__dep5.landscape;const dynamicArt=__dep5.dynamicArt;const __dep6=__require('src/data.js');const BUILDINGS=__dep6.BUILDINGS;const UNITS=__dep6.UNITS;const FACTIONS=__dep6.FACTIONS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const walkable=__dep7.walkable;const __dep8=__require('src/audio/AudioManager.js');const AudioEngine=__dep8.AudioEngine;const __dep9=__require('src/input/CommandSystem.js');const CommandSystem=__dep9.CommandSystem;const __dep10=__require('src/input/SelectionSystem.js');const SelectionSystem=__dep10.SelectionSystem;const __dep11=__require('src/input/TouchControls.js');const TouchControls=__dep11.TouchControls;const __dep12=__require('src/input/Commands.js');const MoveCommand=__dep12.MoveCommand;const AttackCommand=__dep12.AttackCommand;const BuildCommand=__dep12.BuildCommand;const StopCommand=__dep12.StopCommand;const TrainCommand=__dep12.TrainCommand;const CancelCommand=__dep12.CancelCommand;const SetRallyCommand=__dep12.SetRallyCommand;const GatherCommand=__dep12.GatherCommand;const RepairCommand=__dep12.RepairCommand;const AssistConstructionCommand=__dep12.AssistConstructionCommand;const SetAutoGatherCommand=__dep12.SetAutoGatherCommand;const __dep13=__require('src/ui/Notifications.js');const Notifications=__dep13.Notifications;const __dep14=__require('src/ui/BuildMenu.js');const BuildMenu=__dep14.BuildMenu;const __dep15=__require('src/ui/HUD.js');const HUD=__dep15.HUD;const __dep16=__require('src/ui/Minimap.js');const Minimap=__dep16.Minimap;const __dep17=__require('src/ui/PerformancePanel.js');const PerformancePanel=__dep17.PerformancePanel;const __dep18=__require('src/ui/OverlayRenderer.js');const OverlayRenderer=__dep18.OverlayRenderer;const __dep19=__require('src/core/Config.js');const BALANCE=__dep19.BALANCE;
+const __dep0=__require('src/effects/EffectCoordinator.js');const Effects=__dep0.EffectCoordinator;const __dep1=__require('src/render/art/EffectArt.js');const effectArt=__dep1.effectArt;const __dep2=__require('src/render/Batch.js');const Batch=__dep2.Batch;const __dep3=__require('src/simulation/Simulation.js');const Simulation=__dep3.Simulation;const __dep4=__require('src/render/Renderer.js');const Renderer=__dep4.Renderer;const __dep5=__require('src/render/art/BattlefieldArt.js');const landscape=__dep5.landscape;const dynamicArt=__dep5.dynamicArt;const __dep6=__require('src/data.js');const BUILDINGS=__dep6.BUILDINGS;const UNITS=__dep6.UNITS;const FACTIONS=__dep6.FACTIONS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const walkable=__dep7.walkable;const __dep8=__require('src/audio/AudioManager.js');const AudioEngine=__dep8.AudioEngine;const __dep9=__require('src/input/CommandSystem.js');const CommandSystem=__dep9.CommandSystem;const __dep10=__require('src/input/SelectionSystem.js');const SelectionSystem=__dep10.SelectionSystem;const __dep11=__require('src/input/TouchControls.js');const TouchControls=__dep11.TouchControls;const __dep12=__require('src/input/Commands.js');const MoveCommand=__dep12.MoveCommand;const AttackCommand=__dep12.AttackCommand;const BuildCommand=__dep12.BuildCommand;const StopCommand=__dep12.StopCommand;const TrainCommand=__dep12.TrainCommand;const CancelCommand=__dep12.CancelCommand;const SetRallyCommand=__dep12.SetRallyCommand;const GatherCommand=__dep12.GatherCommand;const RepairCommand=__dep12.RepairCommand;const AssistConstructionCommand=__dep12.AssistConstructionCommand;const SetAutoGatherCommand=__dep12.SetAutoGatherCommand;const __dep13=__require('src/ui/Notifications.js');const Notifications=__dep13.Notifications;const __dep14=__require('src/ui/BuildMenu.js');const BuildMenu=__dep14.BuildMenu;const __dep15=__require('src/ui/HUD.js');const HUD=__dep15.HUD;const __dep16=__require('src/ui/Minimap.js');const Minimap=__dep16.Minimap;const __dep17=__require('src/ui/PerformancePanel.js');const PerformancePanel=__dep17.PerformancePanel;const __dep18=__require('src/ui/OverlayRenderer.js');const OverlayRenderer=__dep18.OverlayRenderer;const __dep19=__require('src/core/Config.js');const BALANCE=__dep19.BALANCE;const __dep20=__require('src/world/FogOfWar.js');const VISIBILITY=__dep20.VISIBILITY;
+
 
 
 
@@ -268,6 +269,7 @@ function hit(px,py) {
   let best=null,score=Infinity;
   for(const e of [...sim.squads,...sim.buildings,...sim.resourceNodes]) {
     const resource=typeof e.id==='string';if(resource?e.depleted:e.hp<=0)continue;
+    if(resource&&sim.fogOfWar?.state(sim.player,e.x,e.z)===VISIBILITY.UNEXPLORED)continue;
     if(!resource&&e.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,e))continue;
     const p=renderer.project(e.x,resource ? .7 : e.path ? 1 : 2,e.z),d=Math.hypot(p.x-px,p.y-py),radius=resource?28:e.path?24:Math.max(24,e.r*renderer.height/renderer.cam.zoom);
     if(d<radius&&d<score) {
@@ -2195,10 +2197,11 @@ function buildingArt(b,v,time,ghost=false) {
   };
   const stone=organic?[.30,.23,.22]:C.stone,metal=organic?C.flesh:C.metal,accent=FACTIONS[f].accent;
   if(['trench','sandbag','barbedWire'].includes(v.type)){
-    const length=v.segmentLength||6,yaw=v.yaw||0;
-    if(v.type==='trench'){for(let i=-2;i<=2;i++){add('sphere',i*length/5,.35,-.8,1.45,.7,1.15,C.sand,yaw);add('sphere',i*length/5,.35,.8,1.45,.7,1.15,C.sand,yaw);}add('box',0,.08,0,length,.12,1.4,C.mud,yaw);}
-    if(v.type==='sandbag')for(let row=0;row<2;row++)for(let i=-2;i<=2;i++)add('sphere',i*length/5+(row?.35:0),.28+row*.38,0,1.35,.48,.72,C.sand,yaw);
-    if(v.type==='barbedWire'){for(const i of[-1,0,1]){add('box',i*length/3,.55,0,.12,1.1,.12,metal,yaw);add('ring',i*length/3,.6,0,1.3,.08,1.3,metal,yaw);}add('box',0,.55,0,length,.06,.06,metal,yaw);}
+    const length=v.segmentLength||6,yaw=v.yaw||0,c=Math.cos(yaw),s=Math.sin(yaw);
+    const segmentAdd=(kind,dx,y,dz,sx,sy,sz,color,localRot=0,pitch=0,roll=0,glow=0)=>add(kind,dx*c-dz*s,y,dx*s+dz*c,sx,sy,sz,color,yaw+localRot,pitch,roll,glow);
+    if(v.type==='trench'){for(let i=-2;i<=2;i++){segmentAdd('sphere',i*length/5,.35,-.8,1.45,.7,1.15,C.sand);segmentAdd('sphere',i*length/5,.35,.8,1.45,.7,1.15,C.sand);}segmentAdd('box',0,.08,0,length,.12,1.4,C.mud);}
+    if(v.type==='sandbag')for(let row=0;row<2;row++)for(let i=-2;i<=2;i++)segmentAdd('sphere',i*length/5+(row?.35:0),.28+row*.38,0,1.35,.48,.72,C.sand);
+    if(v.type==='barbedWire'){for(const i of[-1,0,1]){segmentAdd('box',i*length/3,.55,0,.12,1.1,.12,metal);segmentAdd('ring',i*length/3,.6,0,1.3,.08,1.3,metal);}segmentAdd('box',0,.55,0,length,.06,.06,metal);}
     if(!ghost&&p<1)constructionSiteArt(b,v);return;
   }
   if(!organic&&p<1&&!ghost){constructionSiteArt(b,v);return;}
@@ -2408,7 +2411,7 @@ function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.time) {
   let visible=0,near=0,far=0;
   let ruins=0;
   if(sim.fogOfWar){const fog=sim.fogOfWar,grid=fog.grids[sim.player];for(let z=0;z<fog.width;z++)for(let x=0;x<fog.width;x++){const state=grid[z*fog.width+x];if(state===VISIBILITY.VISIBLE)continue;const shade=state===VISIBILITY.EXPLORED?.12:.025;b.add('box',(x+.5)*fog.cell,.18,(z+.5)*fog.cell,fog.cell+.08,.12,fog.cell+.08,[shade,shade*1.08,shade]);}}
-  for(const node of sim.resourceNodes||[]){if(node.depleted)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
+  for(const node of sim.resourceNodes||[]){if(node.depleted||sim.fogOfWar?.state(sim.player,node.x,node.z)===VISIBILITY.UNEXPLORED)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
   for(let bi=sim.buildings.length-1;bi>=0;bi--) {
     const v=sim.buildings[bi];
     if(v.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,v))continue;
