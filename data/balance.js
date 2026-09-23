@@ -2,7 +2,7 @@ export const BALANCE = Object.freeze({
   simulation: Object.freeze({ step: 0.05, maxFrame: 0.1, maxSteps: 5 }),
   match: Object.freeze({mode:'SIEGE', preparationSeconds:60, durationSeconds:600, durationOptions:Object.freeze([300,600,1800,3600]), warningSeconds:10, captureVictory:false}),
   world: Object.freeze({ size: 168, cell: 2, grid: 84 }),
-  fog: Object.freeze({cell:4,refresh:.25,combatVision:24,supportVision:18,buildingVision:20,observationVision:38}),
+  fog: Object.freeze({cell:4,refresh:.25,combatVision:24,supportVision:18,buildingVision:20,armedBuildingVision:26,observationVision:38}),
   army: Object.freeze({ maxSquads: 10, squadSize: 8, separation: 2.5, separationForce: 0.65, baseForceCap:32 }),
   economy: Object.freeze({ baseIncome: 2, supplyIncome: 2, controlIncome: 3 }),
   capture: Object.freeze({ radius: 5, duration: 8, decay: 0.5 }),
