@@ -32,7 +32,7 @@ button.active{box-shadow:inset 0 -2px #bba16a}
 <aside id="mapPanel"><div class="panelLabel">TAKTİK HARİTA <span>CANLI</span></div><canvas id="minimap" width="224" height="224" aria-label="Kamerayı taşımak için taktik haritaya dokun"></canvas><div id="mapFoot">3 GEÇİT <i>•</i> TARTIŞMALI BÖLGE</div></aside>
 <section id="bottom"><div id="selection"><button id="deselect" aria-label="Seçimi kapat" title="Seçimi kapat" hidden>×</button><span class="eyebrow" id="selectionType">NEW ANTIOCH / SEFER KUVVETİ</span><strong id="selectionName">Cephe seni bekliyor.</strong><span id="selectionInfo">Mangaya dokun, ardından bir hedef seç.</span></div><div id="actions"><button id="buildMenu">⚒ <span>Üs inşa et</span></button><button id="trainInf">＋ <span>Piyade</span></button><button id="trainHeavy">✠ <span>Ağır</span></button><button id="trainEngineer">⚙ <span>Mühendis</span></button><button id="autoGather">↻ <span>Oto topla</span></button><button id="stop">■ <span>Dur</span></button></div></section>
 <section id="buildPanel" hidden><div class="panelLabel">İNŞA DOKTRİNİ <button id="closeBuild" aria-label="İnşa menüsünü kapat">×</button></div><div id="buildingList"></div></section>
-<div id="placement" hidden><span id="placementText">Yapı konumu seç</span><button id="confirmBuild">✓ İnşa et</button><button id="cancelBuild">× Vazgeç</button></div>
+<div id="placement" hidden><span id="placementText">Yapı konumu seç</span><button id="rotateBuild">↻ Döndür</button><button id="confirmBuild">✓ İnşa et</button><button id="cancelBuild">× Vazgeç</button></div>
 <div id="start" class="scrim"><div class="startCard"><div class="eyebrow">BİR KUTSAL SAVAŞIN KÜLLERİNDEN</div><div class="startSigil">✠</div><h1>TRENCH<br><span>CRUSADE</span></h1><div class="subtitle">A S H E N &nbsp; C R O S S I N G</div><p>Üç geçit. İki inanç. Geri çekilecek yer yok.</p><div class="factionChoice"><button class="chosen" data-faction="0"><b>NEW ANTIOCH</b><small>Çelik, disiplin ve iman.</small></button><button data-faction="1"><b>BLACK GRAIL</b><small>Çürüme, et ve salgın.</small></button></div><label class="durationLabel" for="matchDuration">MAÇ SÜRESİ</label><select id="matchDuration"><option value="300">5 dakika</option><option value="600" selected>10 dakika</option><option value="1800">30 dakika</option><option value="3600">60 dakika</option></select><button id="begin" class="primary">SEFERE BAŞLA <span>→</span></button><button id="resume" hidden>KAYITLI SEFERE DEVAM ET</button><div class="startHelp"><b>Dokun</b> seç / emir ver <i>·</i> <b>Sürükle</b> kamera<br><b>İki parmak</b> yakınlaştır <i>·</i> <b>Alan seç</b> çoklu seçim</div><div class="fine">BAĞIMSIZ HAYRAN PROJESİ · RESMÎ ÜRÜN DEĞİLDİR<br>PROSEDÜREL 3D / HARİCİ GÖRSEL VE SES YOK</div></div></div>
 <div id="menu" class="scrim" hidden><div class="menuCard"><span class="eyebrow">CEPHE KONTROLÜ</span><h2 id="menuTitle">Savaş duraklatıldı</h2><p id="menuInfo">İlerlemen bu cihazda otomatik kaydedilir.</p><button id="continue" class="primary">Savaşa dön</button><button id="save">Kaydet</button><button id="sound">Ses: kapalı</button><button id="quality">Görüntü: dengeli</button><button id="effectQuality">Efekt yoğunluğu: Orta</button><button id="effectStress">Efekt testi · 160 asker çatışması</button><button id="stress">Performans senaryosu · 160 asker</button><button id="restart">Yeni sefer</button><p class="help">Kamera: sürükle / ok tuşları<br>Seçim: dokun / B ile alan seç<br>Emir: zemine veya düşmana dokun<br>A: tümünü seç · H: üs · Esc: iptal<br>İnşa: yapı seç → zemine dokun → onayla<br>Kışla seçiliyken zemine dokun: toplanma noktası</p><span class="fine" id="saveStatus"></span></div></div>
 <script>
@@ -44,7 +44,8 @@ const game=new Game();
 __exports.game=game;
 },
 'src/core/Game.js':function(__exports,__require){
-const __dep0=__require('src/effects/EffectCoordinator.js');const Effects=__dep0.EffectCoordinator;const __dep1=__require('src/render/art/EffectArt.js');const effectArt=__dep1.effectArt;const __dep2=__require('src/render/Batch.js');const Batch=__dep2.Batch;const __dep3=__require('src/simulation/Simulation.js');const Simulation=__dep3.Simulation;const __dep4=__require('src/render/Renderer.js');const Renderer=__dep4.Renderer;const __dep5=__require('src/render/art/BattlefieldArt.js');const landscape=__dep5.landscape;const dynamicArt=__dep5.dynamicArt;const __dep6=__require('src/data.js');const BUILDINGS=__dep6.BUILDINGS;const UNITS=__dep6.UNITS;const FACTIONS=__dep6.FACTIONS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const walkable=__dep7.walkable;const __dep8=__require('src/audio/AudioManager.js');const AudioEngine=__dep8.AudioEngine;const __dep9=__require('src/input/CommandSystem.js');const CommandSystem=__dep9.CommandSystem;const __dep10=__require('src/input/SelectionSystem.js');const SelectionSystem=__dep10.SelectionSystem;const __dep11=__require('src/input/TouchControls.js');const TouchControls=__dep11.TouchControls;const __dep12=__require('src/input/Commands.js');const MoveCommand=__dep12.MoveCommand;const AttackCommand=__dep12.AttackCommand;const BuildCommand=__dep12.BuildCommand;const StopCommand=__dep12.StopCommand;const TrainCommand=__dep12.TrainCommand;const CancelCommand=__dep12.CancelCommand;const SetRallyCommand=__dep12.SetRallyCommand;const GatherCommand=__dep12.GatherCommand;const RepairCommand=__dep12.RepairCommand;const AssistConstructionCommand=__dep12.AssistConstructionCommand;const SetAutoGatherCommand=__dep12.SetAutoGatherCommand;const __dep13=__require('src/ui/Notifications.js');const Notifications=__dep13.Notifications;const __dep14=__require('src/ui/BuildMenu.js');const BuildMenu=__dep14.BuildMenu;const __dep15=__require('src/ui/HUD.js');const HUD=__dep15.HUD;const __dep16=__require('src/ui/Minimap.js');const Minimap=__dep16.Minimap;const __dep17=__require('src/ui/PerformancePanel.js');const PerformancePanel=__dep17.PerformancePanel;const __dep18=__require('src/ui/OverlayRenderer.js');const OverlayRenderer=__dep18.OverlayRenderer;const __dep19=__require('src/core/Config.js');const BALANCE=__dep19.BALANCE;
+const __dep0=__require('src/effects/EffectCoordinator.js');const Effects=__dep0.EffectCoordinator;const __dep1=__require('src/render/art/EffectArt.js');const effectArt=__dep1.effectArt;const __dep2=__require('src/render/Batch.js');const Batch=__dep2.Batch;const __dep3=__require('src/simulation/Simulation.js');const Simulation=__dep3.Simulation;const __dep4=__require('src/render/Renderer.js');const Renderer=__dep4.Renderer;const __dep5=__require('src/render/art/BattlefieldArt.js');const landscape=__dep5.landscape;const dynamicArt=__dep5.dynamicArt;const __dep6=__require('src/data.js');const BUILDINGS=__dep6.BUILDINGS;const UNITS=__dep6.UNITS;const FACTIONS=__dep6.FACTIONS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const walkable=__dep7.walkable;const __dep8=__require('src/audio/AudioManager.js');const AudioEngine=__dep8.AudioEngine;const __dep9=__require('src/input/CommandSystem.js');const CommandSystem=__dep9.CommandSystem;const __dep10=__require('src/input/SelectionSystem.js');const SelectionSystem=__dep10.SelectionSystem;const __dep11=__require('src/input/TouchControls.js');const TouchControls=__dep11.TouchControls;const __dep12=__require('src/input/Commands.js');const MoveCommand=__dep12.MoveCommand;const AttackCommand=__dep12.AttackCommand;const BuildCommand=__dep12.BuildCommand;const StopCommand=__dep12.StopCommand;const TrainCommand=__dep12.TrainCommand;const CancelCommand=__dep12.CancelCommand;const SetRallyCommand=__dep12.SetRallyCommand;const GatherCommand=__dep12.GatherCommand;const RepairCommand=__dep12.RepairCommand;const AssistConstructionCommand=__dep12.AssistConstructionCommand;const SetAutoGatherCommand=__dep12.SetAutoGatherCommand;const __dep13=__require('src/ui/Notifications.js');const Notifications=__dep13.Notifications;const __dep14=__require('src/ui/BuildMenu.js');const BuildMenu=__dep14.BuildMenu;const __dep15=__require('src/ui/HUD.js');const HUD=__dep15.HUD;const __dep16=__require('src/ui/Minimap.js');const Minimap=__dep16.Minimap;const __dep17=__require('src/ui/PerformancePanel.js');const PerformancePanel=__dep17.PerformancePanel;const __dep18=__require('src/ui/OverlayRenderer.js');const OverlayRenderer=__dep18.OverlayRenderer;const __dep19=__require('src/core/Config.js');const BALANCE=__dep19.BALANCE;const __dep20=__require('src/world/FogOfWar.js');const VISIBILITY=__dep20.VISIBILITY;
+
 
 
 
@@ -200,7 +201,7 @@ function setMode(m) {
 $('pan').onclick=()=>setMode('pan');
 $('select').onclick=()=>setMode('select');
 $('all').onclick=()=> {
-  selected=selection.replace(sim.squads.filter(s=>s.f===sim.player&&s.hp>0).map(s=>s.id));
+  selected=selection.selectAll(sim);
   updateUI();
 };
 $('deselect').onclick=()=>{selected.clear();updateUI();};
@@ -214,13 +215,13 @@ $('buildMenu').onclick=()=>buildMenu.toggle(BUILDINGS,sim.player,sim,definition=
   const engineered=sim.economySystem.get(sim.player).engineeredConstruction;let engineerIds=engineered?sim.squads.filter(squad=>selected.has(squad.id)&&squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0).map(squad=>squad.id):[];
   if(engineered&&!engineerIds.length){const engineer=sim.squads.find(squad=>squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0);if(!engineer){notify('İnşa için muharebe mühendisi gerekli.');return;}engineerIds=[engineer.id];selected=selection.replace(engineerIds);}
   const point=renderer.ground(renderer.width*.52,renderer.height*.45);
-  ghost={...definition,type:definition.id,f:sim.player,x:point.x,z:point.z,valid:false,engineerIds};
+  ghost={...definition,type:definition.id,f:sim.player,x:point.x,z:point.z,yaw:0,valid:false,engineerIds};
   checkGhost();buildMenu.close();$('placement').hidden=false;notify('Zemine dokunarak konum seç; ardından inşayı onayla.');
 });
 $('closeBuild').onclick=()=>buildMenu.close();
 function checkGhost() {
   if(!ghost)return;
-  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z);
+  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z,ghost.yaw);
   ghost.valid=!err;
   $('placementText').textContent=err||ghost.names[sim.player]+' · '+buildMenu.cost(ghost,sim.player)+' · ✓ geçerli zemin';
   $('confirmBuild').disabled=!!err;
@@ -229,9 +230,10 @@ $('cancelBuild').onclick=()=> {
   ghost=null;
   $('placement').hidden=true;
 };
+$('rotateBuild').onclick=()=>{if(ghost){ghost.yaw=(ghost.yaw+Math.PI/2)%(Math.PI*2);checkGhost();}};
 $('confirmBuild').onclick=()=> {
   if(!ghost)return;
-  const error=commandSystem.dispatch(BuildCommand(sim.player,ghost.type,ghost.x,ghost.z,ghost.engineerIds));
+  const error=commandSystem.dispatch(BuildCommand(sim.player,ghost.type,ghost.x,ghost.z,ghost.engineerIds,ghost.yaw));
   if(error) {
     notify(error);
     checkGhost();
@@ -267,6 +269,8 @@ function hit(px,py) {
   let best=null,score=Infinity;
   for(const e of [...sim.squads,...sim.buildings,...sim.resourceNodes]) {
     const resource=typeof e.id==='string';if(resource?e.depleted:e.hp<=0)continue;
+    if(resource&&sim.fogOfWar?.state(sim.player,e.x,e.z)===VISIBILITY.UNEXPLORED)continue;
+    if(!resource&&e.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,e))continue;
     const p=renderer.project(e.x,resource ? .7 : e.path ? 1 : 2,e.z),d=Math.hypot(p.x-px,p.y-py),radius=resource?28:e.path?24:Math.max(24,e.r*renderer.height/renderer.cam.zoom);
     if(d<radius&&d<score) {
       score=d;
@@ -450,7 +454,7 @@ function frame(now) {
     notifications.update();
   }
   const art=dynamicArt(sim,renderer,selected,ghost,frameBatch,playing?effects.clock:sim.time);
-  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer);
+  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer,sim.fogOfWar,sim.player);
   renderer.render(art.batch,smokeBatch);
   orderMarker=overlayRenderer.draw(sim,renderer,selected,drag,orderMarker);
   if(effects.flash>0){ctx.strokeStyle='rgba(207,151,77,'+effects.flash+')';ctx.lineWidth=12;ctx.strokeRect(6,6,renderer.width-12,renderer.height-12);ctx.lineWidth=1;}
@@ -657,12 +661,12 @@ __exports.hash=hash;
 'src/world/Terrain.js':function(__exports,__require){
 const __dep0=__require('src/core/math.js');const hash=__dep0.hash;
 
-const crossings=[24,56,88];
-const forests=[{x:34,z:29,r:10},{x:78,z:82,r:11},{x:20,z:48,r:8},{x:91,z:62,r:7}];
-const craters=Array.from({length:28},(_,i)=>({x:28+hash(i,7)*58,z:8+hash(i,8)*96,r:1.4+hash(i,9)*2.6})).filter(c=>Math.abs(c.x-56)>7);
-const trenchSegments=Object.freeze([Object.freeze({x:43,minZ:34,maxZ:46}),Object.freeze({x:69,minZ:70,maxZ:82})]);
+const crossings=[36,84,132];
+const forests=[{x:49,z:43,r:13},{x:119,z:123,r:15},{x:28,z:75,r:11},{x:138,z:92,r:10}];
+const craters=Array.from({length:42},(_,i)=>({x:38+hash(i,7)*92,z:8+hash(i,8)*152,r:1.4+hash(i,9)*2.9})).filter(c=>Math.abs(c.x-84)>8);
+const trenchSegments=Object.freeze([Object.freeze({x:62,minZ:48,maxZ:66}),Object.freeze({x:106,minZ:105,maxZ:123})]);
 // Short abandoned earthworks are terrain cover, not a ready-made defensive line.
-function terrain(x,z){if(x<1||z<1||x>111||z>111)return'edge';if(Math.abs(x-56)<4)return crossings.some(b=>Math.abs(z-b)<4)?'bridge':'river';if(trenchSegments.some(segment=>Math.abs(x-segment.x)<2.2&&z>segment.minZ&&z<segment.maxZ))return'trench';if(forests.some(f=>Math.hypot(x-f.x,z-f.z)<f.r))return'forest';if(craters.some(c=>Math.hypot(x-c.x,z-c.z)<c.r))return'mud';return'land';}
+function terrain(x,z){if(x<1||z<1||x>167||z>167)return'edge';if(Math.abs(x-84)<4)return crossings.some(b=>Math.abs(z-b)<4)?'bridge':'river';if(trenchSegments.some(segment=>Math.abs(x-segment.x)<2.2&&z>segment.minZ&&z<segment.maxZ))return'trench';if(forests.some(f=>Math.hypot(x-f.x,z-f.z)<f.r))return'forest';if(craters.some(c=>Math.hypot(x-c.x,z-c.z)<c.r))return'mud';return'land';}
 
 __exports.crossings=crossings;
 __exports.forests=forests;
@@ -698,14 +702,15 @@ __exports.CONFIG=CONFIG;
 const BALANCE = Object.freeze({
   simulation: Object.freeze({ step: 0.05, maxFrame: 0.1, maxSteps: 5 }),
   match: Object.freeze({mode:'SIEGE', preparationSeconds:60, durationSeconds:600, durationOptions:Object.freeze([300,600,1800,3600]), warningSeconds:10, captureVictory:false}),
-  world: Object.freeze({ size: 112, cell: 2, grid: 56 }),
+  world: Object.freeze({ size: 168, cell: 2, grid: 84 }),
+  fog: Object.freeze({cell:4,refresh:.25,combatVision:24,supportVision:18,buildingVision:20,armedBuildingVision:26,observationVision:38}),
   army: Object.freeze({ maxSquads: 10, squadSize: 8, separation: 2.5, separationForce: 0.65, baseForceCap:32 }),
   economy: Object.freeze({ baseIncome: 2, supplyIncome: 2, controlIncome: 3 }),
   capture: Object.freeze({ radius: 5, duration: 8, decay: 0.5 }),
   terrain: Object.freeze({ mudSpeed: 0.58, forestSpeed: 0.76, trenchSpeed: 0.83, trenchDamage: 0.58, forestDamage: 0.78 }),
   support: Object.freeze({ hospitalRadius: 12, hospitalDelay: 5, hospitalHeal: 16, workshopRadius: 14, workshopRepair: 7, chapelRadius: 18, chapelDamage: 1.2 }),
   tower: Object.freeze({ range: 22, damage: 22, period: 1.4 }),
-  construction: Object.freeze({ maxSameType: 3, baseRadius: 20, obstacleMargin: 2, pointMargin: 3, cancelRefund: 0.75, queueLimit: 3, engineerRadius:5.5, engineerCap:3, engineerFactors:Object.freeze([1,.65,.4]), workEffectPeriod:.65 }),
+  construction: Object.freeze({ maxSameType: 3, maxFieldSegments:16, baseRadius: 20, obstacleMargin: 2, pointMargin: 3, cancelRefund: 0.75, queueLimit: 3, engineerRadius:5.5, engineerCap:3, engineerFactors:Object.freeze([1,.65,.4]), workEffectPeriod:.65 }),
   logistics:Object.freeze({arrivalRadius:2.8,deliveryRadius:5.5,autoSearchPeriod:2,gatherTick:.25}),
   repair:Object.freeze({radius:4.8,rate:18,materialPerHp:.08,combatDelay:4,effectPeriod:.55}),
   camera: Object.freeze({ minZoom: 27, maxZoom: 100, desktopZoom: 55, mobileZoom: 67, panSpeed:300, edgeMargin:4 }),
@@ -778,16 +783,17 @@ class CorpseManager extends EffectPool { constructor(){super(144);} }
 __exports.CorpseManager=CorpseManager;
 },
 'src/render/art/EffectArt.js':function(__exports,__require){
-const __dep0=__require('src/data.js');const clamp=__dep0.clamp;const __dep1=__require('src/effects/EffectCoordinator.js');const PARTICLE=__dep1.PARTICLE;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;
+const __dep0=__require('src/data.js');const clamp=__dep0.clamp;const __dep1=__require('src/effects/EffectCoordinator.js');const PARTICLE=__dep1.PARTICLE;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/world/FogOfWar.js');const VISIBILITY=__dep3.VISIBILITY;
+
 
 
 
 const DUST=[.39,.35,.28],SMOKE=[.32,.31,.27],SPORE=[.37,.42,.19];
 const ASH=[.09,.10,.085],BRUISE=[.17,.105,.085],ROT=[.18,.21,.10];
 const FIRE=[1,.48,.13],TOXIC=[.61,.75,.20],SPARK=[1,.78,.37],DIRT=[.25,.21,.15];
-function effectArt(fx,batch,transparent,renderer){
-  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1);
-  const visible=(p,margin=80)=>{const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
+function effectArt(fx,batch,transparent,renderer,fog=null,player=0){
+  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1),fogVisible=(x,z)=>!fog||fog.state(player,x,z)===VISIBILITY.VISIBLE;
+  const visible=(p,margin=80)=>{if(!fogVisible(p.x,p.z))return false;const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
   for(let i=0;i<fx.marks.limit;i++){
     const p=fx.marks.slots[i];if(!p.active||!visible(p))continue;
     const fade=Math.min(1,(p.life-p.age)/12),col=p.kind===1?(p.f?ROT:BRUISE):ASH;
@@ -808,6 +814,7 @@ function effectArt(fx,batch,transparent,renderer){
     const p=fx.particles.slots[i];if(!p.active||p.age<0||!visible(p,110))continue;
     const t=p.age/p.life,fade=Math.min(1,(1-t)*3);
     if(p.kind===PARTICLE.TRACER){
+      if(!fogVisible(p.tx,p.tz))continue;
       const h=clamp(t*1.6,0,1),tail=Math.max(0,h-.22),dx=p.tx-p.x,dy=p.ty-p.y,dz=p.tz-p.z;
       const length=Math.hypot(dx,dy,dz)*(h-tail),yaw=Math.atan2(dx,dz),pitch=-Math.atan2(dy,Math.hypot(dx,dz));
       batch.add('box',p.x+dx*(h+tail)*.5,p.y+dy*(h+tail)*.5,p.z+dz*(h+tail)*.5,p.size,p.size,length,p.f?TOXIC:SPARK,yaw,fade,pitch,0,1);
@@ -846,7 +853,7 @@ __exports.effectArt=effectArt;
 
 
 
-const SIZE=112,CELL=2,GRID=56,MAX_SQUADS=10;
+const SIZE=168,CELL=2,GRID=84,MAX_SQUADS=10;
 
 const __rex0=__require('data/buildings.js');__exports.BUILDINGS=__rex0.BUILDING_DEFINITIONS;__exports.BUILDING_BY_ID=__rex0.BUILDING_BY_ID;__exports.getBuildingDefinition=__rex0.getBuildingDefinition;
 const __rex1=__require('data/units.js');__exports.UNITS=__rex1.UNIT_DEFINITIONS;__exports.UNIT_BY_ID=__rex1.UNIT_BY_ID;__exports.getUnitDefinition=__rex1.getUnitDefinition;
@@ -866,6 +873,9 @@ const BUILDING_DEFINITIONS = Object.freeze([
   Object.freeze({id:'materialDepot',names:Object.freeze(['Malzeme Deposu','—']),cost:145,costs:Object.freeze({supply:25,material:125,manpower:0}),time:17,hp:700,r:3.1,desc:'Toplanan metal ve tahkimat malzemesinin kapasitesini artırır.',symbol:'▦',production:Object.freeze([]),footprint:3.1,requires:Object.freeze(['workshop']),forceCap:0,storage:Object.freeze({supply:0,material:350,manpower:0}),factions:Object.freeze([0])}),
   Object.freeze({id:'hospital',names:Object.freeze(['Saha Hastanesi','Veba Bahçesi']),cost:170,costs:Object.freeze({supply:75,material:110,manpower:0}),time:22,hp:650,r:3,desc:'Yakındaki çatışma dışı mangaları iyileştirir.',symbol:'✚',production:Object.freeze([]),footprint:3,requires:Object.freeze(['workshop']),forceCap:0}),
   Object.freeze({id:'observation',names:Object.freeze(['Gözetleme Karakolu','—']),cost:125,costs:Object.freeze({supply:45,material:85,manpower:0}),time:16,hp:560,r:2.2,desc:'Cephe görüşü ve komuta varlığı sağlar.',symbol:'◉',production:Object.freeze([]),footprint:2.2,requires:Object.freeze(['barracks']),forceCap:4,factions:Object.freeze([0])}),
+  Object.freeze({id:'trench',names:Object.freeze(['Siper Segmenti','—']),category:'FIELD_DEFENSE',cost:45,costs:Object.freeze({supply:10,material:35,manpower:0}),time:8,hp:520,r:3.2,desc:'Döndürülebilir kısa hat; arkasındaki askere güçlü cover sağlar.',symbol:'▰',production:Object.freeze([]),footprint:3.2,segmentLength:7,cover:0.58,requires:Object.freeze(['workshop']),forceCap:0,factions:Object.freeze([0])}),
+  Object.freeze({id:'sandbag',names:Object.freeze(['Kum Torbası Duvarı','—']),category:'FIELD_DEFENSE',cost:25,costs:Object.freeze({supply:8,material:18,manpower:0}),time:4,hp:280,r:2.7,desc:'Ucuz ve hızlı hafif cover segmenti.',symbol:'▱',production:Object.freeze([]),footprint:2.7,segmentLength:6,cover:0.76,requires:Object.freeze(['workshop']),forceCap:0,factions:Object.freeze([0])}),
+  Object.freeze({id:'barbedWire',names:Object.freeze(['Dikenli Tel','—']),category:'FIELD_DEFENSE',cost:20,costs:Object.freeze({supply:5,material:15,manpower:0}),time:3,hp:180,r:3,desc:'Geçişi kapatmadan düşman piyadesini yavaşlatır.',symbol:'≋',production:Object.freeze([]),footprint:3,segmentLength:7,movement:Object.freeze({friendly:0.86,enemy:0.42}),requires:Object.freeze(['workshop']),forceCap:0,factions:Object.freeze([0])}),
   Object.freeze({id:'defense',names:Object.freeze(['Tahkimli Ateş Mevzisi','—']),cost:165,costs:Object.freeze({supply:65,material:130,manpower:0}),time:21,hp:760,r:2.4,desc:'22 m menzilli sabit savunma mevzisi.',symbol:'♜',production:Object.freeze([]),footprint:2.4,requires:Object.freeze(['workshop']),forceCap:0,factions:Object.freeze([0])}),
   Object.freeze({id:'tower',names:Object.freeze(['Nöbet Kulesi','Diken Nöbetçisi']),cost:150,costs:Object.freeze({supply:50,material:120,manpower:0}),time:19,hp:700,r:2,desc:'22 m menzilli otomatik savunma.',symbol:'♜',production:Object.freeze([]),footprint:2,requires:Object.freeze([]),factions:Object.freeze([1])}),
   Object.freeze({id:'chapel',names:Object.freeze(['Savaş Şapeli','Kara Kâse Sunağı']),cost:210,costs:Object.freeze({supply:80,material:150,manpower:0}),time:25,hp:900,r:3,desc:'18 m içindeki müttefiklere %20 ateş desteği.',symbol:'✠',production:Object.freeze([]),footprint:3,requires:Object.freeze([]),factions:Object.freeze([1])})
@@ -881,9 +891,9 @@ __exports.getBuildingDefinition=getBuildingDefinition;
 'data/units.js':function(__exports,__require){
 
 const UNIT_DEFINITIONS = Object.freeze([
-  Object.freeze({id:'infantry', names:Object.freeze(['Siper Muhafızları','Veba Müritleri']), cost:100, costs:Object.freeze({supply:80,material:0,manpower:8}), time:12, hp:100, damage:10, range:15, speed:4.3, period:1.1, squadSize:8,forceCost:8,producer:'barracks',requires:Object.freeze([])}),
-  Object.freeze({id:'heavy', names:Object.freeze(['Zırhlı Haçlılar','Çürük Muhafızlar']), cost:175, costs:Object.freeze({supply:120,material:40,manpower:8}), time:18, hp:155, damage:16, range:18, speed:3.3, period:1.45, squadSize:8,forceCost:8,producer:'barracks',requires:Object.freeze(['workshop'])}),
-  Object.freeze({id:'engineer',names:Object.freeze(['Muharebe Mühendisleri','—']),cost:90,costs:Object.freeze({supply:50,material:30,manpower:5}),time:15,hp:82,damage:4,range:9,speed:4,period:1.6,squadSize:5,forceCost:5,producer:'workshop',requires:Object.freeze(['workshop']),support:true})
+  Object.freeze({id:'infantry', combatUnit:true, names:Object.freeze(['Siper Muhafızları','Veba Müritleri']), cost:100, costs:Object.freeze({supply:80,material:0,manpower:8}), time:12, hp:100, damage:10, range:15, speed:4.3, period:1.1, squadSize:8,forceCost:8,producer:'barracks',requires:Object.freeze([])}),
+  Object.freeze({id:'heavy', combatUnit:true, names:Object.freeze(['Zırhlı Haçlılar','Çürük Muhafızlar']), cost:175, costs:Object.freeze({supply:120,material:40,manpower:8}), time:18, hp:155, damage:16, range:18, speed:3.3, period:1.45, squadSize:8,forceCost:8,producer:'barracks',requires:Object.freeze(['workshop'])}),
+  Object.freeze({id:'engineer',combatUnit:false,names:Object.freeze(['Muharebe Mühendisleri','—']),cost:90,costs:Object.freeze({supply:50,material:30,manpower:5}),time:15,hp:82,damage:4,range:9,speed:4,period:1.6,squadSize:5,forceCost:5,producer:'workshop',requires:Object.freeze(['workshop']),support:true})
 ]);
 
 const UNIT_BY_ID = new Map(UNIT_DEFINITIONS.map(definition => [definition.id, definition]));
@@ -897,15 +907,15 @@ __exports.getUnitDefinition=getUnitDefinition;
 
 const FACTION_DEFINITIONS = Object.freeze([
   Object.freeze({
-    id:'newAntioch', index:0, name:'New Antioch', short:'ANTIOCH', color:'#9ebdca', gameplayRole:'DEFENDER', deploymentZone:Object.freeze({minX:1,maxX:50}),
-    ink:Object.freeze([.46,.59,.62]), accent:Object.freeze([.64,.22,.12]), base:Object.freeze([19,82]), resource:'İkmal',
+    id:'newAntioch', index:0, name:'New Antioch', short:'ANTIOCH', color:'#9ebdca', gameplayRole:'DEFENDER', deploymentZone:Object.freeze({minX:1,maxX:65}),
+    ink:Object.freeze([.46,.59,.62]), accent:Object.freeze([.64,.22,.12]), base:Object.freeze([25,123]), resource:'İkmal',
     visualProfile:Object.freeze({strategy:'newAntioch', organic:false, smokeTint:'soot'}),
-    allowedUnits:Object.freeze(['infantry','heavy','engineer']), allowedBuildings:Object.freeze(['hq','barracks','workshop','supply','materialDepot','hospital','observation','defense']),
+    allowedUnits:Object.freeze(['infantry','heavy','engineer']), allowedBuildings:Object.freeze(['hq','barracks','workshop','supply','materialDepot','hospital','observation','trench','sandbag','barbedWire','defense']),
     systems:Object.freeze({economy:'newAntioch', construction:'engineered'}),startingArmy:Object.freeze([Object.freeze({type:'infantry',count:4}),Object.freeze({type:'engineer',count:1})])
   }),
   Object.freeze({
-    id:'blackGrail', index:1, name:'Black Grail', short:'GRAIL', color:'#a4b56c', gameplayRole:'ATTACKER', deploymentZone:Object.freeze({minX:62,maxX:111}),
-    ink:Object.freeze([.35,.42,.22]), accent:Object.freeze([.5,.22,.23]), base:Object.freeze([93,30]), resource:'Öz',
+    id:'blackGrail', index:1, name:'Black Grail', short:'GRAIL', color:'#a4b56c', gameplayRole:'ATTACKER', deploymentZone:Object.freeze({minX:103,maxX:167}),
+    ink:Object.freeze([.35,.42,.22]), accent:Object.freeze([.5,.22,.23]), base:Object.freeze([143,45]), resource:'Öz',
     visualProfile:Object.freeze({strategy:'blackGrail', organic:true, smokeTint:'toxic'}),
     allowedUnits:Object.freeze(['infantry','heavy']), allowedBuildings:Object.freeze(['hq','barracks','workshop','supply','hospital','tower','chapel']),
     systems:Object.freeze({economy:'legacyBlackGrail', construction:'growth'}),startingArmy:Object.freeze([Object.freeze({type:'infantry',count:4})])
@@ -930,12 +940,12 @@ const getResourceDefinition=id=>RESOURCE_BY_ID.get(id);
 
 // Fixed authored positions keep matches deterministic and avoid runtime random placement.
 const RESOURCE_NODE_LAYOUT=Object.freeze([
-  Object.freeze({type:'supply',x:30,z:76,amount:280}),Object.freeze({type:'supply',x:39,z:18,amount:240}),
-  Object.freeze({type:'supply',x:75,z:55,amount:260}),Object.freeze({type:'supply',x:87,z:91,amount:240}),
-  Object.freeze({type:'material',x:31,z:59,amount:240}),Object.freeze({type:'material',x:48,z:43,amount:220}),
-  Object.freeze({type:'material',x:76,z:70,amount:260}),Object.freeze({type:'material',x:83,z:19,amount:220}),
-  Object.freeze({type:'manpower',x:17,z:63,amount:54}),Object.freeze({type:'manpower',x:46,z:96,amount:48}),
-  Object.freeze({type:'manpower',x:67,z:14,amount:48}),Object.freeze({type:'manpower',x:94,z:48,amount:54})
+  Object.freeze({type:'supply',x:38,z:114,amount:280}),Object.freeze({type:'supply',x:58,z:27,amount:240}),
+  Object.freeze({type:'supply',x:113,z:83,amount:260}),Object.freeze({type:'supply',x:131,z:137,amount:240}),
+  Object.freeze({type:'material',x:47,z:89,amount:240}),Object.freeze({type:'material',x:72,z:65,amount:220}),
+  Object.freeze({type:'material',x:114,z:105,amount:260}),Object.freeze({type:'material',x:125,z:29,amount:220}),
+  Object.freeze({type:'manpower',x:25,z:95,amount:54}),Object.freeze({type:'manpower',x:69,z:144,amount:48}),
+  Object.freeze({type:'manpower',x:101,z:21,amount:48}),Object.freeze({type:'manpower',x:141,z:72,amount:54})
 ]);
 
 __exports.RESOURCE_TYPES=RESOURCE_TYPES;
@@ -951,8 +961,8 @@ const __dep0=__require('src/data.js');const FACTIONS=__dep0.FACTIONS;const clamp
 const IRON=[.22,.28,.29],BOOT=[.075,.09,.085],BONE=[.66,.63,.43];
 const CLOTH=[.39,.36,.27],FLESH=[.35,.19,.19],SORE=[.46,.39,.16];
 // A shared pose builder keeps a casualty visually continuous with its live model.
-function soldierArt(batch,x,z,yaw,f,heavy,lod,time,walking=false,fall=0,fade=1,seed=0,hit=0,engineer=false){
-  const organic=getFactionVisual(f).organic,t=clamp(fall,0,1),angle=t*1.49,scale=heavy?1.17:1;
+function soldierArt(batch,x,z,yaw,f,heavy,lod,time,walking=false,fall=0,fade=1,seed=0,hit=0,engineer=false,recoil=0){
+  const organic=getFactionVisual(f).organic,t=clamp(fall,0,1),angle=t*1.49,scale=heavy?1.28:1;
   const cp=Math.cos(angle),sp=Math.sin(angle),c=Math.cos(yaw),s=Math.sin(yaw);
   const bob=walking?Math.sin(time*9+seed*6)*.055:0;
   const body=organic?FLESH:FACTIONS[0].ink;
@@ -972,8 +982,9 @@ function soldierArt(batch,x,z,yaw,f,heavy,lod,time,walking=false,fall=0,fade=1,s
   if(!organic){
     add('box',0,.63,.20,.35,.67,.06,CLOTH);
     add('cone',0,1.77,0,.14,.32,.14,IRON);
-    add('box',.29,1,.32,.13,.13,.97,BOOT);
-    if(engineer){add('box',0,1.03,-.31,.62,.72,.24,[.38,.29,.17]);add('box',-.48,.82,.04,.12,.72,.14,[.72,.55,.25],1,0,.2);}
+    add('box',.29,1,.32-recoil*.22,.13,.13,heavy?1.34:.97,BOOT,1,-recoil*.08);
+    if(engineer){add('box',0,1.03,-.31,.68,.82,.28,[.38,.29,.17]);add('box',-.48,.82,.04,.12,.92,.14,[.72,.55,.25],1,0,.2);add('cylinder',.47,.88,-.2,.18,.75,.18,[.31,.34,.31],1,0,.55);}
+    else if((seed*100|0)%3===0)add('box',0,1.05,-.28,.42,.48,.2,CLOTH,lod);
   }else{
     add('sphere',-.12,1.14,-.23,.63,.68,.47,SORE);
     add('cone',.13,1.86,.07,.15,.66,.15,BONE,1,-.20);
@@ -990,7 +1001,7 @@ function soldierArt(batch,x,z,yaw,f,heavy,lod,time,walking=false,fall=0,fade=1,s
     add('box',0,.79,.25,.055,.25,.022,BONE,lod);
     add('box',0,.83,.255,.20,.055,.023,BONE,lod);
     add('box',-.33,.77,0,.13,.50,.18,CLOTH,lod);
-    if(heavy){add('box',-.45,1.09,.05,.14,.52,.42,IRON,lod);add('box',.45,1.09,.05,.14,.52,.42,IRON,lod);}
+    if(heavy){add('box',-.48,1.09,.05,.22,.62,.52,IRON,lod);add('box',.48,1.09,.05,.22,.62,.52,IRON,lod);add('box',0,1.18,-.34,.72,.76,.3,IRON,lod);}
     if(engineer){add('cylinder',0,1.76,0,.55,.18,.55,[.73,.58,.27],lod);add('box',.43,.82,.2,.1,.18,.72,IRON,lod,0,.3);}
   }else{
     for(let i=0;i<3;i++)add('box',0,.83+i*.13,.25,.41,.055,.07,BONE,lod,0,(i-1)*.08);
@@ -1025,6 +1036,25 @@ const blackGrailVisuals=Object.freeze({id:'blackGrail',index:1,organic:true,body
 
 __exports.blackGrailVisuals=blackGrailVisuals;
 },
+'src/world/FogOfWar.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;
+
+
+const VISIBILITY=Object.freeze({UNEXPLORED:0,EXPLORED:1,VISIBLE:2});
+class FogOfWar {
+  constructor(simulation){this.simulation=simulation;this.cell=BALANCE.fog.cell;this.width=Math.ceil(BALANCE.world.size/this.cell);this.timer=0;this.grids=[new Uint8Array(this.width*this.width),new Uint8Array(this.width*this.width)];}
+  restore(saved){if(!Array.isArray(saved))return;for(let f=0;f<2;f++)if(Array.isArray(saved[f])&&saved[f].length===this.grids[f].length)this.grids[f].set(saved[f]);}
+  snapshot(){return this.grids.map(grid=>Array.from(grid,value=>value===VISIBILITY.VISIBLE?VISIBILITY.EXPLORED:value));}
+  index(x,z){const cx=Math.max(0,Math.min(this.width-1,Math.floor(x/this.cell))),cz=Math.max(0,Math.min(this.width-1,Math.floor(z/this.cell)));return cz*this.width+cx;}
+  state(faction,x,z){return this.grids[faction]?.[this.index(x,z)]??VISIBILITY.UNEXPLORED;}
+  visible(faction,entity){return entity.f===faction||this.state(faction,entity.x,entity.z)===VISIBILITY.VISIBLE;}
+  reveal(grid,x,z,radius){const minX=Math.max(0,Math.floor((x-radius)/this.cell)),maxX=Math.min(this.width-1,Math.floor((x+radius)/this.cell)),minZ=Math.max(0,Math.floor((z-radius)/this.cell)),maxZ=Math.min(this.width-1,Math.floor((z+radius)/this.cell)),rr=radius*radius;for(let zc=minZ;zc<=maxZ;zc++)for(let xc=minX;xc<=maxX;xc++){const px=(xc+.5)*this.cell,pz=(zc+.5)*this.cell;if((px-x)**2+(pz-z)**2<=rr)grid[zc*this.width+xc]=VISIBILITY.VISIBLE;}}
+  update(dt,force=false){this.timer-=dt;if(!force&&this.timer>0)return;this.timer=BALANCE.fog.refresh;for(let faction=0;faction<2;faction++){const grid=this.grids[faction];for(let i=0;i<grid.length;i++)if(grid[i]===VISIBILITY.VISIBLE)grid[i]=VISIBILITY.EXPLORED;for(const squad of this.simulation.squads)if(squad.f===faction&&squad.hp>0){const definition=getUnitDefinition(squad.type);this.reveal(grid,squad.x,squad.z,definition?.vision??(definition?.combatUnit?BALANCE.fog.combatVision:BALANCE.fog.supportVision));}for(const building of this.simulation.buildings)if(building.f===faction&&building.hp>0&&building.progress===1){const radius=building.type==='observation'?BALANCE.fog.observationVision:['tower','defense'].includes(building.type)?BALANCE.fog.armedBuildingVision:BALANCE.fog.buildingVision;this.reveal(grid,building.x,building.z,radius);}}}
+}
+
+__exports.VISIBILITY=VISIBILITY;
+__exports.FogOfWar=FogOfWar;
+},
 'src/render/Batch.js':function(__exports,__require){
 
 const INSTANCE_STRIDE=15;
@@ -1044,7 +1074,8 @@ __exports.INSTANCE_STRIDE=INSTANCE_STRIDE;
 __exports.Batch=Batch;
 },
 'src/simulation/Simulation.js':function(__exports,__require){
-const __dep0=__require('src/core/GameState.js');const GameState=__dep0.GameState;const __dep1=__require('src/effects/VisualEvents.js');const VisualEvents=__dep1.VisualEvents;const __dep2=__require('data/factions.js');const FACTION_DEFINITIONS=__dep2.FACTION_DEFINITIONS;const __dep3=__require('src/simulation/SimulationClock.js');const SimulationClock=__dep3.SimulationClock;const __dep4=__require('src/simulation/EconomySystem.js');const EconomySystem=__dep4.EconomySystem;const __dep5=__require('src/simulation/CaptureSystem.js');const CaptureSystem=__dep5.CaptureSystem;const __dep6=__require('src/units/UnitManager.js');const UnitManager=__dep6.UnitManager;const __dep7=__require('src/buildings/BuildingManager.js');const BuildingManager=__dep7.BuildingManager;const __dep8=__require('src/units/MovementSystem.js');const MovementSystem=__dep8.MovementSystem;const __dep9=__require('src/combat/DamageSystem.js');const DamageSystem=__dep9.DamageSystem;const __dep10=__require('src/combat/CombatSystem.js');const CombatSystem=__dep10.CombatSystem;const __dep11=__require('src/buildings/ConstructionSystem.js');const ConstructionSystem=__dep11.ConstructionSystem;const __dep12=__require('src/ai/AIController.js');const AIController=__dep12.AIController;const __dep13=__require('src/world/ResourceNodeManager.js');const ResourceNodeManager=__dep13.ResourceNodeManager;const __dep14=__require('src/units/LogisticsSystem.js');const LogisticsSystem=__dep14.LogisticsSystem;const __dep15=__require('src/units/EngineeringSystem.js');const EngineeringSystem=__dep15.EngineeringSystem;const __dep16=__require('data/units.js');const getUnitDefinition=__dep16.getUnitDefinition;const __dep17=__require('src/simulation/MatchFlow.js');const MatchFlow=__dep17.MatchFlow;
+const __dep0=__require('src/core/GameState.js');const GameState=__dep0.GameState;const __dep1=__require('src/effects/VisualEvents.js');const VisualEvents=__dep1.VisualEvents;const __dep2=__require('data/factions.js');const FACTION_DEFINITIONS=__dep2.FACTION_DEFINITIONS;const __dep3=__require('src/simulation/SimulationClock.js');const SimulationClock=__dep3.SimulationClock;const __dep4=__require('src/simulation/EconomySystem.js');const EconomySystem=__dep4.EconomySystem;const __dep5=__require('src/simulation/CaptureSystem.js');const CaptureSystem=__dep5.CaptureSystem;const __dep6=__require('src/units/UnitManager.js');const UnitManager=__dep6.UnitManager;const __dep7=__require('src/buildings/BuildingManager.js');const BuildingManager=__dep7.BuildingManager;const __dep8=__require('src/units/MovementSystem.js');const MovementSystem=__dep8.MovementSystem;const __dep9=__require('src/combat/DamageSystem.js');const DamageSystem=__dep9.DamageSystem;const __dep10=__require('src/combat/CombatSystem.js');const CombatSystem=__dep10.CombatSystem;const __dep11=__require('src/buildings/ConstructionSystem.js');const ConstructionSystem=__dep11.ConstructionSystem;const __dep12=__require('src/ai/AIController.js');const AIController=__dep12.AIController;const __dep13=__require('src/world/ResourceNodeManager.js');const ResourceNodeManager=__dep13.ResourceNodeManager;const __dep14=__require('src/units/LogisticsSystem.js');const LogisticsSystem=__dep14.LogisticsSystem;const __dep15=__require('src/units/EngineeringSystem.js');const EngineeringSystem=__dep15.EngineeringSystem;const __dep16=__require('data/units.js');const getUnitDefinition=__dep16.getUnitDefinition;const __dep17=__require('src/simulation/MatchFlow.js');const MatchFlow=__dep17.MatchFlow;const __dep18=__require('src/world/FogOfWar.js');const FogOfWar=__dep18.FogOfWar;
+
 
 
 
@@ -1066,8 +1097,8 @@ const __dep0=__require('src/core/GameState.js');const GameState=__dep0.GameState
 
 class Simulation {
   constructor(player=0,initialize=true,options={}){Object.assign(this,GameState.create(player));this.visualEvents=new VisualEvents();this.events=[];this.attachSystems();if(initialize)this.initializeMatch(options);}
-  attachSystems(){this.clock=new SimulationClock();this.matchFlow=new MatchFlow(this);this.unitManager=new UnitManager(this);this.buildingManager=new BuildingManager(this);this.movementSystem=new MovementSystem(this);this.resourceNodeManager=new ResourceNodeManager(this);this.economySystem=new EconomySystem(this);this.logisticsSystem=new LogisticsSystem(this,this.resourceNodeManager,this.movementSystem);this.engineeringSystem=new EngineeringSystem(this,this.movementSystem);this.damageSystem=new DamageSystem(this);this.combatSystem=new CombatSystem(this,this.damageSystem);this.constructionSystem=new ConstructionSystem(this,this.buildingManager,this.unitManager,this.combatSystem,this.movementSystem,this.engineeringSystem);this.captureSystem=new CaptureSystem(this);this.aiController=new AIController(this);}
-  initializeMatch(options={}){this.matchFlow.setup(options.duration);this.resourceNodeManager.initialize();for(let faction=0;faction<FACTION_DEFINITIONS.length;faction++){const definition=FACTION_DEFINITIONS[faction],[x,z]=definition.base,direction=faction?-1:1;this.addBuilding(faction,'hq',x,z,true);this.addBuilding(faction,'barracks',x+direction*8,z-7,true);this.addBuilding(faction,'supply',x,z-direction*10,true);let slot=0;for(const group of definition.startingArmy)for(let index=0;index<group.count;index++,slot++)this.addSquad(faction,group.type,x+direction*(group.type==='engineer'?5:10),z+(group.type==='engineer'?-4:3+slot*3));}this.matchFlow.bindObjective();this.matchFlow.start();this.economySystem.update(0);}
+  attachSystems(){this.clock=new SimulationClock();this.matchFlow=new MatchFlow(this);this.unitManager=new UnitManager(this);this.buildingManager=new BuildingManager(this);this.movementSystem=new MovementSystem(this);this.resourceNodeManager=new ResourceNodeManager(this);this.economySystem=new EconomySystem(this);this.logisticsSystem=new LogisticsSystem(this,this.resourceNodeManager,this.movementSystem);this.engineeringSystem=new EngineeringSystem(this,this.movementSystem);this.damageSystem=new DamageSystem(this);this.combatSystem=new CombatSystem(this,this.damageSystem);this.constructionSystem=new ConstructionSystem(this,this.buildingManager,this.unitManager,this.combatSystem,this.movementSystem,this.engineeringSystem);this.captureSystem=new CaptureSystem(this);this.fogOfWar=new FogOfWar(this);this.fogOfWar.restore(this.fog);this.aiController=new AIController(this);}
+  initializeMatch(options={}){this.matchFlow.setup(options.duration);this.resourceNodeManager.initialize();for(let faction=0;faction<FACTION_DEFINITIONS.length;faction++){const definition=FACTION_DEFINITIONS[faction],[x,z]=definition.base,direction=faction?-1:1;this.addBuilding(faction,'hq',x,z,true);this.addBuilding(faction,'barracks',x+direction*8,z-7,true);this.addBuilding(faction,'supply',x,z-direction*10,true);let slot=0;for(const group of definition.startingArmy)for(let index=0;index<group.count;index++,slot++)this.addSquad(faction,group.type,x+direction*(group.type==='engineer'?5:10),z+(group.type==='engineer'?-4:3+slot*3));}this.matchFlow.bindObjective();this.matchFlow.start();this.economySystem.update(0);this.fogOfWar.update(0,true);this.fog=this.fogOfWar.snapshot();}
   notify(msg){this.events.push({t:this.time,msg});if(this.events.length>30)this.events.shift();}
   addBuilding(...args){return this.buildingManager.add(...args);}
   addSquad(...args){return this.unitManager.add(...args);}
@@ -1086,7 +1117,7 @@ class Simulation {
   repair(...args){return this.engineeringSystem.repair(...args);}
   forceUsed(faction){let total=0;for(const squad of this.squads)if(squad.f===faction&&squad.hp>0)total+=getUnitDefinition(squad.type)?.forceCost||0;for(const building of this.buildings)if(building.f===faction&&building.hp>0)for(const queued of building.queue)total+=getUnitDefinition(queued.type)?.forceCost||0;return total;}
   forceCap(faction){return this.economySystem.get(faction).forceCap();}
-  step(dt){if(this.winner!==null)return;this.tick++;this.clock.advance(this,dt);this.matchFlow.update(dt);this.economySystem.update(dt);this.constructionSystem.update(dt);for(const squad of this.squads){if(squad.hp<=0)continue;const combat=this.combatSystem.updateSquad(squad,dt);this.movementSystem.updateSquad(squad,combat.definition,combat.enemy,combat.target,dt);}this.logisticsSystem.update(dt);this.engineeringSystem.update(dt);const living=this.unitManager.living();this.movementSystem.separate(living,dt);if(this.match?.mode!=='SIEGE')this.captureSystem.update(living,dt);this.aiController.update(dt);this.unitManager.purge();}
+  step(dt){if(this.winner!==null)return;this.tick++;this.clock.advance(this,dt);this.matchFlow.update(dt);this.economySystem.update(dt);this.constructionSystem.update(dt);for(const squad of this.squads){if(squad.hp<=0)continue;const combat=this.combatSystem.updateSquad(squad,dt);this.movementSystem.updateSquad(squad,combat.definition,combat.enemy,combat.target,dt);}this.logisticsSystem.update(dt);this.engineeringSystem.update(dt);const living=this.unitManager.living();this.movementSystem.separate(living,dt);if(this.match?.mode!=='SIEGE')this.captureSystem.update(living,dt);this.aiController.update(dt);this.fogOfWar.update(dt);this.fog=this.fogOfWar.snapshot();this.unitManager.purge();}
   serialize(){return GameState.serialize(this);}
   static restore(raw){const data=GameState.parse(raw),simulation=new Simulation(data.player,false);Object.assign(simulation,data);simulation.visualEvents=new VisualEvents();simulation.events=[];simulation.attachSystems();simulation.resourceNodeManager.initialize();simulation.economySystem.update(0);return simulation;}
 }
@@ -1094,7 +1125,8 @@ class Simulation {
 __exports.Simulation=Simulation;
 },
 'src/core/GameState.js':function(__exports,__require){
-const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/buildings.js');const getBuildingDefinition=__dep1.getBuildingDefinition;const __dep2=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep2.createSiegeMatchState;const __dep3=__require('src/units/Squad.js');const createSquad=__dep3.createSquad;const __dep4=__require('data/units.js');const getUnitDefinition=__dep4.getUnitDefinition;
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/buildings.js');const getBuildingDefinition=__dep1.getBuildingDefinition;const __dep2=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep2.createSiegeMatchState;const __dep3=__require('src/units/Squad.js');const createSquad=__dep3.createSquad;const __dep4=__require('data/units.js');const getUnitDefinition=__dep4.getUnitDefinition;const __dep5=__require('data/resources.js');const RESOURCE_NODE_LAYOUT=__dep5.RESOURCE_NODE_LAYOUT;
+
 
 
 
@@ -1115,6 +1147,19 @@ const hydrateLegacyBuilding=building=>{
 };
 const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';if(squad.worker){squad.worker.state='IDLE';squad.worker.nodeId=null;squad.worker.targetBuildingId=null;squad.worker.depotId=null;squad.worker.pendingNodeId=null;squad.worker.pendingEngineering=null;squad.worker.timer=0;squad.worker.auto=false;squad.worker.searchCooldown=0;}}};
 const redeployLegacyBuildings=buildings=>{for(const building of buildings){building.assignedEngineers=[];if(building.hp<=0)continue;const zone=FACTION_DEFINITIONS[building.f]?.deploymentZone;if(!zone)continue;const footprint=building.footprint||building.r||0,margin=.51;building.x=Math.max(zone.minX+footprint+margin,Math.min(zone.maxX-footprint-margin,building.x));building.rally=null;}};
+const resetMigratedSquad=squad=>{squad.path=[];squad.target=null;squad.order='hold';if(squad.worker){squad.worker.state='IDLE';squad.worker.nodeId=null;squad.worker.targetBuildingId=null;squad.worker.depotId=null;squad.worker.pendingNodeId=null;squad.worker.pendingEngineering=null;squad.worker.timer=0;squad.worker.auto=false;squad.worker.searchCooldown=0;}};
+const migrateExpandedBattlefield=data=>{
+  const spatial=[...(data.squads||[]),...(data.buildings||[]),...(data.resourceNodes||[])];
+  const legacyMap=spatial.length>0&&spatial.every(entity=>(entity.x??0)<=112&&(entity.z??0)<=112);
+  if(!legacyMap)return;
+  const scale=1.5,clamp=value=>Math.max(1.5,Math.min(166.5,value*scale));
+  for(const building of data.buildings||[]){building.x=clamp(building.x);building.z=clamp(building.z);building.assignedEngineers=[];if(building.rally)building.rally={x:clamp(building.rally.x),z:clamp(building.rally.z)};}
+  for(const squad of data.squads||[]){squad.x=clamp(squad.x);squad.z=clamp(squad.z);resetMigratedSquad(squad);}
+  if(data.match?.state==='PREPARATION'){redeployLegacyBuildings(data.buildings||[]);redeployLegacySquads(data.squads||[]);}
+  if(Array.isArray(data.points))for(const point of data.points){point.x=clamp(point.x);point.z=clamp(point.z);}
+  const previous=new Map((data.resourceNodes||[]).map(node=>[node.id,node]));
+  data.resourceNodes=RESOURCE_NODE_LAYOUT.map((item,index)=>{const id='resource-'+(index+1),saved=previous.get(id),depleted=!!saved?.depleted||Number(saved?.amount)<=0,amount=depleted?0:Math.max(0,Math.min(item.amount,Number.isFinite(saved?.amount)?saved.amount:item.amount));return{id,type:item.type,x:item.x,z:item.z,r:1.8,amount,maxAmount:item.amount,depleted};});
+};
 const ensureLegacyNewAntiochEngineer=data=>{
   const hasEngineer=data.squads.some(squad=>squad.f===0&&squad.type==='engineer'&&squad.hp>0);
   if(hasEngineer)return;
@@ -1136,16 +1181,17 @@ const points=()=>[
 
 class GameState {
   static create(player=0){
-    return {player,time:0,tick:0,resources:[400,500],economies:[{strategy:'newAntioch',stock:{supply:400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0},population:{civilianPopulation:0,recruitablePopulation:60,housingCapacity:90,foodDemand:0,commandCapacity:32}},{strategy:'legacyBlackGrail',population:{reserve:0}}],resourceNodes:[],buildings:[],squads:[],points:points(),nextId:1,winner:null,gameplayEvents:[],match:null,ai:{tick:0,wave:45}};
+    return {player,time:0,tick:0,resources:[400,500],fog:null,economies:[{strategy:'newAntioch',stock:{supply:400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0},population:{civilianPopulation:0,recruitablePopulation:60,housingCapacity:90,foodDemand:0,commandCapacity:32}},{strategy:'legacyBlackGrail',population:{reserve:0}}],resourceNodes:[],buildings:[],squads:[],points:points(),nextId:1,winner:null,gameplayEvents:[],match:null,ai:{tick:0,wave:45}};
   }
   static serialize(source){
-    return JSON.stringify({version:3,player:source.player,time:source.time,tick:source.tick,resources:source.resources,economies:source.economies,resourceNodes:source.resourceNodes,buildings:source.buildings,squads:source.squads,points:source.points,nextId:source.nextId,winner:source.winner,gameplayEvents:source.gameplayEvents,match:source.match,ai:source.ai});
+    return JSON.stringify({version:4,player:source.player,time:source.time,tick:source.tick,resources:source.resources,fog:source.fog,economies:source.economies,resourceNodes:source.resourceNodes,buildings:source.buildings,squads:source.squads,points:source.points,nextId:source.nextId,winner:source.winner,gameplayEvents:source.gameplayEvents,match:source.match,ai:source.ai});
   }
   static parse(raw){
     const data=JSON.parse(raw);
-    if(![1,2,3].includes(data.version)||!Array.isArray(data.squads)||!Array.isArray(data.buildings))throw Error('Uyumsuz kayıt');
+    if(![1,2,3,4].includes(data.version)||!Array.isArray(data.squads)||!Array.isArray(data.buildings))throw Error('Uyumsuz kayıt');
     if(!FACTION_DEFINITIONS[data.player])throw Error('Bilinmeyen faction');
     if(data.version===1){data.version=2;data.economies=[{strategy:'newAntioch',stock:{supply:data.resources[0]??400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0}},{strategy:'legacyBlackGrail'}];data.resourceNodes=[];for(const squad of data.squads)if(squad.type==='engineer'&&!squad.worker)squad.worker={state:'IDLE',nodeId:null,targetBuildingId:null,depotId:null,cargoType:null,cargo:0,timer:0,auto:false,autoResourceType:null,searchCooldown:0,effectCooldown:0};}
+    if(data.version<4)migrateExpandedBattlefield(data);
     if(data.version<3){
       data.version=3;
       data.tick=Math.round((data.time||0)/.05);
@@ -1156,6 +1202,7 @@ class GameState {
       redeployLegacySquads(data.squads);
       data.match=createSiegeMatchState(undefined,data.buildings,0,data.winner,data.player);
     }
+    if(data.version<4){data.version=4;data.fog=null;}
     return data;
   }
   static isSerializable(source){try{const json=GameState.serialize(source);return !/(visualEvents|renderer|mesh|WebGL)/.test(json);}catch{return false;}}
@@ -1405,14 +1452,15 @@ const __dep0=__require('data/buildings.js');const getBuildingDefinition=__dep0.g
 function createBuilding(id,faction,type,x,z,ready=false){
   const definition=getBuildingDefinition(type);
   if(!definition)throw Error('Bilinmeyen yapı: '+type);
-  const {names,cost,costs,time,hp,r,desc,symbol,production,footprint,requires,forceCap=0,storage=null,category='SUPPORT',mainObjectiveForRole=null}=definition;
-  return {id,names,cost,costs,time,hp,r,desc,symbol,production,footprint,requires,forceCap,storage,category,mainObjectiveForRole,type,f:faction,x,z,maxHp:hp,progress:ready?1:0,queue:[],cooldown:0,assignedEngineers:[]};
+  const {names,cost,costs,time,hp,r,desc,symbol,production,footprint,requires,forceCap=0,storage=null,category='SUPPORT',mainObjectiveForRole=null,segmentLength=0,cover=1,movement=null}=definition;
+  return {id,names,cost,costs,time,hp,r,desc,symbol,production,footprint,requires,forceCap,storage,category,mainObjectiveForRole,segmentLength,cover,movement,yaw:0,type,f:faction,x,z,maxHp:hp,progress:ready?1:0,queue:[],cooldown:0,assignedEngineers:[]};
 }
 
 __exports.createBuilding=createBuilding;
 },
 'src/units/MovementSystem.js':function(__exports,__require){
-const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/core/math.js');const dist=__dep2.dist;const __dep3=__require('src/world/World.js');const terrain=__dep3.terrain;const walkable=__dep3.walkable;const pathfind=__dep3.pathfind;const __dep4=__require('src/units/FormationSystem.js');const FormationSystem=__dep4.FormationSystem;const __dep5=__require('data/factions.js');const FACTION_DEFINITIONS=__dep5.FACTION_DEFINITIONS;
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/core/math.js');const dist=__dep2.dist;const __dep3=__require('src/world/World.js');const terrain=__dep3.terrain;const walkable=__dep3.walkable;const pathfind=__dep3.pathfind;const __dep4=__require('src/units/FormationSystem.js');const FormationSystem=__dep4.FormationSystem;const __dep5=__require('data/factions.js');const FACTION_DEFINITIONS=__dep5.FACTION_DEFINITIONS;const __dep6=__require('src/world/FieldDefense.js');const wireSpeedAt=__dep6.wireSpeedAt;
+
 
 
 
@@ -1442,7 +1490,7 @@ class MovementSystem {
     if(!(enemy&&squad.order!=='move')&&squad.path.length){
       const point=squad.path[0],distance=dist(squad,point),kind=terrain(squad.x,squad.z);
       const multiplier=kind==='mud'?BALANCE.terrain.mudSpeed:kind==='forest'?BALANCE.terrain.forestSpeed:kind==='trench'?BALANCE.terrain.trenchSpeed:1;
-      const travel=definition.speed*multiplier*dt;
+      const travel=definition.speed*multiplier*wireSpeedAt(this.simulation.buildings,squad)*dt;
       if(distance<=travel){squad.x=point.x;squad.z=point.z;squad.path.shift();if(!squad.path.length)squad.order=squad.target?'attack':'hold';}
       else{squad.x+=(point.x-squad.x)/distance*travel;squad.z+=(point.z-squad.z)/distance*travel;squad.yaw=Math.atan2(point.x-squad.x,point.z-squad.z);}
     }else if(target&&!enemy&&Math.floor(this.simulation.time*2)!==squad.replan){squad.replan=Math.floor(this.simulation.time*2);this.move([squad.id],target.x,target.z,target);}
@@ -1470,7 +1518,7 @@ const __rex1=__require('src/world/Map.js');__exports.walkable=__rex1.walkable;__
 const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('src/world/Terrain.js');const terrain=__dep1.terrain;
 
 
-function walkable(x,z,buildings=[],ignoreId=0){const kind=terrain(x,z);return kind!=='river'&&kind!=='edge'&&!buildings.some(b=>b.hp>0&&b.id!==ignoreId&&Math.hypot(x-b.x,z-b.z)<b.r+.8);}
+function walkable(x,z,buildings=[],ignoreId=0){const kind=terrain(x,z);return kind!=='river'&&kind!=='edge'&&!buildings.some(b=>b.hp>0&&b.id!==ignoreId&&b.category!=='FIELD_DEFENSE'&&Math.hypot(x-b.x,z-b.z)<b.r+.8);}
 function pathfind(sx,sz,tx,tz,buildings=[]){
   const {grid,cell}=BALANCE.world,coord=value=>Math.max(0,Math.min(grid-1,Math.floor(value/cell))),start=coord(sz)*grid+coord(sx),end=coord(tz)*grid+coord(tx),blocked=new Uint8Array(grid*grid);
   for(let z=0;z<grid;z++)for(let x=0;x<grid;x++)blocked[z*grid+x]=!walkable(x*cell+1,z*cell+1,buildings);
@@ -1498,8 +1546,23 @@ class FormationSystem {
 
 __exports.FormationSystem=FormationSystem;
 },
+'src/world/FieldDefense.js':function(__exports,__require){
+
+const FIELD_TYPES=Object.freeze(['trench','sandbag','barbedWire']);
+function pointNearSegment(entity,x,z,padding=0){const half=(entity.segmentLength||entity.r*2)/2,c=Math.cos(entity.yaw||0),s=Math.sin(entity.yaw||0),dx=x-entity.x,dz=z-entity.z,along=dx*c-dz*s,across=dx*s+dz*c;return Math.abs(along)<=half+padding&&Math.abs(across)<=1.35+padding;}
+function fieldTerrainAt(buildings,x,z){const trench=buildings.find(b=>b.hp>0&&b.progress===1&&b.type==='trench'&&pointNearSegment(b,x,z));return trench?'trench':null;}
+function coverAt(buildings,x,z){let cover=1;for(const b of buildings)if(b.hp>0&&b.progress===1&&b.cover<cover&&pointNearSegment(b,x,z,1.2))cover=b.cover;return cover;}
+function wireSpeedAt(buildings,squad){let speed=1;for(const b of buildings)if(b.hp>0&&b.progress===1&&b.type==='barbedWire'&&pointNearSegment(b,squad.x,squad.z,.5))speed=Math.min(speed,b.movement?.[b.f===squad.f?'friendly':'enemy']??1);return speed;}
+
+__exports.FIELD_TYPES=FIELD_TYPES;
+__exports.pointNearSegment=pointNearSegment;
+__exports.fieldTerrainAt=fieldTerrainAt;
+__exports.coverAt=coverAt;
+__exports.wireSpeedAt=wireSpeedAt;
+},
 'src/combat/DamageSystem.js':function(__exports,__require){
-const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/world/World.js');const terrain=__dep2.terrain;const __dep3=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep3.VFX_EVENT;const __dep4=__require('src/combat/DeathSystem.js');const DeathSystem=__dep4.DeathSystem;
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;const __dep1=__require('src/core/Config.js');const BALANCE=__dep1.BALANCE;const __dep2=__require('src/world/World.js');const terrain=__dep2.terrain;const __dep3=__require('src/effects/VisualEvents.js');const VFX_EVENT=__dep3.VFX_EVENT;const __dep4=__require('src/combat/DeathSystem.js');const DeathSystem=__dep4.DeathSystem;const __dep5=__require('src/world/FieldDefense.js');const coverAt=__dep5.coverAt;
+
 
 
 
@@ -1510,11 +1573,11 @@ class DamageSystem {
   constructor(simulation){this.simulation=simulation;this.death=new DeathSystem(simulation);}
   apply(attacker,target,power){
     if(this.simulation.match?.state!=='WAR')return false;
-    const ground=target.path!==undefined?terrain(target.x,target.z):'';
-    const cover=ground==='trench'?BALANCE.terrain.trenchDamage:1;
+    const unitTarget=target.path!==undefined,ground=unitTarget?terrain(target.x,target.z):'';
+    const cover=Math.min(ground==='trench'?BALANCE.terrain.trenchDamage:1,unitTarget?coverAt(this.simulation.buildings,target.x,target.z):1);
     const conceal=ground==='forest'?BALANCE.terrain.forestDamage:1;
     if(target.hp<=0)return;
-    const unitTarget=target.path!==undefined,before=unitTarget?(target.alive??8):0;
+    const before=unitTarget?(target.alive??8):0;
     target.hp=Math.max(0,target.hp-power*cover*conceal);target.lastHit=this.simulation.time;
     this.simulation.matchFlow.objectiveDamaged(target);
     if(unitTarget)target.alive=Math.min(before,Math.ceil(target.hp/getUnitDefinition(target.type).hp));
@@ -1582,28 +1645,30 @@ class ConstructionSystem {
   missingRequirement(faction,definition){return (definition.requires||[]).find(type=>!this.complete(faction,type));}
   buildCost(faction,definition){return this.simulation.economySystem.get(faction).cost(definition);}
   unitCost(faction,definition){return this.simulation.economySystem.get(faction).cost(definition);}
-  placement(faction,type,x,z){
+  placement(faction,type,x,z,yaw=0){
     const definition=getBuildingDefinition(type),rules=BALANCE.construction,world=BALANCE.world;
     if(!this.definitionAllowed(faction,definition)||type==='hq')return 'Bu yapı bu faction tarafından kurulamaz';
     const missing=this.missingRequirement(faction,definition);if(missing)return getBuildingDefinition(missing).names[faction]+' gerekli';
     if(!this.simulation.economySystem.get(faction).canAfford(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
-    if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=rules.maxSameType)return 'Bu yapıdan en fazla 3 tane';
+    const typeLimit=definition.category==='FIELD_DEFENSE'?rules.maxFieldSegments:rules.maxSameType;if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=typeLimit)return 'Bu yapı için yerleşim sınırına ulaşıldı';
+    const footprint=definition.footprint||definition.r,isField=definition.category==='FIELD_DEFENSE',halfLength=isField?(definition.segmentLength||footprint*2)/2:footprint,halfWidth=isField?1.35:footprint,c=Math.cos(yaw),s=Math.sin(yaw),extentX=isField?Math.abs(c)*halfLength+Math.abs(s)*halfWidth:footprint,extentZ=isField?Math.abs(s)*halfLength+Math.abs(c)*halfWidth:footprint;
+    if(x-extentX<1||z-extentZ<1||x+extentX>world.size-1||z+extentZ>world.size-1)return 'Harita sınırına çok yakın';
+    if(this.simulation.match?.state==='PREPARATION'){const zone=FACTION_DEFINITIONS[faction].deploymentZone;if(x-extentX<zone.minX||x+extentX>zone.maxX)return 'Hazırlık bölgesi dışına kurulamaz';}
     if(!this.simulation.buildings.some(building=>building.hp>0&&building.progress===1&&building.f===faction&&dist(building,{x,z})<rules.baseRadius))return 'Tamamlanmış üssüne 20 m yakın olmalı';
-    const footprint=definition.footprint||definition.r;if(x-footprint<1||z-footprint<1||x+footprint>world.size-1||z+footprint>world.size-1)return 'Harita sınırına çok yakın';
-    if(this.simulation.match?.state==='PREPARATION'){const zone=FACTION_DEFINITIONS[faction].deploymentZone;if(x-footprint<zone.minX||x+footprint>zone.maxX)return 'Hazırlık bölgesi dışına kurulamaz';}
-    for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
-    if(x>47&&x<65&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
+    if(isField){for(let along=-halfLength;along<=halfLength+.01;along+=1)for(const across of[-halfWidth,0,halfWidth]){const px=x+along*c-across*s,pz=z+along*s+across*c,kind=terrain(px,pz);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}}
+    else for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
+    if(x>75&&x<93&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
     if(this.simulation.buildings.some(building=>building.hp>0&&dist(building,{x,z})<(building.footprint||building.r)+footprint+rules.obstacleMargin))return 'Başka yapıya çok yakın';
     if(this.simulation.resourceNodes.some(node=>!node.depleted&&dist(node,{x,z})<node.r+footprint+1))return 'Kaynak alanını kapatamazsın';
     if(this.simulation.match?.mode!=='SIEGE'&&this.simulation.points.some(point=>dist(point,{x,z})<footprint+rules.pointMargin))return 'İkmal noktasını kapatamazsın';
     if(this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<footprint+rules.obstacleMargin))return 'Manganın yolu üzerinde';
     return '';
   }
-  build(faction,type,x,z,engineerIds=[]){
-    const error=this.placement(faction,type,x,z);if(error)return error;const definition=getBuildingDefinition(type),economy=this.simulation.economySystem.get(faction);
+  build(faction,type,x,z,engineerIds=[],yaw=0){
+    const error=this.placement(faction,type,x,z,yaw);if(error)return error;const definition=getBuildingDefinition(type),economy=this.simulation.economySystem.get(faction);
     if(economy.engineeredConstruction&&!this.engineeringSystem.engineers(engineerIds,faction).length)return 'Şantiye için muharebe mühendisi seçilmeli';
     if(!economy.charge(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
-    const building=this.buildingManager.add(faction,type,x,z);building.workEffectCooldown=0;
+    const building=this.buildingManager.add(faction,type,x,z);building.workEffectCooldown=0;building.yaw=yaw;
     if(economy.engineeredConstruction)this.engineeringSystem.assist(engineerIds,building.id);
     if(faction===this.simulation.player)this.simulation.notify(definition.names[faction]+' şantiyesi kuruldu');this.movementSystem.repath();return '';
   }
@@ -1677,13 +1742,26 @@ __exports.WORKER_STATE=WORKER_STATE;
 __exports.LogisticsSystem=LogisticsSystem;
 },
 'src/ai/AIController.js':function(__exports,__require){
-const __dep0=__require('src/core/math.js');const dist=__dep0.dist;const __dep1=__require('src/ai/AIOrders.js');const AIOrders=__dep1.AIOrders;
+const __dep0=__require('src/core/math.js');const dist=__dep0.dist;const __dep1=__require('src/ai/AIOrders.js');const AIOrders=__dep1.AIOrders;const __dep2=__require('data/units.js');const getUnitDefinition=__dep2.getUnitDefinition;
+
 
 
 class AIController {
-  constructor(simulation){this.simulation=simulation;}
+  constructor(simulation){this.simulation=simulation;this.lastMatchState=simulation.match?.state;}
+  combatSquads(faction){return this.simulation.squads.filter(s=>s.f===faction&&s.hp>0&&getUnitDefinition(s.type)?.combatUnit===true);}
+  launchSiegeAttack(faction){
+    const sim=this.simulation;if(sim.match?.mode!=='SIEGE'||sim.match.state!=='WAR'||sim.match.roles?.[faction]!=='ATTACKER')return false;
+    const objective=sim.buildings.find(b=>b.id===sim.match.mainObjectiveId&&b.hp>0),squads=this.combatSquads(faction);if(!objective||!squads.length)return false;
+    AIOrders.move(sim,squads.map(s=>s.id),objective.x,objective.z,objective);sim.ai.assaultRetry=3;return squads.some(s=>s.target===objective.id&&(s.path.length||s.order==='attack'));
+  }
   update(dt){
     const sim=this.simulation,faction=1-sim.player;sim.ai.tick-=dt;sim.ai.wave-=dt;
+    const enteredWar=this.lastMatchState!=='WAR'&&sim.match?.state==='WAR';this.lastMatchState=sim.match?.state;
+    sim.ai.assaultRetry=(sim.ai.assaultRetry??0)-dt;
+    if(enteredWar)this.launchSiegeAttack(faction);
+    else if(sim.match?.state==='WAR'&&sim.match?.roles?.[faction]==='ATTACKER'&&sim.ai.assaultRetry<=0){
+      const idle=this.combatSquads(faction).some(s=>!s.target&&!s.path.length);if(idle)this.launchSiegeAttack(faction);else sim.ai.assaultRetry=3;
+    }
     if(sim.ai.tick<=0){
       sim.ai.tick=6;const buildings=sim.buildings.filter(b=>b.f===faction&&b.hp>0),engineers=sim.squads.filter(s=>s.f===faction&&s.type==='engineer'&&s.hp>0);
       if(faction===0)for(const [index,engineer] of engineers.entries())if(engineer.worker.state==='IDLE'&&!engineer.worker.auto)sim.setAutoGather([engineer.id],true,index%2?'supply':'material');
@@ -1696,7 +1774,7 @@ class AIController {
     }
     if(sim.ai.wave<=0){
       sim.ai.wave=45;
-      const squads=sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer');
+      const squads=this.combatSquads(faction);
       if(sim.match?.mode==='SIEGE'){
         if(sim.match.state!=='WAR')return;
         const role=sim.match.roles?.[faction],objective=sim.buildings.find(b=>b.id===sim.match.mainObjectiveId&&b.hp>0);
@@ -2042,7 +2120,9 @@ class Camera {
 __exports.Camera=Camera;
 },
 'src/render/art/BattlefieldArt.js':function(__exports,__require){
-const __dep0=__require('src/render/art/AtmosphereArt.js');const atmosphereArt=__dep0.atmosphereArt;const __dep1=__require('src/render/factions/FactionVisualRegistry.js');const getFactionVisual=__dep1.getFactionVisual;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/render/art/ResourceArt.js');const resourceNodeArt=__dep3.resourceNodeArt;const __dep4=__require('src/render/art/ConstructionArt.js');const constructionSiteArt=__dep4.constructionSiteArt;const placementFeedbackArt=__dep4.placementFeedbackArt;const __dep5=__require('src/render/Batch.js');const Batch=__dep5.Batch;const __dep6=__require('src/data.js');const hash=__dep6.hash;const FACTIONS=__dep6.FACTIONS;const UNITS=__dep6.UNITS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const forests=__dep7.forests;const craters=__dep7.craters;const crossings=__dep7.crossings;const __dep8=__require('src/world/Terrain.js');const trenchSegments=__dep8.trenchSegments;
+const __dep0=__require('src/render/art/AtmosphereArt.js');const atmosphereArt=__dep0.atmosphereArt;const __dep1=__require('src/render/factions/FactionVisualRegistry.js');const getFactionVisual=__dep1.getFactionVisual;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/render/art/ResourceArt.js');const resourceNodeArt=__dep3.resourceNodeArt;const __dep4=__require('src/render/art/ConstructionArt.js');const constructionSiteArt=__dep4.constructionSiteArt;const placementFeedbackArt=__dep4.placementFeedbackArt;const __dep5=__require('src/render/Batch.js');const Batch=__dep5.Batch;const __dep6=__require('src/data.js');const hash=__dep6.hash;const FACTIONS=__dep6.FACTIONS;const UNITS=__dep6.UNITS;const clamp=__dep6.clamp;const __dep7=__require('src/world/World.js');const terrain=__dep7.terrain;const forests=__dep7.forests;const craters=__dep7.craters;const crossings=__dep7.crossings;const __dep8=__require('src/world/Terrain.js');const trenchSegments=__dep8.trenchSegments;const __dep9=__require('src/core/Config.js');const BALANCE=__dep9.BALANCE;const __dep10=__require('src/world/FogOfWar.js');const VISIBILITY=__dep10.VISIBILITY;
+
+
 
 
 
@@ -2058,8 +2138,8 @@ const C= {
 const tint=(c,v)=>c.map(x=>x*v);
 function landscape() {
   const b=new Batch(),add=(...a)=>b.add(...a);
-  add('box',56,-1.1,56,114,2,114,C.earth);
-  for(let z=1; z<112; z+=2)for(let x=1; x<112; x+=2) {
+  const center=BALANCE.world.size/2;add('box',center,-1.1,center,BALANCE.world.size+2,2,BALANCE.world.size+2,C.earth);
+  for(let z=1; z<BALANCE.world.size; z+=2)for(let x=1; x<BALANCE.world.size; x+=2) {
     const t=terrain(x,z),h=hash(x,z),c=t==='river'?[.21,.29,.28]:t==='trench'?[.13,.14,.12]:t==='mud'?C.mud:t==='forest'?[.22,.25,.18]:C.earth;
     add('box',x,t==='river'?-.08:t==='trench'?-.02:.015, z,2.02,.12,2.02,tint(c,.985+h*.03));
     if(t==='land'&&h>.91)add('sphere',x,.06,z,.5+h,.25,.7,C.stone);
@@ -2078,10 +2158,10 @@ function landscape() {
     if(z%4<1.5)add('box',x,.10,z,2.8,.12,.45,[.29,.24,.17]);
   }
   for(const z of crossings) {
-    for(let x=51; x<=61; x+=.65)add('box',x,.23,z,.58,.26,7.5,[.35,.30,.22]);
+    for(let x=center-5; x<=center+5; x+=.65)add('box',x,.23,z,.58,.26,7.5,[.35,.30,.22]);
     for(const side of[-1,1]) {
-      add('box',56,.5,z+side*3.5,11,.3,.25,C.metal);
-      for(const x of[51,54,58,61])add('box',x,.9,z+side*3.5,.18,1.8,.18,C.metal);
+      add('box',center,.5,z+side*3.5,11,.3,.25,C.metal);
+      for(const x of[center-5,center-2,center+2,center+5])add('box',x,.9,z+side*3.5,.18,1.8,.18,C.metal);
     }
   }
   for(const f of forests)for(let i=0; i<23; i++) {
@@ -2095,7 +2175,7 @@ function landscape() {
     }
   }
   for(let i=0; i<95; i++) {
-    const x=8+hash(i,51)*96,z=7+hash(i,52)*98;
+    const x=8+hash(i,51)*(BALANCE.world.size-16),z=7+hash(i,52)*(BALANCE.world.size-14);
     if(['river','bridge'].includes(terrain(x,z)))continue;
     if(i%4===0) {
       add('box',x,.65,z,.12,1.5,.14,[.28,.29,.24],.12);
@@ -2135,6 +2215,14 @@ function buildingArt(b,v,time,ghost=false) {
       sx*breath,sy*scale,sz*breath,material,rot,ghost?.62:1,pitch,roll+collapse*.25,glow);
   };
   const stone=organic?[.30,.23,.22]:C.stone,metal=organic?C.flesh:C.metal,accent=FACTIONS[f].accent;
+  if(['trench','sandbag','barbedWire'].includes(v.type)){
+    const length=v.segmentLength||6,yaw=v.yaw||0,c=Math.cos(yaw),s=Math.sin(yaw);
+    const segmentAdd=(kind,dx,y,dz,sx,sy,sz,color,localRot=0,pitch=0,roll=0,glow=0)=>add(kind,dx*c-dz*s,y,dx*s+dz*c,sx,sy,sz,color,yaw+localRot,pitch,roll,glow);
+    if(v.type==='trench'){for(let i=-2;i<=2;i++){segmentAdd('sphere',i*length/5,.35,-.8,1.45,.7,1.15,C.sand);segmentAdd('sphere',i*length/5,.35,.8,1.45,.7,1.15,C.sand);}segmentAdd('box',0,.08,0,length,.12,1.4,C.mud);}
+    if(v.type==='sandbag')for(let row=0;row<2;row++)for(let i=-2;i<=2;i++)segmentAdd('sphere',i*length/5+(row?.35:0),.28+row*.38,0,1.35,.48,.72,C.sand);
+    if(v.type==='barbedWire'){for(const i of[-1,0,1]){segmentAdd('box',i*length/3,.55,0,.12,1.1,.12,metal);segmentAdd('ring',i*length/3,.6,0,1.3,.08,1.3,metal);}segmentAdd('box',0,.55,0,length,.06,.06,metal);}
+    if(!ghost&&p<1)constructionSiteArt(b,v);return;
+  }
   if(!organic&&p<1&&!ghost){constructionSiteArt(b,v);return;}
   if(dead&&collapse>=1){
     // A bounded visual ruin pass is selected by dynamicArt; not a collision object.
@@ -2341,9 +2429,11 @@ function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.time) {
   const b=targetBatch?targetBatch.reset():new Batch();
   let visible=0,near=0,far=0;
   let ruins=0;
-  for(const node of sim.resourceNodes||[]){if(node.depleted)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
+  if(sim.fogOfWar){const fog=sim.fogOfWar,grid=fog.grids[sim.player];for(let z=0;z<fog.width;z++)for(let x=0;x<fog.width;x++){const state=grid[z*fog.width+x];if(state===VISIBILITY.VISIBLE)continue;const shade=state===VISIBILITY.EXPLORED?.12:.025;b.add('box',(x+.5)*fog.cell,.18,(z+.5)*fog.cell,fog.cell+.08,.12,fog.cell+.08,[shade,shade*1.08,shade]);}}
+  for(const node of sim.resourceNodes||[]){if(node.depleted||sim.fogOfWar?.state(sim.player,node.x,node.z)===VISIBILITY.UNEXPLORED)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
   for(let bi=sim.buildings.length-1;bi>=0;bi--) {
     const v=sim.buildings[bi];
+    if(v.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,v))continue;
     if(v.hp<=0&&(!Number.isFinite(v.diedAt)||visualTime-v.diedAt>180||ruins++>=32))continue;
     const p=r.project(v.x,0,v.z);
     if(p.x< -150||p.x>r.width+150||p.y< -160||p.y>r.height+160)continue;
@@ -2352,7 +2442,7 @@ function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.time) {
     if(selected.has(v.id))b.add('ring',v.x,.3,v.z,v.r*2.8,.1,v.r*2.8,[.77,.73,.47]);
   }
   for(const s of sim.squads) {
-    if(s.hp<=0)continue;
+    if(s.hp<=0||s.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,s))continue;
     const p=r.project(s.x,0,s.z);
     if(p.x< -80||p.x>r.width+80||p.y< -100||p.y>r.height+100)continue;
     visible++;
@@ -2371,7 +2461,8 @@ function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.time) {
       const ox=(i%4-1.5)*.9,oz=(Math.floor(i/4)-.5)*1.3,a=s.yaw;
       const x=s.x+ox*Math.cos(a)+oz*Math.sin(a),z=s.z-ox*Math.sin(a)+oz*Math.cos(a);
       const hit=clamp(1-(visualTime-(s.lastHit??-100))/.15,0,1);
-      soldierArt(b,x,z,a,s.f,s.type==='heavy',lod,visualTime,s.path.length>0,0,1,i*.13,hit,s.type==='engineer');
+      const recoil=clamp((s.firing||0)/.16,0,1)*(.65+.35*Math.sin(i*2.17));
+      soldierArt(b,x,z,a,s.f,s.type==='heavy',lod,visualTime,s.path.length>0,0,1,i*.13,hit,s.type==='engineer',recoil);
     }
     if(s.type==='engineer'&&s.worker?.cargo>0){const cargoColor=s.worker.cargoType==='supply'?[.55,.48,.31]:s.worker.cargoType==='material'?[.38,.42,.40]:[.50,.43,.34];b.add('box',s.x,.9,s.z-.8,1.4,.65,.8,cargoColor,s.yaw);}
   }
@@ -2522,7 +2613,7 @@ class CommandSystem {
     const sim=this.simulation;this.sequence++;if(this.history.length>=64)this.history.shift();this.history.push({sequence:this.sequence,command:JSON.parse(JSON.stringify(command))});
     if(command.type===COMMAND.MOVE){sim.engineeringSystem.stop(command.ids);sim.logisticsSystem.interrupt(command.ids);return sim.move(command.ids,command.x,command.z);}
     if(command.type===COMMAND.ATTACK){sim.engineeringSystem.stop(command.ids);sim.logisticsSystem.interrupt(command.ids);const target=[...sim.squads,...sim.buildings].find(entity=>entity.id===command.targetId&&entity.hp>0);return sim.move(command.ids,command.x,command.z,target||null);}
-    if(command.type===COMMAND.BUILD)return sim.build(command.faction,command.buildingType,command.x,command.z,command.engineerIds||[]);
+    if(command.type===COMMAND.BUILD)return sim.build(command.faction,command.buildingType,command.x,command.z,command.engineerIds||[],command.yaw||0);
     if(command.type===COMMAND.GATHER)return sim.gather(command.ids,command.nodeId,command.auto);
     if(command.type===COMMAND.REPAIR)return sim.repair(command.ids,command.buildingId);
     if(command.type===COMMAND.ASSIST_CONSTRUCTION)return sim.assistConstruction(command.ids,command.buildingId);
@@ -2543,7 +2634,7 @@ __exports.CommandSystem=CommandSystem;
 const COMMAND=Object.freeze({MOVE:'MOVE',ATTACK:'ATTACK',BUILD:'BUILD',STOP:'STOP',TRAIN:'TRAIN',CANCEL:'CANCEL',SET_RALLY:'SET_RALLY',GATHER:'GATHER',REPAIR:'REPAIR',ASSIST_CONSTRUCTION:'ASSIST_CONSTRUCTION',SET_AUTO_GATHER:'SET_AUTO_GATHER'});
 const MoveCommand=(ids,x,z)=>({type:COMMAND.MOVE,ids:[...ids],x,z});
 const AttackCommand=(ids,targetId,x,z)=>({type:COMMAND.ATTACK,ids:[...ids],targetId,x,z});
-const BuildCommand=(faction,buildingType,x,z,engineerIds=[])=>({type:COMMAND.BUILD,faction,buildingType,x,z,engineerIds:[...engineerIds]});
+const BuildCommand=(faction,buildingType,x,z,engineerIds=[],yaw=0)=>({type:COMMAND.BUILD,faction,buildingType,x,z,engineerIds:[...engineerIds],yaw});
 const StopCommand=ids=>({type:COMMAND.STOP,ids:[...ids]});
 const TrainCommand=(buildingId,unitType)=>({type:COMMAND.TRAIN,buildingId,unitType});
 const CancelCommand=buildingId=>({type:COMMAND.CANCEL,buildingId});
@@ -2569,6 +2660,7 @@ __exports.SetAutoGatherCommand=SetAutoGatherCommand;
 __exports.isSerializableCommand=isSerializableCommand;
 },
 'src/input/SelectionSystem.js':function(__exports,__require){
+const __dep0=__require('data/units.js');const getUnitDefinition=__dep0.getUnitDefinition;
 
 class SelectionSystem {
   constructor(){this.ids=new Set();}
@@ -2578,7 +2670,7 @@ class SelectionSystem {
   has(id){return this.ids.has(id);}
   array(){return [...this.ids];}
   prune(simulation){for(const id of this.ids)if(!simulation.squads.some(s=>s.id===id&&s.hp>0)&&!simulation.buildings.some(b=>b.id===id&&b.hp>0))this.ids.delete(id);}
-  selectAll(simulation){return this.replace(simulation.squads.filter(s=>s.f===simulation.player&&s.hp>0).map(s=>s.id));}
+  selectAll(simulation){return this.replace(simulation.squads.filter(s=>s.f===simulation.player&&s.hp>0&&getUnitDefinition(s.type)?.combatUnit===true).map(s=>s.id));}
 }
 
 __exports.SelectionSystem=SelectionSystem;
@@ -2615,17 +2707,20 @@ class BuildMenu {
 __exports.BuildMenu=BuildMenu;
 },
 'src/ui/HUD.js':function(__exports,__require){
-const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;const __dep2=__require('src/world/Terrain.js');const terrain=__dep2.terrain;const __dep3=__require('src/core/Config.js');const BALANCE=__dep3.BALANCE;
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;const __dep2=__require('src/world/Terrain.js');const terrain=__dep2.terrain;const __dep3=__require('src/world/FieldDefense.js');const coverAt=__dep3.coverAt;const __dep4=__require('src/core/Config.js');const BALANCE=__dep4.BALANCE;
+
 
 
 
 
 
 const formatCountdown=remaining=>{const total=Math.max(0,Math.ceil(Number(remaining)||0));return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');};
+const pruneSelection=(sim,selected)=>{for(const id of selected){const entity=[...sim.squads,...sim.buildings].find(item=>item.id===id);if(!entity||entity.hp<=0||entity.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,entity))selected.delete(id);}return selected;};
+const squadGroundStatus=(sim,squad)=>{const fieldCover=coverAt(sim.buildings,squad.x,squad.z);if(fieldCover<1)return 'Saha savunması: %'+Math.round((1-fieldCover)*100)+' koruma';const kind=terrain(squad.x,squad.z);return({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');};
 class HUD {
   constructor(get){this.get=get;}
   update(sim,selected){
-    const $=this.get;for(const id of selected)if(![...sim.squads,...sim.buildings].some(entity=>entity.id===id&&entity.hp>0))selected.delete(id);
+    const $=this.get;pruneSelection(sim,selected);
     const newAntioch=sim.economySystem.get(sim.player).activeGathering,economy=sim.economies?.[sim.player];
     $('resource').textContent=Math.floor(newAntioch?economy.stock.supply:sim.resources[sim.player]);
     $('materialBox').hidden=!newAntioch;$('manpowerBox').hidden=!newAntioch;
@@ -2635,7 +2730,7 @@ class HUD {
     $('matchPhase').textContent=match?.state==='PREPARATION'?'HAZIRLIK':match?.state==='WAR'?'SAVAŞ':match?.state||'KURULUM';$('matchClock').textContent=formatCountdown(remaining);$('matchClock').classList.toggle('warning',match?.state==='PREPARATION'&&remaining<=10);$('missionText').textContent=role==='DEFENDER'?'SAVUNAN · Ana savunma merkezini süre sonuna kadar koru.':'SALDIRAN · Süre dolmadan ana savunma merkezini yok et.';$('objectives').innerHTML=`<span>ANA MERKEZ ${objective?Math.ceil(objective.hp/objective.maxHp*100):0}%</span><span>${role}</span>`;
     const entities=[...sim.squads,...sim.buildings].filter(entity=>selected.has(entity.id)),building=entities.find(entity=>entity.queue),squads=entities.filter(entity=>entity.path);
     if(building){$('selectionType').textContent=FACTION_DEFINITIONS[building.f].name.toUpperCase()+' / YAPI';$('selectionName').textContent=building.names[building.f];$('selectionInfo').textContent=`${Math.ceil(building.hp)} / ${building.maxHp} CAN · `+(building.progress<1?'İnşa %'+Math.floor(building.progress*100)+' · '+(building.assignedEngineers?.length||0)+' mühendis':building.queue.length?'Sıra '+building.queue.length+' · '+getUnitDefinition(building.queue[0].type).names[building.f]+' · '+Math.ceil(getUnitDefinition(building.queue[0].type).time-building.queue[0].time)+' sn':building.desc);}
-    else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),kind=terrain(squads[0].x,squads[0].z),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');}
+    else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+squadGroundStatus(sim,squads[0]);}
     else{$('selectionType').textContent=FACTION_DEFINITIONS[sim.player].name.toUpperCase()+' / SEFER KUVVETİ';$('selectionName').textContent='Cephe seni bekliyor.';$('selectionInfo').textContent='Mangaya dokun, ardından bir hedef seç.';}
     $('deselect').hidden=entities.length===0;const friendly=squads.filter(item=>item.f===sim.player),engineers=friendly.filter(item=>item.type==='engineer');
     $('stop').querySelector('span').textContent=building?'İptal':'Dur';$('stop').disabled=!(friendly.length||building&&building.f===sim.player&&(building.progress<1||building.queue.length));$('trainHeavy').disabled=!sim.buildings.some(item=>item.f===sim.player&&item.type==='workshop'&&item.progress===1&&item.hp>0);$('trainEngineer').hidden=!newAntioch;$('autoGather').hidden=!newAntioch;$('autoGather').disabled=!engineers.length;$('autoGather').classList.toggle('active',engineers.length>0&&engineers.every(item=>item.worker.auto));$('buildMenu').disabled=sim.economySystem.get(sim.player).engineeredConstruction&&!sim.squads.some(item=>item.f===sim.player&&item.type==='engineer'&&item.hp>0);
@@ -2643,16 +2738,19 @@ class HUD {
 }
 
 __exports.formatCountdown=formatCountdown;
+__exports.pruneSelection=pruneSelection;
+__exports.squadGroundStatus=squadGroundStatus;
 __exports.HUD=HUD;
 },
 'src/ui/Minimap.js':function(__exports,__require){
-const __dep0=__require('src/world/Terrain.js');const terrain=__dep0.terrain;const __dep1=__require('data/factions.js');const FACTION_DEFINITIONS=__dep1.FACTION_DEFINITIONS;const __dep2=__require('src/core/Config.js');const BALANCE=__dep2.BALANCE;
+const __dep0=__require('src/world/Terrain.js');const terrain=__dep0.terrain;const __dep1=__require('data/factions.js');const FACTION_DEFINITIONS=__dep1.FACTION_DEFINITIONS;const __dep2=__require('src/core/Config.js');const BALANCE=__dep2.BALANCE;const __dep3=__require('src/world/FogOfWar.js');const VISIBILITY=__dep3.VISIBILITY;
+
 
 
 
 class Minimap {
-  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('2d');this.background=document.createElement('canvas');this.background.width=224;this.background.height=224;const context=this.background.getContext('2d');for(let z=0;z<BALANCE.world.size;z+=BALANCE.world.cell)for(let x=0;x<BALANCE.world.size;x+=BALANCE.world.cell){const kind=terrain(x,z);context.fillStyle=({river:'#425b59',bridge:'#998458',forest:'#374c35',trench:'#8b805f',mud:'#3c3d30'})[kind]||'#535744';context.fillRect(x*2,z*2,4,4);}}
-  draw(sim,renderer){const context=this.context;context.drawImage(this.background,0,0);for(const node of sim.resourceNodes||[])if(!node.depleted){context.fillStyle=node.type==='supply'?'#c0a25f':node.type==='material'?'#8f9a91':'#b18a74';context.fillRect(node.x*2-2,node.z*2-2,4,4);}if(sim.match?.mode!=='SIEGE')for(const point of sim.points){context.strokeStyle=point.owner<0?'#e1c288':FACTION_DEFINITIONS[point.owner].color;context.lineWidth=2;context.strokeRect(point.x*2-5,point.z*2-5,10,10);}for(const building of sim.buildings)if(building.hp>0){context.fillStyle=FACTION_DEFINITIONS[building.f].color;context.fillRect(building.x*2-4,building.z*2-4,8,8);}for(const squad of sim.squads)if(squad.hp>0){context.fillStyle=squad.f===sim.player?'#e2e9d9':'#d57c5c';context.beginPath();context.arc(squad.x*2,squad.z*2,2.7,0,7);context.fill();}context.strokeStyle='#f2e8c8';context.lineWidth=1.5;context.beginPath();for(const [index,point] of [[0,[0,0]],[1,[renderer.width,0]],[2,[renderer.width,renderer.height]],[3,[0,renderer.height]]]){const world=renderer.ground(...point);if(!index)context.moveTo(world.x*2,world.z*2);else context.lineTo(world.x*2,world.z*2);}context.closePath();context.stroke();}
+  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('2d');this.background=document.createElement('canvas');this.background.width=224;this.background.height=224;const context=this.background.getContext('2d'),scale=224/BALANCE.world.size;for(let z=0;z<BALANCE.world.size;z+=BALANCE.world.cell)for(let x=0;x<BALANCE.world.size;x+=BALANCE.world.cell){const kind=terrain(x,z);context.fillStyle=({river:'#425b59',bridge:'#998458',forest:'#374c35',trench:'#8b805f',mud:'#3c3d30'})[kind]||'#535744';context.fillRect(x*scale,z*scale,BALANCE.world.cell*scale+.5,BALANCE.world.cell*scale+.5);}}
+  draw(sim,renderer){const context=this.context,scale=this.canvas.width/BALANCE.world.size,known=(e,visibleOnly=false)=>e.f===sim.player||sim.fogOfWar&&(visibleOnly?sim.fogOfWar.visible(sim.player,e):sim.fogOfWar.state(sim.player,e.x,e.z)!==VISIBILITY.UNEXPLORED);context.drawImage(this.background,0,0,this.canvas.width,this.canvas.height);if(sim.match?.mode!=='SIEGE')for(const point of sim.points){context.strokeStyle=point.owner<0?'#e1c288':FACTION_DEFINITIONS[point.owner].color;context.strokeRect(point.x*scale-4,point.z*scale-4,8,8);}for(const node of sim.resourceNodes||[])if(!node.depleted&&sim.fogOfWar?.state(sim.player,node.x,node.z)!==VISIBILITY.UNEXPLORED){context.fillStyle=node.type==='supply'?'#c0a25f':node.type==='material'?'#8f9a91':'#b18a74';context.fillRect(node.x*scale-2,node.z*scale-2,4,4);}for(const building of sim.buildings)if(building.hp>0&&known(building,true)){context.fillStyle=FACTION_DEFINITIONS[building.f].color;context.fillRect(building.x*scale-3,building.z*scale-3,6,6);}for(const squad of sim.squads)if(squad.hp>0&&known(squad,true)){context.fillStyle=squad.f===sim.player?'#e2e9d9':'#d57c5c';context.beginPath();context.arc(squad.x*scale,squad.z*scale,2.7,0,7);context.fill();}if(sim.fogOfWar){const grid=sim.fogOfWar.grids[sim.player],cellPx=sim.fogOfWar.cell*scale;for(let z=0;z<sim.fogOfWar.width;z++)for(let x=0;x<sim.fogOfWar.width;x++){const state=grid[z*sim.fogOfWar.width+x];if(state===VISIBILITY.VISIBLE)continue;context.fillStyle=state===VISIBILITY.EXPLORED?'#07100aa0':'#020504ed';context.fillRect(x*cellPx,z*cellPx,cellPx+.5,cellPx+.5);}}context.strokeStyle='#f2e8c8';context.lineWidth=1.5;context.beginPath();for(const [index,point] of [[0,[0,0]],[1,[renderer.width,0]],[2,[renderer.width,renderer.height]],[3,[0,renderer.height]]]){const world=renderer.ground(...point);if(!index)context.moveTo(world.x*scale,world.z*scale);else context.lineTo(world.x*scale,world.z*scale);}context.closePath();context.stroke();}
 }
 
 __exports.Minimap=Minimap;
@@ -2673,7 +2771,7 @@ class OverlayRenderer {
   constructor(context){this.context=context;}
   draw(sim,renderer,selected,drag,orderMarker,now=performance.now()){
     const context=this.context;context.clearRect(0,0,renderer.width,renderer.height);
-    for(const entity of [...sim.squads,...sim.buildings]){if(entity.hp<=0)continue;if(!selected.has(entity.id)&&entity.hp===entity.maxHp&&!(entity.progress<1)&&!entity.path)continue;const point=renderer.project(entity.x,entity.path?2.4:7,entity.z);if(point.x<0||point.x>renderer.width||point.y<0||point.y>renderer.height)continue;const width=entity.path?27:45;context.fillStyle='#0c1412df';context.fillRect(point.x-width/2-1,point.y-1,width+2,5);context.fillStyle=entity.f===sim.player?'#bed095':'#cb7960';context.fillRect(point.x-width/2,point.y,width*entity.hp/entity.maxHp,3);if(entity.progress<1){context.fillStyle='#cdb078';context.fillRect(point.x-width/2,point.y+5,width*entity.progress,2);}if(selected.has(entity.id)&&entity.path?.length){context.strokeStyle='#d6c98c66';context.setLineDash([4,5]);context.beginPath();const origin=renderer.project(entity.x,.3,entity.z);context.moveTo(origin.x,origin.y);for(const waypoint of entity.path){const projected=renderer.project(waypoint.x,.3,waypoint.z);context.lineTo(projected.x,projected.y);}context.stroke();context.setLineDash([]);}}
+    for(const entity of [...sim.squads,...sim.buildings]){if(entity.hp<=0||entity.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,entity))continue;if(!selected.has(entity.id)&&entity.hp===entity.maxHp&&!(entity.progress<1)&&!entity.path)continue;const point=renderer.project(entity.x,entity.path?2.4:7,entity.z);if(point.x<0||point.x>renderer.width||point.y<0||point.y>renderer.height)continue;const width=entity.path?27:45;context.fillStyle='#0c1412df';context.fillRect(point.x-width/2-1,point.y-1,width+2,5);context.fillStyle=entity.f===sim.player?'#bed095':'#cb7960';context.fillRect(point.x-width/2,point.y,width*entity.hp/entity.maxHp,3);if(entity.progress<1){context.fillStyle='#cdb078';context.fillRect(point.x-width/2,point.y+5,width*entity.progress,2);}if(selected.has(entity.id)&&entity.path?.length){context.strokeStyle='#d6c98c66';context.setLineDash([4,5]);context.beginPath();const origin=renderer.project(entity.x,.3,entity.z);context.moveTo(origin.x,origin.y);for(const waypoint of entity.path){const projected=renderer.project(waypoint.x,.3,waypoint.z);context.lineTo(projected.x,projected.y);}context.stroke();context.setLineDash([]);}}
     if(sim.match?.mode!=='SIEGE')for(const [point,index] of sim.points.map((point,index)=>[point,index])){const projected=renderer.project(point.x,4,point.z);context.font='10px Arial';context.textAlign='center';context.fillStyle='#e0d4ab';context.fillText(['I · KUZEY','II · MERKEZ','III · GÜNEY'][index],projected.x,projected.y);}
     if(drag?.select&&drag.moved){context.fillStyle='#c9ca7420';context.strokeStyle='#d0c58c';context.fillRect(drag.x,drag.y,drag.cx-drag.x,drag.cy-drag.y);context.strokeRect(drag.x,drag.y,drag.cx-drag.x,drag.cy-drag.y);}
     if(orderMarker){const age=(now-orderMarker.t)/1000;if(age>1)return null;const point=renderer.project(orderMarker.x,.3,orderMarker.z);context.strokeStyle=orderMarker.attack?'#e89a6f':'#e5d397';if(orderMarker.attack){context.beginPath();context.moveTo(point.x-15,point.y-8);context.lineTo(point.x+15,point.y+8);context.moveTo(point.x+15,point.y-8);context.lineTo(point.x-15,point.y+8);context.stroke();}context.beginPath();context.ellipse(point.x,point.y,12+age*14,6+age*7,0,0,7);context.stroke();}

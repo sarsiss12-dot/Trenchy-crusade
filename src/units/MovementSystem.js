@@ -4,6 +4,7 @@ import {dist} from '../core/math.js';
 import {terrain,walkable,pathfind} from '../world/World.js';
 import {FormationSystem} from './FormationSystem.js';
 import {FACTION_DEFINITIONS} from '../../data/factions.js';
+import {wireSpeedAt} from '../world/FieldDefense.js';
 
 export class MovementSystem {
   constructor(simulation){this.simulation=simulation;this.formation=new FormationSystem();}
@@ -27,7 +28,7 @@ export class MovementSystem {
     if(!(enemy&&squad.order!=='move')&&squad.path.length){
       const point=squad.path[0],distance=dist(squad,point),kind=terrain(squad.x,squad.z);
       const multiplier=kind==='mud'?BALANCE.terrain.mudSpeed:kind==='forest'?BALANCE.terrain.forestSpeed:kind==='trench'?BALANCE.terrain.trenchSpeed:1;
-      const travel=definition.speed*multiplier*dt;
+      const travel=definition.speed*multiplier*wireSpeedAt(this.simulation.buildings,squad)*dt;
       if(distance<=travel){squad.x=point.x;squad.z=point.z;squad.path.shift();if(!squad.path.length)squad.order=squad.target?'attack':'hold';}
       else{squad.x+=(point.x-squad.x)/distance*travel;squad.z+=(point.z-squad.z)/distance*travel;squad.yaw=Math.atan2(point.x-squad.x,point.z-squad.z);}
     }else if(target&&!enemy&&Math.floor(this.simulation.time*2)!==squad.replan){squad.replan=Math.floor(this.simulation.time*2);this.move([squad.id],target.x,target.z,target);}

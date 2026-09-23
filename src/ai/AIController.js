@@ -1,9 +1,22 @@
 import {dist} from '../core/math.js';
 import {AIOrders} from './AIOrders.js';
+import {getUnitDefinition} from '../../data/units.js';
 export class AIController {
-  constructor(simulation){this.simulation=simulation;}
+  constructor(simulation){this.simulation=simulation;this.lastMatchState=simulation.match?.state;}
+  combatSquads(faction){return this.simulation.squads.filter(s=>s.f===faction&&s.hp>0&&getUnitDefinition(s.type)?.combatUnit===true);}
+  launchSiegeAttack(faction){
+    const sim=this.simulation;if(sim.match?.mode!=='SIEGE'||sim.match.state!=='WAR'||sim.match.roles?.[faction]!=='ATTACKER')return false;
+    const objective=sim.buildings.find(b=>b.id===sim.match.mainObjectiveId&&b.hp>0),squads=this.combatSquads(faction);if(!objective||!squads.length)return false;
+    AIOrders.move(sim,squads.map(s=>s.id),objective.x,objective.z,objective);sim.ai.assaultRetry=3;return squads.some(s=>s.target===objective.id&&(s.path.length||s.order==='attack'));
+  }
   update(dt){
     const sim=this.simulation,faction=1-sim.player;sim.ai.tick-=dt;sim.ai.wave-=dt;
+    const enteredWar=this.lastMatchState!=='WAR'&&sim.match?.state==='WAR';this.lastMatchState=sim.match?.state;
+    sim.ai.assaultRetry=(sim.ai.assaultRetry??0)-dt;
+    if(enteredWar)this.launchSiegeAttack(faction);
+    else if(sim.match?.state==='WAR'&&sim.match?.roles?.[faction]==='ATTACKER'&&sim.ai.assaultRetry<=0){
+      const idle=this.combatSquads(faction).some(s=>!s.target&&!s.path.length);if(idle)this.launchSiegeAttack(faction);else sim.ai.assaultRetry=3;
+    }
     if(sim.ai.tick<=0){
       sim.ai.tick=6;const buildings=sim.buildings.filter(b=>b.f===faction&&b.hp>0),engineers=sim.squads.filter(s=>s.f===faction&&s.type==='engineer'&&s.hp>0);
       if(faction===0)for(const [index,engineer] of engineers.entries())if(engineer.worker.state==='IDLE'&&!engineer.worker.auto)sim.setAutoGather([engineer.id],true,index%2?'supply':'material');
@@ -16,7 +29,7 @@ export class AIController {
     }
     if(sim.ai.wave<=0){
       sim.ai.wave=45;
-      const squads=sim.squads.filter(s=>s.f===faction&&s.hp>0&&s.type!=='engineer');
+      const squads=this.combatSquads(faction);
       if(sim.match?.mode==='SIEGE'){
         if(sim.match.state!=='WAR')return;
         const role=sim.match.roles?.[faction],objective=sim.buildings.find(b=>b.id===sim.match.mainObjectiveId&&b.hp>0);

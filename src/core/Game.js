@@ -18,6 +18,7 @@ import {Minimap} from '../ui/Minimap.js';
 import {PerformancePanel} from '../ui/PerformancePanel.js';
 import {OverlayRenderer} from '../ui/OverlayRenderer.js';
 import {BALANCE} from './Config.js';
+import {VISIBILITY} from '../world/FogOfWar.js';
 
 export class Game {
   constructor(){
@@ -153,7 +154,7 @@ function setMode(m) {
 $('pan').onclick=()=>setMode('pan');
 $('select').onclick=()=>setMode('select');
 $('all').onclick=()=> {
-  selected=selection.replace(sim.squads.filter(s=>s.f===sim.player&&s.hp>0).map(s=>s.id));
+  selected=selection.selectAll(sim);
   updateUI();
 };
 $('deselect').onclick=()=>{selected.clear();updateUI();};
@@ -167,13 +168,13 @@ $('buildMenu').onclick=()=>buildMenu.toggle(BUILDINGS,sim.player,sim,definition=
   const engineered=sim.economySystem.get(sim.player).engineeredConstruction;let engineerIds=engineered?sim.squads.filter(squad=>selected.has(squad.id)&&squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0).map(squad=>squad.id):[];
   if(engineered&&!engineerIds.length){const engineer=sim.squads.find(squad=>squad.f===sim.player&&squad.type==='engineer'&&squad.hp>0);if(!engineer){notify('İnşa için muharebe mühendisi gerekli.');return;}engineerIds=[engineer.id];selected=selection.replace(engineerIds);}
   const point=renderer.ground(renderer.width*.52,renderer.height*.45);
-  ghost={...definition,type:definition.id,f:sim.player,x:point.x,z:point.z,valid:false,engineerIds};
+  ghost={...definition,type:definition.id,f:sim.player,x:point.x,z:point.z,yaw:0,valid:false,engineerIds};
   checkGhost();buildMenu.close();$('placement').hidden=false;notify('Zemine dokunarak konum seç; ardından inşayı onayla.');
 });
 $('closeBuild').onclick=()=>buildMenu.close();
 function checkGhost() {
   if(!ghost)return;
-  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z);
+  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z,ghost.yaw);
   ghost.valid=!err;
   $('placementText').textContent=err||ghost.names[sim.player]+' · '+buildMenu.cost(ghost,sim.player)+' · ✓ geçerli zemin';
   $('confirmBuild').disabled=!!err;
@@ -182,9 +183,10 @@ $('cancelBuild').onclick=()=> {
   ghost=null;
   $('placement').hidden=true;
 };
+$('rotateBuild').onclick=()=>{if(ghost){ghost.yaw=(ghost.yaw+Math.PI/2)%(Math.PI*2);checkGhost();}};
 $('confirmBuild').onclick=()=> {
   if(!ghost)return;
-  const error=commandSystem.dispatch(BuildCommand(sim.player,ghost.type,ghost.x,ghost.z,ghost.engineerIds));
+  const error=commandSystem.dispatch(BuildCommand(sim.player,ghost.type,ghost.x,ghost.z,ghost.engineerIds,ghost.yaw));
   if(error) {
     notify(error);
     checkGhost();
@@ -220,6 +222,8 @@ function hit(px,py) {
   let best=null,score=Infinity;
   for(const e of [...sim.squads,...sim.buildings,...sim.resourceNodes]) {
     const resource=typeof e.id==='string';if(resource?e.depleted:e.hp<=0)continue;
+    if(resource&&sim.fogOfWar?.state(sim.player,e.x,e.z)===VISIBILITY.UNEXPLORED)continue;
+    if(!resource&&e.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,e))continue;
     const p=renderer.project(e.x,resource ? .7 : e.path ? 1 : 2,e.z),d=Math.hypot(p.x-px,p.y-py),radius=resource?28:e.path?24:Math.max(24,e.r*renderer.height/renderer.cam.zoom);
     if(d<radius&&d<score) {
       score=d;
@@ -403,7 +407,7 @@ function frame(now) {
     notifications.update();
   }
   const art=dynamicArt(sim,renderer,selected,ghost,frameBatch,playing?effects.clock:sim.time);
-  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer);
+  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer,sim.fogOfWar,sim.player);
   renderer.render(art.batch,smokeBatch);
   orderMarker=overlayRenderer.draw(sim,renderer,selected,drag,orderMarker);
   if(effects.flash>0){ctx.strokeStyle='rgba(207,151,77,'+effects.flash+')';ctx.lineWidth=12;ctx.strokeRect(6,6,renderer.width-12,renderer.height-12);ctx.lineWidth=1;}

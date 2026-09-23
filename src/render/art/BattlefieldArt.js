@@ -16,14 +16,16 @@ import {
 }
 from '../../world/World.js';
 import {trenchSegments} from '../../world/Terrain.js';
+import {BALANCE} from '../../core/Config.js';
+import {VISIBILITY} from '../../world/FogOfWar.js';
 const C= {
   earth:[.27,.255,.215],mud:[.16,.145,.115],stone:[.43,.44,.39],metal:[.24,.29,.29],sand:[.49,.43,.31],bone:[.68,.64,.43],flesh:[.34,.17,.19],black:[.10,.13,.13]
 };
 const tint=(c,v)=>c.map(x=>x*v);
 export function landscape() {
   const b=new Batch(),add=(...a)=>b.add(...a);
-  add('box',56,-1.1,56,114,2,114,C.earth);
-  for(let z=1; z<112; z+=2)for(let x=1; x<112; x+=2) {
+  const center=BALANCE.world.size/2;add('box',center,-1.1,center,BALANCE.world.size+2,2,BALANCE.world.size+2,C.earth);
+  for(let z=1; z<BALANCE.world.size; z+=2)for(let x=1; x<BALANCE.world.size; x+=2) {
     const t=terrain(x,z),h=hash(x,z),c=t==='river'?[.21,.29,.28]:t==='trench'?[.13,.14,.12]:t==='mud'?C.mud:t==='forest'?[.22,.25,.18]:C.earth;
     add('box',x,t==='river'?-.08:t==='trench'?-.02:.015, z,2.02,.12,2.02,tint(c,.985+h*.03));
     if(t==='land'&&h>.91)add('sphere',x,.06,z,.5+h,.25,.7,C.stone);
@@ -42,10 +44,10 @@ export function landscape() {
     if(z%4<1.5)add('box',x,.10,z,2.8,.12,.45,[.29,.24,.17]);
   }
   for(const z of crossings) {
-    for(let x=51; x<=61; x+=.65)add('box',x,.23,z,.58,.26,7.5,[.35,.30,.22]);
+    for(let x=center-5; x<=center+5; x+=.65)add('box',x,.23,z,.58,.26,7.5,[.35,.30,.22]);
     for(const side of[-1,1]) {
-      add('box',56,.5,z+side*3.5,11,.3,.25,C.metal);
-      for(const x of[51,54,58,61])add('box',x,.9,z+side*3.5,.18,1.8,.18,C.metal);
+      add('box',center,.5,z+side*3.5,11,.3,.25,C.metal);
+      for(const x of[center-5,center-2,center+2,center+5])add('box',x,.9,z+side*3.5,.18,1.8,.18,C.metal);
     }
   }
   for(const f of forests)for(let i=0; i<23; i++) {
@@ -59,7 +61,7 @@ export function landscape() {
     }
   }
   for(let i=0; i<95; i++) {
-    const x=8+hash(i,51)*96,z=7+hash(i,52)*98;
+    const x=8+hash(i,51)*(BALANCE.world.size-16),z=7+hash(i,52)*(BALANCE.world.size-14);
     if(['river','bridge'].includes(terrain(x,z)))continue;
     if(i%4===0) {
       add('box',x,.65,z,.12,1.5,.14,[.28,.29,.24],.12);
@@ -99,6 +101,14 @@ export function buildingArt(b,v,time,ghost=false) {
       sx*breath,sy*scale,sz*breath,material,rot,ghost?.62:1,pitch,roll+collapse*.25,glow);
   };
   const stone=organic?[.30,.23,.22]:C.stone,metal=organic?C.flesh:C.metal,accent=FACTIONS[f].accent;
+  if(['trench','sandbag','barbedWire'].includes(v.type)){
+    const length=v.segmentLength||6,yaw=v.yaw||0,c=Math.cos(yaw),s=Math.sin(yaw);
+    const segmentAdd=(kind,dx,y,dz,sx,sy,sz,color,localRot=0,pitch=0,roll=0,glow=0)=>add(kind,dx*c-dz*s,y,dx*s+dz*c,sx,sy,sz,color,yaw+localRot,pitch,roll,glow);
+    if(v.type==='trench'){for(let i=-2;i<=2;i++){segmentAdd('sphere',i*length/5,.35,-.8,1.45,.7,1.15,C.sand);segmentAdd('sphere',i*length/5,.35,.8,1.45,.7,1.15,C.sand);}segmentAdd('box',0,.08,0,length,.12,1.4,C.mud);}
+    if(v.type==='sandbag')for(let row=0;row<2;row++)for(let i=-2;i<=2;i++)segmentAdd('sphere',i*length/5+(row?.35:0),.28+row*.38,0,1.35,.48,.72,C.sand);
+    if(v.type==='barbedWire'){for(const i of[-1,0,1]){segmentAdd('box',i*length/3,.55,0,.12,1.1,.12,metal);segmentAdd('ring',i*length/3,.6,0,1.3,.08,1.3,metal);}segmentAdd('box',0,.55,0,length,.06,.06,metal);}
+    if(!ghost&&p<1)constructionSiteArt(b,v);return;
+  }
   if(!organic&&p<1&&!ghost){constructionSiteArt(b,v);return;}
   if(dead&&collapse>=1){
     // A bounded visual ruin pass is selected by dynamicArt; not a collision object.
@@ -305,9 +315,11 @@ export function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.
   const b=targetBatch?targetBatch.reset():new Batch();
   let visible=0,near=0,far=0;
   let ruins=0;
-  for(const node of sim.resourceNodes||[]){if(node.depleted)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
+  if(sim.fogOfWar){const fog=sim.fogOfWar,grid=fog.grids[sim.player];for(let z=0;z<fog.width;z++)for(let x=0;x<fog.width;x++){const state=grid[z*fog.width+x];if(state===VISIBILITY.VISIBLE)continue;const shade=state===VISIBILITY.EXPLORED?.12:.025;b.add('box',(x+.5)*fog.cell,.18,(z+.5)*fog.cell,fog.cell+.08,.12,fog.cell+.08,[shade,shade*1.08,shade]);}}
+  for(const node of sim.resourceNodes||[]){if(node.depleted||sim.fogOfWar?.state(sim.player,node.x,node.z)===VISIBILITY.UNEXPLORED)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
   for(let bi=sim.buildings.length-1;bi>=0;bi--) {
     const v=sim.buildings[bi];
+    if(v.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,v))continue;
     if(v.hp<=0&&(!Number.isFinite(v.diedAt)||visualTime-v.diedAt>180||ruins++>=32))continue;
     const p=r.project(v.x,0,v.z);
     if(p.x< -150||p.x>r.width+150||p.y< -160||p.y>r.height+160)continue;
@@ -316,7 +328,7 @@ export function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.
     if(selected.has(v.id))b.add('ring',v.x,.3,v.z,v.r*2.8,.1,v.r*2.8,[.77,.73,.47]);
   }
   for(const s of sim.squads) {
-    if(s.hp<=0)continue;
+    if(s.hp<=0||s.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,s))continue;
     const p=r.project(s.x,0,s.z);
     if(p.x< -80||p.x>r.width+80||p.y< -100||p.y>r.height+100)continue;
     visible++;
@@ -335,7 +347,8 @@ export function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.
       const ox=(i%4-1.5)*.9,oz=(Math.floor(i/4)-.5)*1.3,a=s.yaw;
       const x=s.x+ox*Math.cos(a)+oz*Math.sin(a),z=s.z-ox*Math.sin(a)+oz*Math.cos(a);
       const hit=clamp(1-(visualTime-(s.lastHit??-100))/.15,0,1);
-      soldierArt(b,x,z,a,s.f,s.type==='heavy',lod,visualTime,s.path.length>0,0,1,i*.13,hit,s.type==='engineer');
+      const recoil=clamp((s.firing||0)/.16,0,1)*(.65+.35*Math.sin(i*2.17));
+      soldierArt(b,x,z,a,s.f,s.type==='heavy',lod,visualTime,s.path.length>0,0,1,i*.13,hit,s.type==='engineer',recoil);
     }
     if(s.type==='engineer'&&s.worker?.cargo>0){const cargoColor=s.worker.cargoType==='supply'?[.55,.48,.31]:s.worker.cargoType==='material'?[.38,.42,.40]:[.50,.43,.34];b.add('box',s.x,.9,s.z-.8,1.4,.65,.8,cargoColor,s.yaw);}
   }

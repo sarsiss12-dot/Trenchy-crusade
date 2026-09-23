@@ -1,4 +1,4 @@
-# Trench Crusade 3D RTS — Faz 05
+# Trench Crusade 3D RTS — Faz 05.5
 
 Tarayıcıda çalışan, native ES Modules kullanan bağımsız bir hayran RTS prototipi. **Gerçek kaynak ağacı** repo kökündeki `src/`, `data/`, `tests/` ve `docs/` dizinleridir. `Trench-Crusade-Faz05.html` yalnız build tarafından üretilen taşınabilir demo/test çıktısıdır; kaynak değildir. Orijinal Faz 04 ZIP'i binary PR diff'i oluşturmamak için repository kökündeki özgün konumunda değişmeden tutulur; standalone HTML `archive/phase-04/` altında arşivlenmiştir. Modüler ağaç kaynak sürümdür.
 
@@ -19,6 +19,8 @@ New Antioch data-driven `DEFENDER`, Black Grail `ATTACKER` rolündedir. Maçın 
 
 Capture noktaları gelecekteki alternatif modlar için kodda tutulmuştur; SIEGE modunda çizilmez, güncellenmez ve zafer sağlamaz. Harita artık iki kesintisiz hazır siper hattı yerine yalnız kısa, terk edilmiş savaş kalıntıları içerir.
 
+Faz 05.5 savaş alanını 168×168'e genişletir; düşük çözünürlüklü, faction-bazlı `UNEXPLORED / EXPLORED / VISIBLE` savaş sisi ekler. New Antioch mühendisleri döndürülebilir siper, kum torbası ve geçilebilir dikenli tel segmentleri kurabilir. Gözetleme Karakolu daha geniş görüş verir; aynı segment verisi cover, hareket ve render tarafından paylaşılır. `Tümü` yalnız `combatUnit: true` mangaları seçer ve Black Grail saldıranı SAVAŞ başladığı anda ana hedefe yürür.
+
 - Savunan, data'da `mainObjectiveForRole: 'DEFENDER'` olarak işaretlenen ana merkezi süre bitene dek korursa kazanır.
 - Saldıran, süre bitmeden bu ana merkezi yok ederse kazanır.
 - Başka bir HQ, duvar veya ilk savunma katmanının kaybı maçı tek başına bitirmez.
@@ -31,7 +33,7 @@ HUD hazırlık/maç sayacını, oyuncu rolünü ve ana objective sağlığını 
 - `src/simulation/MatchFlow.js`: `SETUP`, `PREPARATION`, `WAR`, `VICTORY`, `DEFEAT`; gelecekte `FRONT_QUIET`, recovery ve special event eklenebilecek tek state sınırı.
 - `data/factions.js`: faction adından bağımsız gameplay role ve deployment zone.
 - `data/balance.js`: preparation, duration seçenekleri ve SIEGE/capture policy.
-- `src/core/GameState.js`: sürüm 3 save; match state/timer/roller/objective/outcome, tick ve gameplay event geçmişi.
+- `src/core/GameState.js`: sürüm 4 save; match state/timer/roller/objective/outcome, tick ve gameplay event geçmişi.
 - `economies[].strategy`: New Antioch ve Black Grail için ayrı strateji hook'u. Black Grail'in nihai corpse/infection ekonomisi bu fazın kapsamı değildir.
 - `economies[].population`: gelecekte civilian, recruitable population, housing, food ve command capacity ilişkisini büyütmek için başlangıç abstraction'ı.
 - Squad `formation` metadata'sı ve yapı `category` metadata'sı sonraki sistemlere hook sağlar; bu faz tam formation, trench editor veya reinforcement route uygulamaz.
@@ -45,7 +47,7 @@ npm test
 npm run build
 ```
 
-`npm test` 79 otomatik testi çalıştırır: 67 Faz 04 regresyonu ile 12 Faz 05 source/bootstrap, preparation, damage/deployment, state transition, duration, iki victory yolu, no-capture, role validation, save/load, determinism, deselect ve strategy/population kontrolleri. Paket kurulumu gerekmez.
+`npm test` 116 otomatik testi çalıştırır. Faz 05.5 regresyonları combat-only seçim, anlık kuşatma hücumu, fog/minimap bilgi sınırı, Observation Post görüşü, saha savunması cover/yavaşlatma/veri bütünlüğü, save/load determinism ve 160 asker sınırlarını kapsar. Paket kurulumu gerekmez.
 
 `npm run build`, kaynak ağacından `Trench-Crusade-Faz05.html` üretir. Python standart kütüphanesi dışında bağımlılık yoktur.
 
@@ -64,4 +66,4 @@ Trench-Crusade-Faz04.zip   Değiştirilmemiş kaynak teslim paketi
 
 ## Bilinen sınırlar / sonraki aday
 
-Bu faz gerçek siper kazma, tam formasyon, otomatik cephe ikmali, civilian agents veya Black Grail infection/corpse üretimini uygulamaz. Sonraki ana aday **Faz 06 — Black Grail enfeksiyon + ceset + Thrall dönüşümü + organik ekonomi**dir.
+Bu faz spline tabanlı siper editörü, tam formasyon, otomatik cephe ikmali, civilian agents veya Black Grail infection/corpse/Thrall üretimini uygulamaz. Sonraki ana aday **Faz 06 — Black Grail enfeksiyon + ceset + Thrall dönüşümü + organik ekonomi**dir.

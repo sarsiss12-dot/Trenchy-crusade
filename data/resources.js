@@ -9,10 +9,10 @@ export const getResourceDefinition=id=>RESOURCE_BY_ID.get(id);
 
 // Fixed authored positions keep matches deterministic and avoid runtime random placement.
 export const RESOURCE_NODE_LAYOUT=Object.freeze([
-  Object.freeze({type:'supply',x:30,z:76,amount:280}),Object.freeze({type:'supply',x:39,z:18,amount:240}),
-  Object.freeze({type:'supply',x:75,z:55,amount:260}),Object.freeze({type:'supply',x:87,z:91,amount:240}),
-  Object.freeze({type:'material',x:31,z:59,amount:240}),Object.freeze({type:'material',x:48,z:43,amount:220}),
-  Object.freeze({type:'material',x:76,z:70,amount:260}),Object.freeze({type:'material',x:83,z:19,amount:220}),
-  Object.freeze({type:'manpower',x:17,z:63,amount:54}),Object.freeze({type:'manpower',x:46,z:96,amount:48}),
-  Object.freeze({type:'manpower',x:67,z:14,amount:48}),Object.freeze({type:'manpower',x:94,z:48,amount:54})
+  Object.freeze({type:'supply',x:38,z:114,amount:280}),Object.freeze({type:'supply',x:58,z:27,amount:240}),
+  Object.freeze({type:'supply',x:113,z:83,amount:260}),Object.freeze({type:'supply',x:131,z:137,amount:240}),
+  Object.freeze({type:'material',x:47,z:89,amount:240}),Object.freeze({type:'material',x:72,z:65,amount:220}),
+  Object.freeze({type:'material',x:114,z:105,amount:260}),Object.freeze({type:'material',x:125,z:29,amount:220}),
+  Object.freeze({type:'manpower',x:25,z:95,amount:54}),Object.freeze({type:'manpower',x:69,z:144,amount:48}),
+  Object.freeze({type:'manpower',x:101,z:21,amount:48}),Object.freeze({type:'manpower',x:141,z:72,amount:54})
 ]);

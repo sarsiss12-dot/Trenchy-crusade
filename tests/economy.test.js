@@ -8,7 +8,7 @@ import {WORKER_STATE} from '../src/units/LogisticsSystem.js';
 const quiet=simulation=>{simulation.ai.tick=simulation.ai.wave=1e9;return simulation;};
 const advance=(simulation,seconds)=>{for(let i=0;i<Math.ceil(seconds*20);i++)simulation.step(.05);};
 const engineer=simulation=>simulation.squads.find(squad=>squad.f===0&&squad.type==='engineer'&&squad.hp>0);
-const valid=(simulation,type,faction=0)=>{for(let z=5;z<108;z+=2)for(let x=5;x<108;x+=2)if(!simulation.placement(faction,type,x,z))return{x,z};throw Error('no placement for '+type);};
+const valid=(simulation,type,faction=0)=>{for(let z=5;z<164;z+=2)for(let x=5;x<164;x+=2)if(!simulation.placement(faction,type,x,z))return{x,z};throw Error('no placement for '+type);};
 const buildSite=(simulation,type='workshop',ids=[engineer(simulation).id])=>{const point=valid(simulation,type),error=simulation.build(0,type,point.x,point.z,ids);assert.equal(error,'');return simulation.buildings.at(-1);};
 
 test('resource nodes are deterministic, typed and visually bounded',()=>{const a=new Simulation(),b=new Simulation();assert.equal(a.resourceNodes.length,12);assert.deepEqual(a.resourceNodes,b.resourceNodes);assert.deepEqual(new Set(a.resourceNodes.map(node=>node.type)),new Set(['supply','material','manpower']));assert.ok(a.resourceNodes.every(node=>node.amount>0&&node.r>0));});
