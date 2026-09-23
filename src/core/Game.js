@@ -18,6 +18,7 @@ import {Minimap} from '../ui/Minimap.js';
 import {PerformancePanel} from '../ui/PerformancePanel.js';
 import {OverlayRenderer} from '../ui/OverlayRenderer.js';
 import {BALANCE} from './Config.js';
+import {VISIBILITY} from '../world/FogOfWar.js';
 
 export class Game {
   constructor(){
@@ -221,6 +222,7 @@ function hit(px,py) {
   let best=null,score=Infinity;
   for(const e of [...sim.squads,...sim.buildings,...sim.resourceNodes]) {
     const resource=typeof e.id==='string';if(resource?e.depleted:e.hp<=0)continue;
+    if(resource&&sim.fogOfWar?.state(sim.player,e.x,e.z)===VISIBILITY.UNEXPLORED)continue;
     if(!resource&&e.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,e))continue;
     const p=renderer.project(e.x,resource ? .7 : e.path ? 1 : 2,e.z),d=Math.hypot(p.x-px,p.y-py),radius=resource?28:e.path?24:Math.max(24,e.r*renderer.height/renderer.cam.zoom);
     if(d<radius&&d<score) {
