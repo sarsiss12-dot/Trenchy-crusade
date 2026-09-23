@@ -7,6 +7,8 @@ import {getUnitDefinition} from '../data/units.js';
 import {VISIBILITY} from '../src/world/FogOfWar.js';
 import {coverAt,fieldTerrainAt,wireSpeedAt} from '../src/world/FieldDefense.js';
 import {BALANCE} from '../src/core/Config.js';
+import {Batch} from '../src/render/Batch.js';
+import {buildingArt,dynamicArt} from '../src/render/art/BattlefieldArt.js';
 const quiet=s=>{s.ai.tick=s.ai.wave=1e9;return s;};
 const advance=(s,t)=>{for(let i=0;i<Math.ceil(t/.05);i++)s.step(.05);};
 const unlock=s=>{s.addBuilding(0,'workshop',33,132,true);s.economies[0].stock={supply:9999,material:9999,manpower:999};s.economySystem.update(0);return s.squads.find(q=>q.f===0&&q.type==='engineer');};
@@ -21,3 +23,7 @@ test('barbed wire applies data-driven friendly and enemy movement modifiers',()=
 test('terrain and renderer both consume segment data rather than fake lines',()=>{const field=fs.readFileSync(new URL('../src/world/FieldDefense.js',import.meta.url),'utf8'),art=fs.readFileSync(new URL('../src/render/art/BattlefieldArt.js',import.meta.url),'utf8');assert.match(field,/segmentLength/);assert.match(art,/v\.segmentLength/);assert.match(art,/\['trench','sandbag','barbedWire'\]/);});
 test('save/load preserves Phase 05.5 fog and field defense state deterministically',()=>{const s=quiet(new Simulation()),e=unlock(s);assert.equal(s.build(0,'sandbag',41,123,[e.id],Math.PI/2),'');s.fogOfWar.update(0,true);s.fog=s.fogOfWar.snapshot();const r=Simulation.restore(s.serialize());assert.equal(r.serialize(),s.serialize());assert.equal(r.buildings.at(-1).yaw,Math.PI/2);assert.deepEqual(r.fog,s.fog);});
 test('160-soldier stress state remains bounded with fog and effects enabled',()=>{const s=quiet(new Simulation());s.match.state='WAR';s.squads=[];for(let f=0;f<2;f++)for(let i=0;i<10;i++)s.addSquad(f,i%3?'infantry':'heavy',f?103:65,18+i*7);advance(s,.5);assert.equal(s.squads.reduce((n,q)=>n+q.alive,0),160);assert.ok(s.visualEvents.count<=s.visualEvents.capacity);assert.ok(s.fogOfWar.grids.every(g=>g.length===42*42));});
+
+test('unexplored resource nodes are hidden from world render and hit testing',()=>{const s=quiet(new Simulation()),node=s.resourceNodes.find(n=>!n.depleted);s.fogOfWar.grids[s.player].fill(VISIBILITY.UNEXPLORED);const renderer={width:800,height:600,cam:{zoom:100},project:()=>({x:400,y:300})},hidden=dynamicArt(s,renderer,new Set(),null,new Batch(),0);assert.equal(hidden.batch.data.ring.length,0);s.fogOfWar.grids[s.player][s.fogOfWar.index(node.x,node.z)]=VISIBILITY.EXPLORED;const known=dynamicArt(s,renderer,new Set(),null,new Batch(),0);assert.ok(known.batch.data.ring.length>0);const gameSource=fs.readFileSync(new URL('../src/core/Game.js',import.meta.url),'utf8');assert.match(gameSource,/resource&&sim\.fogOfWar\?\.state\(sim\.player,e\.x,e\.z\)===VISIBILITY\.UNEXPLORED/);});
+
+test('rotated field-defense art rotates component offsets with gameplay yaw',()=>{const batch=new Batch(),segment={id:999,f:0,type:'trench',x:50,z:60,hp:100,maxHp:100,progress:1,r:3,segmentLength:10,yaw:Math.PI/2};buildingArt(batch,segment,0,false);const spheres=batch.data.sphere;assert.ok(spheres.length>=15);assert.ok(Math.abs(spheres[0]-(segment.x+.8))<.01);assert.ok(Math.abs(spheres[2]-(segment.z-4))<.01);});
