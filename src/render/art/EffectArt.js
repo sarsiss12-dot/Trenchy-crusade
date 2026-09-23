@@ -1,12 +1,13 @@
 import {clamp} from '../../data.js';
 import {PARTICLE} from '../../effects/EffectCoordinator.js';
 import {soldierArt} from './SoldierArt.js';
+import {VISIBILITY} from '../../world/FogOfWar.js';
 const DUST=[.39,.35,.28],SMOKE=[.32,.31,.27],SPORE=[.37,.42,.19];
 const ASH=[.09,.10,.085],BRUISE=[.17,.105,.085],ROT=[.18,.21,.10];
 const FIRE=[1,.48,.13],TOXIC=[.61,.75,.20],SPARK=[1,.78,.37],DIRT=[.25,.21,.15];
-export function effectArt(fx,batch,transparent,renderer){
-  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1);
-  const visible=(p,margin=80)=>{const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
+export function effectArt(fx,batch,transparent,renderer,fog=null,player=0){
+  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1),fogVisible=(x,z)=>!fog||fog.state(player,x,z)===VISIBILITY.VISIBLE;
+  const visible=(p,margin=80)=>{if(!fogVisible(p.x,p.z))return false;const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
   for(let i=0;i<fx.marks.limit;i++){
     const p=fx.marks.slots[i];if(!p.active||!visible(p))continue;
     const fade=Math.min(1,(p.life-p.age)/12),col=p.kind===1?(p.f?ROT:BRUISE):ASH;
@@ -27,6 +28,7 @@ export function effectArt(fx,batch,transparent,renderer){
     const p=fx.particles.slots[i];if(!p.active||p.age<0||!visible(p,110))continue;
     const t=p.age/p.life,fade=Math.min(1,(1-t)*3);
     if(p.kind===PARTICLE.TRACER){
+      if(!fogVisible(p.tx,p.tz))continue;
       const h=clamp(t*1.6,0,1),tail=Math.max(0,h-.22),dx=p.tx-p.x,dy=p.ty-p.y,dz=p.tz-p.z;
       const length=Math.hypot(dx,dy,dz)*(h-tail),yaw=Math.atan2(dx,dz),pitch=-Math.atan2(dy,Math.hypot(dx,dz));
       batch.add('box',p.x+dx*(h+tail)*.5,p.y+dy*(h+tail)*.5,p.z+dz*(h+tail)*.5,p.size,p.size,length,p.f?TOXIC:SPARK,yaw,fade,pitch,0,1);
