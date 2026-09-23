@@ -102,10 +102,11 @@ export function buildingArt(b,v,time,ghost=false) {
   };
   const stone=organic?[.30,.23,.22]:C.stone,metal=organic?C.flesh:C.metal,accent=FACTIONS[f].accent;
   if(['trench','sandbag','barbedWire'].includes(v.type)){
-    const length=v.segmentLength||6,yaw=v.yaw||0;
-    if(v.type==='trench'){for(let i=-2;i<=2;i++){add('sphere',i*length/5,.35,-.8,1.45,.7,1.15,C.sand,yaw);add('sphere',i*length/5,.35,.8,1.45,.7,1.15,C.sand,yaw);}add('box',0,.08,0,length,.12,1.4,C.mud,yaw);}
-    if(v.type==='sandbag')for(let row=0;row<2;row++)for(let i=-2;i<=2;i++)add('sphere',i*length/5+(row?.35:0),.28+row*.38,0,1.35,.48,.72,C.sand,yaw);
-    if(v.type==='barbedWire'){for(const i of[-1,0,1]){add('box',i*length/3,.55,0,.12,1.1,.12,metal,yaw);add('ring',i*length/3,.6,0,1.3,.08,1.3,metal,yaw);}add('box',0,.55,0,length,.06,.06,metal,yaw);}
+    const length=v.segmentLength||6,yaw=v.yaw||0,c=Math.cos(yaw),s=Math.sin(yaw);
+    const segmentAdd=(kind,dx,y,dz,sx,sy,sz,color,localRot=0,pitch=0,roll=0,glow=0)=>add(kind,dx*c-dz*s,y,dx*s+dz*c,sx,sy,sz,color,yaw+localRot,pitch,roll,glow);
+    if(v.type==='trench'){for(let i=-2;i<=2;i++){segmentAdd('sphere',i*length/5,.35,-.8,1.45,.7,1.15,C.sand);segmentAdd('sphere',i*length/5,.35,.8,1.45,.7,1.15,C.sand);}segmentAdd('box',0,.08,0,length,.12,1.4,C.mud);}
+    if(v.type==='sandbag')for(let row=0;row<2;row++)for(let i=-2;i<=2;i++)segmentAdd('sphere',i*length/5+(row?.35:0),.28+row*.38,0,1.35,.48,.72,C.sand);
+    if(v.type==='barbedWire'){for(const i of[-1,0,1]){segmentAdd('box',i*length/3,.55,0,.12,1.1,.12,metal);segmentAdd('ring',i*length/3,.6,0,1.3,.08,1.3,metal);}segmentAdd('box',0,.55,0,length,.06,.06,metal);}
     if(!ghost&&p<1)constructionSiteArt(b,v);return;
   }
   if(!organic&&p<1&&!ghost){constructionSiteArt(b,v);return;}
@@ -315,7 +316,7 @@ export function dynamicArt(sim,r,selected,ghost,targetBatch=null,visualTime=sim.
   let visible=0,near=0,far=0;
   let ruins=0;
   if(sim.fogOfWar){const fog=sim.fogOfWar,grid=fog.grids[sim.player];for(let z=0;z<fog.width;z++)for(let x=0;x<fog.width;x++){const state=grid[z*fog.width+x];if(state===VISIBILITY.VISIBLE)continue;const shade=state===VISIBILITY.EXPLORED?.12:.025;b.add('box',(x+.5)*fog.cell,.18,(z+.5)*fog.cell,fog.cell+.08,.12,fog.cell+.08,[shade,shade*1.08,shade]);}}
-  for(const node of sim.resourceNodes||[]){if(node.depleted)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
+  for(const node of sim.resourceNodes||[]){if(node.depleted||sim.fogOfWar?.state(sim.player,node.x,node.z)===VISIBILITY.UNEXPLORED)continue;const projected=r.project(node.x,0,node.z);if(projected.x< -80||projected.x>r.width+80||projected.y< -100||projected.y>r.height+100)continue;resourceNodeArt(b,node);}
   for(let bi=sim.buildings.length-1;bi>=0;bi--) {
     const v=sim.buildings[bi];
     if(v.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,v))continue;
