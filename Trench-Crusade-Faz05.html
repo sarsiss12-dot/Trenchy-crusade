@@ -221,7 +221,7 @@ $('buildMenu').onclick=()=>buildMenu.toggle(BUILDINGS,sim.player,sim,definition=
 $('closeBuild').onclick=()=>buildMenu.close();
 function checkGhost() {
   if(!ghost)return;
-  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z);
+  const err=sim.placement(sim.player,ghost.type,ghost.x,ghost.z,ghost.yaw);
   ghost.valid=!err;
   $('placementText').textContent=err||ghost.names[sim.player]+' · '+buildMenu.cost(ghost,sim.player)+' · ✓ geçerli zemin';
   $('confirmBuild').disabled=!!err;
@@ -454,7 +454,7 @@ function frame(now) {
     notifications.update();
   }
   const art=dynamicArt(sim,renderer,selected,ghost,frameBatch,playing?effects.clock:sim.time);
-  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer);
+  smokeBatch.reset();effectArt(effects,art.batch,smokeBatch,renderer,sim.fogOfWar,sim.player);
   renderer.render(art.batch,smokeBatch);
   orderMarker=overlayRenderer.draw(sim,renderer,selected,drag,orderMarker);
   if(effects.flash>0){ctx.strokeStyle='rgba(207,151,77,'+effects.flash+')';ctx.lineWidth=12;ctx.strokeRect(6,6,renderer.width-12,renderer.height-12);ctx.lineWidth=1;}
@@ -783,16 +783,17 @@ class CorpseManager extends EffectPool { constructor(){super(144);} }
 __exports.CorpseManager=CorpseManager;
 },
 'src/render/art/EffectArt.js':function(__exports,__require){
-const __dep0=__require('src/data.js');const clamp=__dep0.clamp;const __dep1=__require('src/effects/EffectCoordinator.js');const PARTICLE=__dep1.PARTICLE;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;
+const __dep0=__require('src/data.js');const clamp=__dep0.clamp;const __dep1=__require('src/effects/EffectCoordinator.js');const PARTICLE=__dep1.PARTICLE;const __dep2=__require('src/render/art/SoldierArt.js');const soldierArt=__dep2.soldierArt;const __dep3=__require('src/world/FogOfWar.js');const VISIBILITY=__dep3.VISIBILITY;
+
 
 
 
 const DUST=[.39,.35,.28],SMOKE=[.32,.31,.27],SPORE=[.37,.42,.19];
 const ASH=[.09,.10,.085],BRUISE=[.17,.105,.085],ROT=[.18,.21,.10];
 const FIRE=[1,.48,.13],TOXIC=[.61,.75,.20],SPARK=[1,.78,.37],DIRT=[.25,.21,.15];
-function effectArt(fx,batch,transparent,renderer){
-  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1);
-  const visible=(p,margin=80)=>{const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
+function effectArt(fx,batch,transparent,renderer,fog=null,player=0){
+  const pixel=renderer.height/renderer.cam.zoom,lod=clamp((pixel-6)/7,0,1),fogVisible=(x,z)=>!fog||fog.state(player,x,z)===VISIBILITY.VISIBLE;
+  const visible=(p,margin=80)=>{if(!fogVisible(p.x,p.z))return false;const q=renderer.project(p.x,p.y,p.z);return q.x>-margin&&q.x<renderer.width+margin&&q.y>-margin&&q.y<renderer.height+margin;};
   for(let i=0;i<fx.marks.limit;i++){
     const p=fx.marks.slots[i];if(!p.active||!visible(p))continue;
     const fade=Math.min(1,(p.life-p.age)/12),col=p.kind===1?(p.f?ROT:BRUISE):ASH;
@@ -813,6 +814,7 @@ function effectArt(fx,batch,transparent,renderer){
     const p=fx.particles.slots[i];if(!p.active||p.age<0||!visible(p,110))continue;
     const t=p.age/p.life,fade=Math.min(1,(1-t)*3);
     if(p.kind===PARTICLE.TRACER){
+      if(!fogVisible(p.tx,p.tz))continue;
       const h=clamp(t*1.6,0,1),tail=Math.max(0,h-.22),dx=p.tx-p.x,dy=p.ty-p.y,dz=p.tz-p.z;
       const length=Math.hypot(dx,dy,dz)*(h-tail),yaw=Math.atan2(dx,dz),pitch=-Math.atan2(dy,Math.hypot(dx,dz));
       batch.add('box',p.x+dx*(h+tail)*.5,p.y+dy*(h+tail)*.5,p.z+dz*(h+tail)*.5,p.size,p.size,length,p.f?TOXIC:SPARK,yaw,fade,pitch,0,1);
@@ -1034,6 +1036,25 @@ const blackGrailVisuals=Object.freeze({id:'blackGrail',index:1,organic:true,body
 
 __exports.blackGrailVisuals=blackGrailVisuals;
 },
+'src/world/FogOfWar.js':function(__exports,__require){
+const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;
+
+
+const VISIBILITY=Object.freeze({UNEXPLORED:0,EXPLORED:1,VISIBLE:2});
+class FogOfWar {
+  constructor(simulation){this.simulation=simulation;this.cell=BALANCE.fog.cell;this.width=Math.ceil(BALANCE.world.size/this.cell);this.timer=0;this.grids=[new Uint8Array(this.width*this.width),new Uint8Array(this.width*this.width)];}
+  restore(saved){if(!Array.isArray(saved))return;for(let f=0;f<2;f++)if(Array.isArray(saved[f])&&saved[f].length===this.grids[f].length)this.grids[f].set(saved[f]);}
+  snapshot(){return this.grids.map(grid=>Array.from(grid,value=>value===VISIBILITY.VISIBLE?VISIBILITY.EXPLORED:value));}
+  index(x,z){const cx=Math.max(0,Math.min(this.width-1,Math.floor(x/this.cell))),cz=Math.max(0,Math.min(this.width-1,Math.floor(z/this.cell)));return cz*this.width+cx;}
+  state(faction,x,z){return this.grids[faction]?.[this.index(x,z)]??VISIBILITY.UNEXPLORED;}
+  visible(faction,entity){return entity.f===faction||this.state(faction,entity.x,entity.z)===VISIBILITY.VISIBLE;}
+  reveal(grid,x,z,radius){const minX=Math.max(0,Math.floor((x-radius)/this.cell)),maxX=Math.min(this.width-1,Math.floor((x+radius)/this.cell)),minZ=Math.max(0,Math.floor((z-radius)/this.cell)),maxZ=Math.min(this.width-1,Math.floor((z+radius)/this.cell)),rr=radius*radius;for(let zc=minZ;zc<=maxZ;zc++)for(let xc=minX;xc<=maxX;xc++){const px=(xc+.5)*this.cell,pz=(zc+.5)*this.cell;if((px-x)**2+(pz-z)**2<=rr)grid[zc*this.width+xc]=VISIBILITY.VISIBLE;}}
+  update(dt,force=false){this.timer-=dt;if(!force&&this.timer>0)return;this.timer=BALANCE.fog.refresh;for(let faction=0;faction<2;faction++){const grid=this.grids[faction];for(let i=0;i<grid.length;i++)if(grid[i]===VISIBILITY.VISIBLE)grid[i]=VISIBILITY.EXPLORED;for(const squad of this.simulation.squads)if(squad.f===faction&&squad.hp>0){const definition=getUnitDefinition(squad.type);this.reveal(grid,squad.x,squad.z,definition?.vision??(definition?.combatUnit?BALANCE.fog.combatVision:BALANCE.fog.supportVision));}for(const building of this.simulation.buildings)if(building.f===faction&&building.hp>0&&building.progress===1)this.reveal(grid,building.x,building.z,building.type==='observation'?BALANCE.fog.observationVision:BALANCE.fog.buildingVision);}}
+}
+
+__exports.VISIBILITY=VISIBILITY;
+__exports.FogOfWar=FogOfWar;
+},
 'src/render/Batch.js':function(__exports,__require){
 
 const INSTANCE_STRIDE=15;
@@ -1104,7 +1125,8 @@ class Simulation {
 __exports.Simulation=Simulation;
 },
 'src/core/GameState.js':function(__exports,__require){
-const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/buildings.js');const getBuildingDefinition=__dep1.getBuildingDefinition;const __dep2=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep2.createSiegeMatchState;const __dep3=__require('src/units/Squad.js');const createSquad=__dep3.createSquad;const __dep4=__require('data/units.js');const getUnitDefinition=__dep4.getUnitDefinition;
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/buildings.js');const getBuildingDefinition=__dep1.getBuildingDefinition;const __dep2=__require('src/simulation/MatchFlow.js');const createSiegeMatchState=__dep2.createSiegeMatchState;const __dep3=__require('src/units/Squad.js');const createSquad=__dep3.createSquad;const __dep4=__require('data/units.js');const getUnitDefinition=__dep4.getUnitDefinition;const __dep5=__require('data/resources.js');const RESOURCE_NODE_LAYOUT=__dep5.RESOURCE_NODE_LAYOUT;
+
 
 
 
@@ -1125,6 +1147,18 @@ const hydrateLegacyBuilding=building=>{
 };
 const redeployLegacySquads=squads=>{for(const squad of squads){const zone=FACTION_DEFINITIONS[squad.f]?.deploymentZone;if(!zone)continue;squad.x=Math.max(zone.minX+.51,Math.min(zone.maxX-.51,squad.x));squad.path=[];squad.target=null;squad.order='hold';if(squad.worker){squad.worker.state='IDLE';squad.worker.nodeId=null;squad.worker.targetBuildingId=null;squad.worker.depotId=null;squad.worker.pendingNodeId=null;squad.worker.pendingEngineering=null;squad.worker.timer=0;squad.worker.auto=false;squad.worker.searchCooldown=0;}}};
 const redeployLegacyBuildings=buildings=>{for(const building of buildings){building.assignedEngineers=[];if(building.hp<=0)continue;const zone=FACTION_DEFINITIONS[building.f]?.deploymentZone;if(!zone)continue;const footprint=building.footprint||building.r||0,margin=.51;building.x=Math.max(zone.minX+footprint+margin,Math.min(zone.maxX-footprint-margin,building.x));building.rally=null;}};
+const resetMigratedSquad=squad=>{squad.path=[];squad.target=null;squad.order='hold';if(squad.worker){squad.worker.state='IDLE';squad.worker.nodeId=null;squad.worker.targetBuildingId=null;squad.worker.depotId=null;squad.worker.pendingNodeId=null;squad.worker.pendingEngineering=null;squad.worker.timer=0;squad.worker.auto=false;squad.worker.searchCooldown=0;}};
+const migrateExpandedBattlefield=data=>{
+  const spatial=[...(data.squads||[]),...(data.buildings||[]),...(data.resourceNodes||[])];
+  const legacyMap=spatial.length>0&&spatial.every(entity=>(entity.x??0)<=112&&(entity.z??0)<=112);
+  if(!legacyMap)return;
+  const scale=1.5,clamp=value=>Math.max(1.5,Math.min(166.5,value*scale));
+  for(const building of data.buildings||[]){building.x=clamp(building.x);building.z=clamp(building.z);building.assignedEngineers=[];if(building.rally)building.rally={x:clamp(building.rally.x),z:clamp(building.rally.z)};}
+  for(const squad of data.squads||[]){squad.x=clamp(squad.x);squad.z=clamp(squad.z);resetMigratedSquad(squad);}
+  if(Array.isArray(data.points))for(const point of data.points){point.x=clamp(point.x);point.z=clamp(point.z);}
+  const previous=new Map((data.resourceNodes||[]).map(node=>[node.id,node]));
+  data.resourceNodes=RESOURCE_NODE_LAYOUT.map((item,index)=>{const id='resource-'+(index+1),saved=previous.get(id),depleted=!!saved?.depleted||Number(saved?.amount)<=0,amount=depleted?0:Math.max(0,Math.min(item.amount,Number.isFinite(saved?.amount)?saved.amount:item.amount));return{id,type:item.type,x:item.x,z:item.z,r:1.8,amount,maxAmount:item.amount,depleted};});
+};
 const ensureLegacyNewAntiochEngineer=data=>{
   const hasEngineer=data.squads.some(squad=>squad.f===0&&squad.type==='engineer'&&squad.hp>0);
   if(hasEngineer)return;
@@ -1156,6 +1190,7 @@ class GameState {
     if(![1,2,3,4].includes(data.version)||!Array.isArray(data.squads)||!Array.isArray(data.buildings))throw Error('Uyumsuz kayıt');
     if(!FACTION_DEFINITIONS[data.player])throw Error('Bilinmeyen faction');
     if(data.version===1){data.version=2;data.economies=[{strategy:'newAntioch',stock:{supply:data.resources[0]??400,material:300,manpower:60},capacity:{supply:0,material:0,manpower:0},forceCap:0,delivered:{supply:0,material:0,manpower:0}},{strategy:'legacyBlackGrail'}];data.resourceNodes=[];for(const squad of data.squads)if(squad.type==='engineer'&&!squad.worker)squad.worker={state:'IDLE',nodeId:null,targetBuildingId:null,depotId:null,cargoType:null,cargo:0,timer:0,auto:false,autoResourceType:null,searchCooldown:0,effectCooldown:0};}
+    if(data.version<4)migrateExpandedBattlefield(data);
     if(data.version<3){
       data.version=3;
       data.tick=Math.round((data.time||0)/.05);
@@ -1609,16 +1644,18 @@ class ConstructionSystem {
   missingRequirement(faction,definition){return (definition.requires||[]).find(type=>!this.complete(faction,type));}
   buildCost(faction,definition){return this.simulation.economySystem.get(faction).cost(definition);}
   unitCost(faction,definition){return this.simulation.economySystem.get(faction).cost(definition);}
-  placement(faction,type,x,z){
+  placement(faction,type,x,z,yaw=0){
     const definition=getBuildingDefinition(type),rules=BALANCE.construction,world=BALANCE.world;
     if(!this.definitionAllowed(faction,definition)||type==='hq')return 'Bu yapı bu faction tarafından kurulamaz';
     const missing=this.missingRequirement(faction,definition);if(missing)return getBuildingDefinition(missing).names[faction]+' gerekli';
     if(!this.simulation.economySystem.get(faction).canAfford(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
     const typeLimit=definition.category==='FIELD_DEFENSE'?rules.maxFieldSegments:rules.maxSameType;if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=typeLimit)return 'Bu yapı için yerleşim sınırına ulaşıldı';
-    const footprint=definition.footprint||definition.r;if(x-footprint<1||z-footprint<1||x+footprint>world.size-1||z+footprint>world.size-1)return 'Harita sınırına çok yakın';
-    if(this.simulation.match?.state==='PREPARATION'){const zone=FACTION_DEFINITIONS[faction].deploymentZone;if(x-footprint<zone.minX||x+footprint>zone.maxX)return 'Hazırlık bölgesi dışına kurulamaz';}
+    const footprint=definition.footprint||definition.r,isField=definition.category==='FIELD_DEFENSE',halfLength=isField?(definition.segmentLength||footprint*2)/2:footprint,halfWidth=isField?1.35:footprint,c=Math.cos(yaw),s=Math.sin(yaw),extentX=isField?Math.abs(c)*halfLength+Math.abs(s)*halfWidth:footprint,extentZ=isField?Math.abs(s)*halfLength+Math.abs(c)*halfWidth:footprint;
+    if(x-extentX<1||z-extentZ<1||x+extentX>world.size-1||z+extentZ>world.size-1)return 'Harita sınırına çok yakın';
+    if(this.simulation.match?.state==='PREPARATION'){const zone=FACTION_DEFINITIONS[faction].deploymentZone;if(x-extentX<zone.minX||x+extentX>zone.maxX)return 'Hazırlık bölgesi dışına kurulamaz';}
     if(!this.simulation.buildings.some(building=>building.hp>0&&building.progress===1&&building.f===faction&&dist(building,{x,z})<rules.baseRadius))return 'Tamamlanmış üssüne 20 m yakın olmalı';
-    for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
+    if(isField){for(let along=-halfLength;along<=halfLength+.01;along+=1)for(const across of[-halfWidth,0,halfWidth]){const px=x+along*c-across*s,pz=z+along*s+across*c,kind=terrain(px,pz);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}}
+    else for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
     if(x>75&&x<93&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
     if(this.simulation.buildings.some(building=>building.hp>0&&dist(building,{x,z})<(building.footprint||building.r)+footprint+rules.obstacleMargin))return 'Başka yapıya çok yakın';
     if(this.simulation.resourceNodes.some(node=>!node.depleted&&dist(node,{x,z})<node.r+footprint+1))return 'Kaynak alanını kapatamazsın';
@@ -1627,7 +1664,7 @@ class ConstructionSystem {
     return '';
   }
   build(faction,type,x,z,engineerIds=[],yaw=0){
-    const error=this.placement(faction,type,x,z);if(error)return error;const definition=getBuildingDefinition(type),economy=this.simulation.economySystem.get(faction);
+    const error=this.placement(faction,type,x,z,yaw);if(error)return error;const definition=getBuildingDefinition(type),economy=this.simulation.economySystem.get(faction);
     if(economy.engineeredConstruction&&!this.engineeringSystem.engineers(engineerIds,faction).length)return 'Şantiye için muharebe mühendisi seçilmeli';
     if(!economy.charge(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
     const building=this.buildingManager.add(faction,type,x,z);building.workEffectCooldown=0;building.yaw=yaw;
@@ -1802,25 +1839,6 @@ class EngineeringSystem {
 }
 
 __exports.EngineeringSystem=EngineeringSystem;
-},
-'src/world/FogOfWar.js':function(__exports,__require){
-const __dep0=__require('src/core/Config.js');const BALANCE=__dep0.BALANCE;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;
-
-
-const VISIBILITY=Object.freeze({UNEXPLORED:0,EXPLORED:1,VISIBLE:2});
-class FogOfWar {
-  constructor(simulation){this.simulation=simulation;this.cell=BALANCE.fog.cell;this.width=Math.ceil(BALANCE.world.size/this.cell);this.timer=0;this.grids=[new Uint8Array(this.width*this.width),new Uint8Array(this.width*this.width)];}
-  restore(saved){if(!Array.isArray(saved))return;for(let f=0;f<2;f++)if(Array.isArray(saved[f])&&saved[f].length===this.grids[f].length)this.grids[f].set(saved[f]);}
-  snapshot(){return this.grids.map(grid=>Array.from(grid,value=>value===VISIBILITY.VISIBLE?VISIBILITY.EXPLORED:value));}
-  index(x,z){const cx=Math.max(0,Math.min(this.width-1,Math.floor(x/this.cell))),cz=Math.max(0,Math.min(this.width-1,Math.floor(z/this.cell)));return cz*this.width+cx;}
-  state(faction,x,z){return this.grids[faction]?.[this.index(x,z)]??VISIBILITY.UNEXPLORED;}
-  visible(faction,entity){return entity.f===faction||this.state(faction,entity.x,entity.z)===VISIBILITY.VISIBLE;}
-  reveal(grid,x,z,radius){const minX=Math.max(0,Math.floor((x-radius)/this.cell)),maxX=Math.min(this.width-1,Math.floor((x+radius)/this.cell)),minZ=Math.max(0,Math.floor((z-radius)/this.cell)),maxZ=Math.min(this.width-1,Math.floor((z+radius)/this.cell)),rr=radius*radius;for(let zc=minZ;zc<=maxZ;zc++)for(let xc=minX;xc<=maxX;xc++){const px=(xc+.5)*this.cell,pz=(zc+.5)*this.cell;if((px-x)**2+(pz-z)**2<=rr)grid[zc*this.width+xc]=VISIBILITY.VISIBLE;}}
-  update(dt,force=false){this.timer-=dt;if(!force&&this.timer>0)return;this.timer=BALANCE.fog.refresh;for(let faction=0;faction<2;faction++){const grid=this.grids[faction];for(let i=0;i<grid.length;i++)if(grid[i]===VISIBILITY.VISIBLE)grid[i]=VISIBILITY.EXPLORED;for(const squad of this.simulation.squads)if(squad.f===faction&&squad.hp>0){const definition=getUnitDefinition(squad.type);this.reveal(grid,squad.x,squad.z,definition?.vision??(definition?.combatUnit?BALANCE.fog.combatVision:BALANCE.fog.supportVision));}for(const building of this.simulation.buildings)if(building.f===faction&&building.hp>0&&building.progress===1)this.reveal(grid,building.x,building.z,building.type==='observation'?BALANCE.fog.observationVision:BALANCE.fog.buildingVision);}}
-}
-
-__exports.VISIBILITY=VISIBILITY;
-__exports.FogOfWar=FogOfWar;
 },
 'src/render/Renderer.js':function(__exports,__require){
 const __dep0=__require('src/render/Materials.js');const VERTEX_SHADER=__dep0.VERTEX_SHADER;const FRAGMENT_SHADER=__dep0.FRAGMENT_SHADER;const __dep1=__require('src/render/MeshFactory.js');const createMesh=__dep1.createMesh;const __dep2=__require('src/render/Camera.js');const Camera=__dep2.Camera;const __dep3=__require('src/render/Batch.js');const INSTANCE_STRIDE=__dep3.INSTANCE_STRIDE;const Batch=__dep3.Batch;
