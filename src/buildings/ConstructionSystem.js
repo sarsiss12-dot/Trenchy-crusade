@@ -19,23 +19,23 @@ export class ConstructionSystem {
     if(!this.definitionAllowed(faction,definition)||type==='hq')return 'Bu yapı bu faction tarafından kurulamaz';
     const missing=this.missingRequirement(faction,definition);if(missing)return getBuildingDefinition(missing).names[faction]+' gerekli';
     if(!this.simulation.economySystem.get(faction).canAfford(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
-    if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=rules.maxSameType)return 'Bu yapıdan en fazla 3 tane';
-    if(!this.simulation.buildings.some(building=>building.hp>0&&building.progress===1&&building.f===faction&&dist(building,{x,z})<rules.baseRadius))return 'Tamamlanmış üssüne 20 m yakın olmalı';
+    const typeLimit=definition.category==='FIELD_DEFENSE'?rules.maxFieldSegments:rules.maxSameType;if(this.simulation.buildings.filter(building=>building.hp>0&&building.f===faction&&building.type===type).length>=typeLimit)return 'Bu yapı için yerleşim sınırına ulaşıldı';
     const footprint=definition.footprint||definition.r;if(x-footprint<1||z-footprint<1||x+footprint>world.size-1||z+footprint>world.size-1)return 'Harita sınırına çok yakın';
     if(this.simulation.match?.state==='PREPARATION'){const zone=FACTION_DEFINITIONS[faction].deploymentZone;if(x-footprint<zone.minX||x+footprint>zone.maxX)return 'Hazırlık bölgesi dışına kurulamaz';}
+    if(!this.simulation.buildings.some(building=>building.hp>0&&building.progress===1&&building.f===faction&&dist(building,{x,z})<rules.baseRadius))return 'Tamamlanmış üssüne 20 m yakın olmalı';
     for(let index=0;index<16;index++){const angle=index/16*Math.PI*2,kind=terrain(x+Math.cos(angle)*footprint,z+Math.sin(angle)*footprint);if(['river','bridge','trench','edge'].includes(kind))return 'Geçit, siper veya su üzerine kurulamaz';}
-    if(x>47&&x<65&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
+    if(x>75&&x<93&&crossings.some(value=>Math.abs(z-value)<5.5))return 'Ana geçiş yolunu kapatamazsın';
     if(this.simulation.buildings.some(building=>building.hp>0&&dist(building,{x,z})<(building.footprint||building.r)+footprint+rules.obstacleMargin))return 'Başka yapıya çok yakın';
     if(this.simulation.resourceNodes.some(node=>!node.depleted&&dist(node,{x,z})<node.r+footprint+1))return 'Kaynak alanını kapatamazsın';
     if(this.simulation.match?.mode!=='SIEGE'&&this.simulation.points.some(point=>dist(point,{x,z})<footprint+rules.pointMargin))return 'İkmal noktasını kapatamazsın';
     if(this.simulation.squads.some(squad=>squad.hp>0&&dist(squad,{x,z})<footprint+rules.obstacleMargin))return 'Manganın yolu üzerinde';
     return '';
   }
-  build(faction,type,x,z,engineerIds=[]){
+  build(faction,type,x,z,engineerIds=[],yaw=0){
     const error=this.placement(faction,type,x,z);if(error)return error;const definition=getBuildingDefinition(type),economy=this.simulation.economySystem.get(faction);
     if(economy.engineeredConstruction&&!this.engineeringSystem.engineers(engineerIds,faction).length)return 'Şantiye için muharebe mühendisi seçilmeli';
     if(!economy.charge(this.buildCost(faction,definition)))return 'Yetersiz kaynak';
-    const building=this.buildingManager.add(faction,type,x,z);building.workEffectCooldown=0;
+    const building=this.buildingManager.add(faction,type,x,z);building.workEffectCooldown=0;building.yaw=yaw;
     if(economy.engineeredConstruction)this.engineeringSystem.assist(engineerIds,building.id);
     if(faction===this.simulation.player)this.simulation.notify(definition.names[faction]+' şantiyesi kuruldu');this.movementSystem.repath();return '';
   }

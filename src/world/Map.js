@@ -1,6 +1,6 @@
 import {BALANCE} from '../core/Config.js';
 import {terrain} from './Terrain.js';
-export function walkable(x,z,buildings=[],ignoreId=0){const kind=terrain(x,z);return kind!=='river'&&kind!=='edge'&&!buildings.some(b=>b.hp>0&&b.id!==ignoreId&&Math.hypot(x-b.x,z-b.z)<b.r+.8);}
+export function walkable(x,z,buildings=[],ignoreId=0){const kind=terrain(x,z);return kind!=='river'&&kind!=='edge'&&!buildings.some(b=>b.hp>0&&b.id!==ignoreId&&b.category!=='FIELD_DEFENSE'&&Math.hypot(x-b.x,z-b.z)<b.r+.8);}
 export function pathfind(sx,sz,tx,tz,buildings=[]){
   const {grid,cell}=BALANCE.world,coord=value=>Math.max(0,Math.min(grid-1,Math.floor(value/cell))),start=coord(sz)*grid+coord(sx),end=coord(tz)*grid+coord(tx),blocked=new Uint8Array(grid*grid);
   for(let z=0;z<grid;z++)for(let x=0;x<grid;x++)blocked[z*grid+x]=!walkable(x*cell+1,z*cell+1,buildings);
