@@ -12,6 +12,7 @@ import {buildingArt,dynamicArt} from '../src/render/art/BattlefieldArt.js';
 import {effectArt} from '../src/render/art/EffectArt.js';
 import {EffectCoordinator,PARTICLE} from '../src/effects/EffectCoordinator.js';
 import {terrain} from '../src/world/Terrain.js';
+import {pruneSelection,squadGroundStatus} from '../src/ui/HUD.js';
 const quiet=s=>{s.ai.tick=s.ai.wave=1e9;return s;};
 const advance=(s,t)=>{for(let i=0;i<Math.ceil(t/.05);i++)s.step(.05);};
 const unlock=s=>{s.addBuilding(0,'workshop',33,132,true);s.economies[0].stock={supply:9999,material:9999,manpower:999};s.economySystem.update(0);return s.squads.find(q=>q.f===0&&q.type==='engineer');};
@@ -36,3 +37,9 @@ test('version-3 saves migrate from the legacy 112 map onto authored expanded pos
 test('rotated field defenses validate their actual segment footprint',()=>{const s=quiet(new Simulation());s.economies[0].stock={supply:9999,material:9999,manpower:999};s.addBuilding(0,'workshop',50,69,true);s.economySystem.update(0);assert.equal(s.placement(0,'trench',59,69,0),'');assert.match(s.placement(0,'trench',59,69,Math.PI/2),/siper|Geçit/i);});
 
 test('dynamic effects disappear when their fog cell is not currently visible',()=>{const s=quiet(new Simulation()),fog=s.fogOfWar,fx=new EffectCoordinator(1),opaque=new Batch(),transparent=new Batch(),renderer={height:600,width:800,cam:{zoom:80},project:(x,y,z)=>({x:400,y:300})},x=120,z=120;fog.grids[s.player].fill(VISIBILITY.UNEXPLORED);const particle=fx.particles.take(PARTICLE.FLASH,x,.5,z,1,.5,1,0);particle.age=.1;effectArt(fx,opaque,transparent,renderer,fog,s.player);assert.equal(Object.values(opaque.data).reduce((n,a)=>n+a.length,0),0);fog.grids[s.player][fog.index(x,z)]=VISIBILITY.VISIBLE;opaque.reset();transparent.reset();effectArt(fx,opaque,transparent,renderer,fog,s.player);assert.ok(Object.values(opaque.data).reduce((n,a)=>n+a.length,0)>0);});
+
+test('selected enemies are dropped when they leave current vision',()=>{const s=quiet(new Simulation()),enemy=s.squads.find(q=>q.f!==s.player),selected=new Set([enemy.id]);s.fogOfWar.grids[s.player].fill(VISIBILITY.UNEXPLORED);pruneSelection(s,selected);assert.equal(selected.has(enemy.id),false);s.fogOfWar.grids[s.player][s.fogOfWar.index(enemy.x,enemy.z)]=VISIBILITY.VISIBLE;selected.add(enemy.id);pruneSelection(s,selected);assert.equal(selected.has(enemy.id),true);});
+
+test('armed defenses reveal at least their full weapon range',()=>{const s=quiet(new Simulation());s.squads=[];s.buildings=[];const tower=s.addBuilding(1,'tower',80,80,true);s.fogOfWar.grids[1].fill(VISIBILITY.UNEXPLORED);s.fogOfWar.update(0,true);assert.ok(BALANCE.fog.armedBuildingVision>=BALANCE.tower.range);assert.equal(s.fogOfWar.state(1,tower.x+BALANCE.tower.range,tower.z),VISIBILITY.VISIBLE);});
+
+test('HUD ground status reports constructed sandbag cover',()=>{const s=quiet(new Simulation()),sandbag=s.addBuilding(0,'sandbag',40,90,true),squad=s.addSquad(0,'infantry',40,90);sandbag.progress=1;assert.equal(coverAt(s.buildings,squad.x,squad.z),sandbag.cover);assert.match(squadGroundStatus(s,squad),/Saha savunması: %24 koruma/);assert.doesNotMatch(squadGroundStatus(s,squad),/Açık arazi/);});
