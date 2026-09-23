@@ -703,7 +703,7 @@ const BALANCE = Object.freeze({
   simulation: Object.freeze({ step: 0.05, maxFrame: 0.1, maxSteps: 5 }),
   match: Object.freeze({mode:'SIEGE', preparationSeconds:60, durationSeconds:600, durationOptions:Object.freeze([300,600,1800,3600]), warningSeconds:10, captureVictory:false}),
   world: Object.freeze({ size: 168, cell: 2, grid: 84 }),
-  fog: Object.freeze({cell:4,refresh:.25,combatVision:24,supportVision:18,buildingVision:20,observationVision:38}),
+  fog: Object.freeze({cell:4,refresh:.25,combatVision:24,supportVision:18,buildingVision:20,armedBuildingVision:26,observationVision:38}),
   army: Object.freeze({ maxSquads: 10, squadSize: 8, separation: 2.5, separationForce: 0.65, baseForceCap:32 }),
   economy: Object.freeze({ baseIncome: 2, supplyIncome: 2, controlIncome: 3 }),
   capture: Object.freeze({ radius: 5, duration: 8, decay: 0.5 }),
@@ -1049,7 +1049,7 @@ class FogOfWar {
   state(faction,x,z){return this.grids[faction]?.[this.index(x,z)]??VISIBILITY.UNEXPLORED;}
   visible(faction,entity){return entity.f===faction||this.state(faction,entity.x,entity.z)===VISIBILITY.VISIBLE;}
   reveal(grid,x,z,radius){const minX=Math.max(0,Math.floor((x-radius)/this.cell)),maxX=Math.min(this.width-1,Math.floor((x+radius)/this.cell)),minZ=Math.max(0,Math.floor((z-radius)/this.cell)),maxZ=Math.min(this.width-1,Math.floor((z+radius)/this.cell)),rr=radius*radius;for(let zc=minZ;zc<=maxZ;zc++)for(let xc=minX;xc<=maxX;xc++){const px=(xc+.5)*this.cell,pz=(zc+.5)*this.cell;if((px-x)**2+(pz-z)**2<=rr)grid[zc*this.width+xc]=VISIBILITY.VISIBLE;}}
-  update(dt,force=false){this.timer-=dt;if(!force&&this.timer>0)return;this.timer=BALANCE.fog.refresh;for(let faction=0;faction<2;faction++){const grid=this.grids[faction];for(let i=0;i<grid.length;i++)if(grid[i]===VISIBILITY.VISIBLE)grid[i]=VISIBILITY.EXPLORED;for(const squad of this.simulation.squads)if(squad.f===faction&&squad.hp>0){const definition=getUnitDefinition(squad.type);this.reveal(grid,squad.x,squad.z,definition?.vision??(definition?.combatUnit?BALANCE.fog.combatVision:BALANCE.fog.supportVision));}for(const building of this.simulation.buildings)if(building.f===faction&&building.hp>0&&building.progress===1)this.reveal(grid,building.x,building.z,building.type==='observation'?BALANCE.fog.observationVision:BALANCE.fog.buildingVision);}}
+  update(dt,force=false){this.timer-=dt;if(!force&&this.timer>0)return;this.timer=BALANCE.fog.refresh;for(let faction=0;faction<2;faction++){const grid=this.grids[faction];for(let i=0;i<grid.length;i++)if(grid[i]===VISIBILITY.VISIBLE)grid[i]=VISIBILITY.EXPLORED;for(const squad of this.simulation.squads)if(squad.f===faction&&squad.hp>0){const definition=getUnitDefinition(squad.type);this.reveal(grid,squad.x,squad.z,definition?.vision??(definition?.combatUnit?BALANCE.fog.combatVision:BALANCE.fog.supportVision));}for(const building of this.simulation.buildings)if(building.f===faction&&building.hp>0&&building.progress===1){const radius=building.type==='observation'?BALANCE.fog.observationVision:['tower','defense'].includes(building.type)?BALANCE.fog.armedBuildingVision:BALANCE.fog.buildingVision;this.reveal(grid,building.x,building.z,radius);}}}
 }
 
 __exports.VISIBILITY=VISIBILITY;
@@ -2706,17 +2706,20 @@ class BuildMenu {
 __exports.BuildMenu=BuildMenu;
 },
 'src/ui/HUD.js':function(__exports,__require){
-const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;const __dep2=__require('src/world/Terrain.js');const terrain=__dep2.terrain;const __dep3=__require('src/core/Config.js');const BALANCE=__dep3.BALANCE;
+const __dep0=__require('data/factions.js');const FACTION_DEFINITIONS=__dep0.FACTION_DEFINITIONS;const __dep1=__require('data/units.js');const getUnitDefinition=__dep1.getUnitDefinition;const __dep2=__require('src/world/Terrain.js');const terrain=__dep2.terrain;const __dep3=__require('src/world/FieldDefense.js');const coverAt=__dep3.coverAt;const __dep4=__require('src/core/Config.js');const BALANCE=__dep4.BALANCE;
+
 
 
 
 
 
 const formatCountdown=remaining=>{const total=Math.max(0,Math.ceil(Number(remaining)||0));return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');};
+const pruneSelection=(sim,selected)=>{for(const id of selected){const entity=[...sim.squads,...sim.buildings].find(item=>item.id===id);if(!entity||entity.hp<=0||entity.f!==sim.player&&!sim.fogOfWar?.visible(sim.player,entity))selected.delete(id);}return selected;};
+const squadGroundStatus=(sim,squad)=>{const fieldCover=coverAt(sim.buildings,squad.x,squad.z);if(fieldCover<1)return 'Saha savunması: %'+Math.round((1-fieldCover)*100)+' koruma';const kind=terrain(squad.x,squad.z);return({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');};
 class HUD {
   constructor(get){this.get=get;}
   update(sim,selected){
-    const $=this.get;for(const id of selected)if(![...sim.squads,...sim.buildings].some(entity=>entity.id===id&&entity.hp>0))selected.delete(id);
+    const $=this.get;pruneSelection(sim,selected);
     const newAntioch=sim.economySystem.get(sim.player).activeGathering,economy=sim.economies?.[sim.player];
     $('resource').textContent=Math.floor(newAntioch?economy.stock.supply:sim.resources[sim.player]);
     $('materialBox').hidden=!newAntioch;$('manpowerBox').hidden=!newAntioch;
@@ -2726,7 +2729,7 @@ class HUD {
     $('matchPhase').textContent=match?.state==='PREPARATION'?'HAZIRLIK':match?.state==='WAR'?'SAVAŞ':match?.state||'KURULUM';$('matchClock').textContent=formatCountdown(remaining);$('matchClock').classList.toggle('warning',match?.state==='PREPARATION'&&remaining<=10);$('missionText').textContent=role==='DEFENDER'?'SAVUNAN · Ana savunma merkezini süre sonuna kadar koru.':'SALDIRAN · Süre dolmadan ana savunma merkezini yok et.';$('objectives').innerHTML=`<span>ANA MERKEZ ${objective?Math.ceil(objective.hp/objective.maxHp*100):0}%</span><span>${role}</span>`;
     const entities=[...sim.squads,...sim.buildings].filter(entity=>selected.has(entity.id)),building=entities.find(entity=>entity.queue),squads=entities.filter(entity=>entity.path);
     if(building){$('selectionType').textContent=FACTION_DEFINITIONS[building.f].name.toUpperCase()+' / YAPI';$('selectionName').textContent=building.names[building.f];$('selectionInfo').textContent=`${Math.ceil(building.hp)} / ${building.maxHp} CAN · `+(building.progress<1?'İnşa %'+Math.floor(building.progress*100)+' · '+(building.assignedEngineers?.length||0)+' mühendis':building.queue.length?'Sıra '+building.queue.length+' · '+getUnitDefinition(building.queue[0].type).names[building.f]+' · '+Math.ceil(getUnitDefinition(building.queue[0].type).time-building.queue[0].time)+' sn':building.desc);}
-    else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),kind=terrain(squads[0].x,squads[0].z),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+({trench:'Siper: %42 koruma',forest:'Orman: %22 koruma',mud:'Çamur: yavaş ilerleme',bridge:'Geçit',land:'Açık arazi'}[kind]||'Açık arazi');}
+    else if(squads.length){$('selectionType').textContent=FACTION_DEFINITIONS[squads[0].f].name.toUpperCase()+' / MANGA';$('selectionName').textContent=squads.length===1?getUnitDefinition(squads[0].type).names[squads[0].f]:squads.length+' manga seçili';const alive=squads.reduce((sum,squad)=>sum+Math.ceil(squad.hp/getUnitDefinition(squad.type).hp),0),engineers=squads.filter(squad=>squad.type==='engineer');$('selectionInfo').textContent=engineers.length?alive+' mühendis · '+engineers.map(squad=>squad.worker.state.replaceAll('_',' ')+(squad.worker.cargo?' · '+squad.worker.cargo+' '+squad.worker.cargoType:'')).join(' / '):alive+' asker · '+Math.ceil(squads.reduce((sum,squad)=>sum+squad.hp,0))+' CAN · '+squadGroundStatus(sim,squads[0]);}
     else{$('selectionType').textContent=FACTION_DEFINITIONS[sim.player].name.toUpperCase()+' / SEFER KUVVETİ';$('selectionName').textContent='Cephe seni bekliyor.';$('selectionInfo').textContent='Mangaya dokun, ardından bir hedef seç.';}
     $('deselect').hidden=entities.length===0;const friendly=squads.filter(item=>item.f===sim.player),engineers=friendly.filter(item=>item.type==='engineer');
     $('stop').querySelector('span').textContent=building?'İptal':'Dur';$('stop').disabled=!(friendly.length||building&&building.f===sim.player&&(building.progress<1||building.queue.length));$('trainHeavy').disabled=!sim.buildings.some(item=>item.f===sim.player&&item.type==='workshop'&&item.progress===1&&item.hp>0);$('trainEngineer').hidden=!newAntioch;$('autoGather').hidden=!newAntioch;$('autoGather').disabled=!engineers.length;$('autoGather').classList.toggle('active',engineers.length>0&&engineers.every(item=>item.worker.auto));$('buildMenu').disabled=sim.economySystem.get(sim.player).engineeredConstruction&&!sim.squads.some(item=>item.f===sim.player&&item.type==='engineer'&&item.hp>0);
@@ -2734,6 +2737,8 @@ class HUD {
 }
 
 __exports.formatCountdown=formatCountdown;
+__exports.pruneSelection=pruneSelection;
+__exports.squadGroundStatus=squadGroundStatus;
 __exports.HUD=HUD;
 },
 'src/ui/Minimap.js':function(__exports,__require){
